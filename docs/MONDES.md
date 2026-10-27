@@ -59,26 +59,35 @@ On élargit d'abord, puis on approfondit :
   est accepté comme juste.
 - Un coup hors de ces lignes → écran « Pas votre ligne » + explication de Memo + la position revient plus souvent.
 
-## 6. Contenu : d'où viennent les lignes majeures
+## 6. Philosophie et construction du contenu ✅
 
-Calculées à partir de vraies parties, une fois, **au moment de construire l'app** (aucune dépendance en temps réel) :
+**Objectif pédagogique** : apprendre **les meilleurs coups contre les meilleures réponses** et **comprendre les principes**
+de l'ouverture (centre, développement, roque, cases faibles, plans typiques). On ne couvre pas tout : on apprend
+**les grandes lignes**. On n'adapte pas le contenu au niveau réel du joueur : tout le monde apprend la bonne théorie.
 
-| Source | Contenu | Licence | Usage |
-|---|---|---|---|
-| ✅ **Base de parties Lichess** (database.lichess.org) | ~100 M de parties classées par mois, avec l'Elo des joueurs | **CC0** (libre) | Statistiques des coups les plus joués, **par niveau** (ex. 1200-1600, 1600-2000, 2000+) |
-| ✅ **chess-openings** (Lichess) | 3 865 noms d'ouvertures et variantes (code ECO) | **CC0** | Noms et arborescence du catalogue (déjà importé dans `data/`) |
-| The Week in Chess (TWIC) | Parties de maîtres, chaque semaine | à vérifier | Lignes « théoriques » de haut niveau |
-| Stockfish | Évaluation | GPL (déjà adopté) | Vérifier que chaque ligne retenue est saine |
+### Construction des lignes (hors-ligne, au moment de préparer le contenu)
 
-Pipeline proposé (script hors-ligne, relancé de temps en temps) :
-1. Lire un échantillon de parties (ex. quelques millions de parties rapides/classiques) et compter, pour chaque position
-   des 20 premiers demi-coups, la fréquence de chaque coup selon la tranche d'Elo.
-2. Pour chaque ouverture du catalogue : **lignes majeures** = réponses adverses les plus fréquentes ;
-   **nos coups** = coup principal de la théorie, vérifié par Stockfish.
-3. Exporter en JSON (`content/openings/*.json`), puis **nous rédigeons les explications** de chaque coup (et les traduisons).
+| Qui joue | Choix du coup |
+|---|---|
+| L'adversaire | Les **meilleures réponses** : celles de la théorie (parties de maîtres), validées par Stockfish (MultiPV) |
+| L'utilisateur | Le **meilleur coup** : coup de la théorie, validé par Stockfish (on écarte tout coup qui perd > 0,5 pion) |
+| Positions sans théorie | Stockfish seul |
 
-Bonus possible : « les lignes les plus jouées **à votre niveau** », grâce aux tranches d'Elo.
-Chess.com reste la plateforme prioritaire pour l'import des parties de l'utilisateur ; Lichess ne sert ici que de source de données libres.
+### Coups à punir : réfléchir, pas réciter ✅
+
+- Dans chaque monde, on ajoute **un ou plusieurs coups adverses à punir** : des erreurs fréquentes que Stockfish
+  juge mauvaises (ex. un pion laissé en prise, une attaque prématurée).
+- L'utilisateur doit **trouver lui-même** comment en profiter, en appliquant les principes appris :
+  ça l'oblige à réfléchir au lieu d'apprendre par cœur.
+- Source des erreurs fréquentes : la **base de parties Lichess** (CC0), qui montre les coups les plus joués par les
+  joueurs amateurs. C'est son seul rôle : elle ne sert pas à adapter le niveau.
+
+### Explications
+
+- Chaque coup a une explication de Memo **centrée sur le principe** (« on développe une pièce et on vise f7 »),
+  pas seulement sur le coup. Chaque explication est étiquetée par principe (centre, développement, sécurité du roi…),
+  ce qui permettra plus tard de montrer à l'utilisateur les principes qu'il maîtrise.
+- Rédigées par nous, puis traduites. Les noms d'ouvertures/variantes viennent de la liste chess-openings (CC0).
 
 ## 7. Impact technique (pour plus tard)
 
