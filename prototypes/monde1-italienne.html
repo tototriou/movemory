@@ -94,6 +94,7 @@ button { font: inherit; color: inherit; }
 .sq.l { background: var(--sq-light); } .sq.d { background: var(--sq-dark); }
 .sq.last.l { background: #F3E08A; } .sq.last.d { background: #C7A94A; }
 .sq.sel.l, .sq.sel.d { background: #F6D365; }
+.sq.good.l { background: #B8E6C4; } .sq.good.d { background: #5DBB7A; }
 .sq.hint::after { content: ""; position: absolute; inset: 6%; border-radius: 50%; border: 4px solid var(--hint); animation: pulse 1.2s ease-in-out infinite; }
 @keyframes pulse { 50% { transform: scale(.85); opacity: .6; } }
 .sq.dot::before { content: ""; position: absolute; left: 50%; top: 50%; width: 28%; height: 28%; margin: -14% 0 0 -14%; border-radius: 50%; background: rgba(20,18,28,.28); }
@@ -494,7 +495,8 @@ async function step() {
     animate(game.move(move.san)); renderMoves(true);
     if (game.turn() === 'w' && game.history().length >= run.from && ply + 1 < run.to) {
       S.lastOpp = `Les Noirs jouent <b>${label(ply, move.san)}</b>. ${move.pourquoi}`;
-      say(S.lastOpp + ' À vous !', 'reflechit');
+      if (run.mode === 'learn') say(S.lastOpp + ' À vous !', 'reflechit');
+      else say(`Les Noirs jouent <b>${label(ply, move.san)}</b>. À vous !`, 'reflechit');
     }
     return step();
   }
@@ -535,6 +537,11 @@ function handleAnswer(m, move, c, cs, ply) {
   cs.seen = true; save();
   const gain = learning ? 5 : 10 + Math.min(S.combo, 5); S.xp += gain; floatXp(gain, played.to);
   const expl = move;
+  if (!learning) {
+    sqClass('good', [played.to]); updateBar();
+    say(pick(['Bien joué !', 'Exact !', 'Parfait !', 'Oui !']), 'bravo');
+    return setTimeout(() => { sqClass('good', []); step(); }, 850);
+  }
   sheet({ bad: false, title: learning ? 'C’est noté !' : pick(['Excellent !', 'Bien joué !', 'Parfait !']) + ' ' + label(ply, m.san), text: `<b>Memo :</b> ${expl.pourquoi}`, note: learning ? '' : cs.ok >= 2 ? 'Position maîtrisée ✓' : `Maîtrise : ${cs.ok}/2`, mood: 'bravo', buttons: [['Continuer', 'btn-cta', () => { closeSheet(); step(); }]] });
 }
 function retry(move, c, cs, ply) {
@@ -574,8 +581,9 @@ function sheet({ bad, title, text, note, mood, buttons }) {
     <div class="row">${buttons.map(([t, cls], i) => `<button class="btn ${cls}" data-i="${i}">${t}</button>`).join('')}</div></div>`;
   host.querySelectorAll('button').forEach((b) => b.addEventListener('click', buttons[b.dataset.i][2]));
   host.querySelector('button')?.focus();
-  const total = S.totalAsks || 1; $('s-bar').style.width = `${Math.min(100, (S.correct / total) * 100)}%`;
+  updateBar();
 }
+function updateBar() { const total = S.totalAsks || 1; $('s-bar').style.width = `${Math.min(100, (S.correct / total) * 100)}%`; }
 function closeSheet() { $('sheet-host').innerHTML = ''; }
 
 function endSession() {
