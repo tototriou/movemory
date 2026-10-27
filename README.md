@@ -49,7 +49,8 @@ répertoire, et le transforme en exercice. L'analyse se fait **sur votre télép
 | ✅ | Moteur de révision (découpage en positions, répétition espacée FSRS, détection des écarts dans une partie) |
 | ✅ | Contenu du Monde 1 (1.e4 contre les 6 grandes défenses) et d'un monde avancé (Partie italienne), vérifiés par Stockfish |
 | 🧪 | Prototype jouable du Monde 1 : [`prototypes/monde1.html`](prototypes/monde1.html) |
-| ⏳ | App mobile et web (Expo) : échiquier, carte des mondes, séances, Memo |
+| ✅ | App mobile et web (Expo) : carte du monde animée, séances sur l'échiquier, Memo, coffres, défi final, Blancs et Noirs |
+| ⏳ | Révision quotidienne espacée (FSRS) entre les mondes |
 | ⏳ | Import Chess.com et analyse Stockfish sur l'appareil |
 | ⏳ | Catalogue d'ouvertures, traductions, comptes et synchro |
 
