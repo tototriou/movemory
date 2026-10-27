@@ -35,8 +35,16 @@ button { font: inherit; color: inherit; }
 /* ---------- Carte du monde ---------- */
 .map { position: relative; height: 100vh; height: 100dvh; min-height: 620px; display: flex; flex-direction: column; overflow: hidden; }
 .map-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
-.map-bg::before { content: ""; position: absolute; left: -60%; top: -40%; width: 220%; height: 180%; background: conic-gradient(var(--world-a) 25%, var(--world-b) 0 50%, var(--world-a) 0 75%, var(--world-b) 0); background-size: 112px 112px; transform: scaleY(.58) rotate(45deg); }
-.map-bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(90% 60% at 50% 50%, rgba(0,0,0,0) 40%, rgba(20,8,4,.6) 100%); }
+.map-bg { background: linear-gradient(180deg, #171433 0%, #2A2156 42%, #4B2E63 72%, #7A4062 100%); }
+.map-bg::before { content: ""; position: absolute; inset: 0 0 45% 0; background-image:
+  radial-gradient(1.6px 1.6px at 12% 18%, #fff 50%, transparent 51%), radial-gradient(1.2px 1.2px at 28% 8%, #fff 50%, transparent 51%),
+  radial-gradient(1.8px 1.8px at 47% 22%, #FFE7A3 50%, transparent 51%), radial-gradient(1.2px 1.2px at 64% 12%, #fff 50%, transparent 51%),
+  radial-gradient(1.6px 1.6px at 83% 26%, #fff 50%, transparent 51%), radial-gradient(1.2px 1.2px at 92% 9%, #fff 50%, transparent 51%),
+  radial-gradient(1.4px 1.4px at 8% 42%, #fff 50%, transparent 51%), radial-gradient(1.2px 1.2px at 74% 46%, #fff 50%, transparent 51%);
+  animation: twinkle 4s ease-in-out infinite alternate; }
+@keyframes twinkle { from { opacity: .55; } to { opacity: 1; } }
+.map-bg .hills { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 46%; }
+.map-bg .moon { position: absolute; right: 7%; top: 27%; width: 46px; height: 46px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #FFF6D6, #FFD978); box-shadow: 0 0 40px rgba(255,217,120,.45); }
 .hud { position: relative; z-index: 2; margin: 0 10px; padding: 12px 12px 10px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); background: rgba(15,13,22,.9); border-radius: 0 0 22px 22px; display: grid; gap: 10px; }
 .hud-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .brand { font-family: var(--display); font-weight: 700; font-size: 20px; }
@@ -57,8 +65,12 @@ button { font: inherit; color: inherit; }
 .track { position: absolute; inset: 0; }
 .milestone { position: absolute; z-index: 3; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 2px; background: none; border: 0; padding: 0; color: var(--fg); }
 button.milestone { cursor: pointer; } button.milestone:disabled { cursor: default; opacity: .55; }
-.milestone.ready svg { animation: bob 1.4s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255,201,74,.7)); }
-.flag { font-family: var(--display); font-weight: 600; font-size: 12px; background: rgba(15,13,22,.85); border-radius: 8px; padding: 2px 8px; }
+.milestone.ready svg { animation: bob 1.4s ease-in-out infinite; filter: drop-shadow(0 0 12px rgba(255,201,74,.8)); }
+.flag { font-family: var(--display); font-weight: 600; font-size: 12px; background: rgba(15,13,22,.8); border-radius: 8px; padding: 2px 8px; white-space: nowrap; }
+.badge-ms { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: #2E2A3D; border: 3px solid rgba(255,255,255,.25); box-shadow: 0 4px 0 rgba(0,0,0,.35); }
+.badge-ms.on { background: var(--gold); border-color: #FFF2C2; box-shadow: 0 4px 0 #B88A1A, 0 0 18px rgba(255,201,74,.6); }
+.next-pill { position: absolute; z-index: 5; right: 12px; top: 6px; white-space: nowrap; font-weight: 800; font-size: 13px; color: #FFE7A3; background: rgba(15,13,22,.75); border: 1px solid rgba(255,201,74,.35); border-radius: 999px; padding: 4px 12px; }
+.memo-shadow { position: absolute; z-index: 3; width: 46px; height: 10px; border-radius: 50%; background: rgba(0,0,0,.35); pointer-events: none; }
 .tile { position: absolute; width: 110px; height: 90px; border: 0; padding: 0; background: none; cursor: pointer; }
 .tile svg { position: absolute; inset: 0; }
 .tile:disabled { cursor: default; }
@@ -175,7 +187,14 @@ button.milestone { cursor: pointer; } button.milestone:disabled { cursor: defaul
 
 <div class="app" id="app">
   <section class="map" id="screen-map" aria-label="Carte du monde 1">
-    <div class="map-bg"></div>
+    <div class="map-bg">
+      <span class="moon"></span>
+      <svg class="hills" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true">
+        <path d="M0 120 C 60 80, 120 90, 170 120 S 280 70, 400 110 L 400 300 L 0 300 Z" fill="#3A2752"/>
+        <path d="M0 180 C 70 140, 150 170, 210 160 S 330 120, 400 165 L 400 300 L 0 300 Z" fill="#2C1F44"/>
+        <path d="M0 240 C 90 210, 170 235, 250 220 S 360 205, 400 225 L 400 300 L 0 300 Z" fill="#211836"/>
+      </svg>
+    </div>
     <header class="hud">
       <div class="hud-top">
         <span class="brand">Movemory</span>
@@ -371,38 +390,55 @@ const chestOpen = () => !!P.chest[WI], bossDone = () => !!P.boss[WI];
 const $ = (id) => document.getElementById(id);
 function trackD(W, H) {
   // chemin sinueux du bas (départ) vers le haut (arrivée)
-  const rows = 6, top = H * 0.10, bottom = H * 0.93, dy = (bottom - top) / rows;
-  const pts = Array.from({ length: rows + 1 }, (_, i) => [i % 2 === 0 ? W * 0.24 : W * 0.76, bottom - i * dy]);
+  const rows = 4, top = H * 0.13, bottom = H * 0.86, dy = (bottom - top) / rows;
+  const pts = Array.from({ length: rows + 1 }, (_, i) => [i % 2 === 0 ? W * 0.26 : W * 0.74, bottom - i * dy]);
   let d = `M ${pts[0][0]} ${pts[0][1]}`;
   for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; d += ` C ${x0} ${y0 - dy * 0.55}, ${x1} ${y1 + dy * 0.55}, ${x1} ${y1}`; }
   return d;
 }
+const STAR = '<svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z" fill="currentColor"/></svg>';
 function renderMap() {
   const host = $('path'); const W = host.clientWidth || 380, H = host.clientHeight || 600;
-  const { steps, total } = worldProgress();
+  const { steps, total } = worldProgress(); const f = Math.min(1, steps / total); const chestReached = f >= 0.5;
+  const d = trackD(W, H);
   host.innerHTML = `<svg class="track" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">
-    <path id="track" d="${trackD(W, H)}" fill="none" stroke="#3A2416" stroke-width="34" stroke-linecap="round"/>
-    <path d="${trackD(W, H)}" fill="none" stroke="#5A3A24" stroke-width="26" stroke-linecap="round"/>
-    <g id="dots"></g></svg>`;
+    <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    <path id="track" d="${d}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="30" stroke-linecap="round"/>
+    <path d="${d}" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 14"/>
+    <path id="trail" d="${d}" fill="none" stroke="#FFC94A" stroke-width="8" stroke-linecap="round" filter="url(#glow)"/>
+  </svg>`;
   const track = host.querySelector('#track'); const L = track.getTotalLength();
-  const at = (f) => { const p = track.getPointAtLength(Math.max(0, Math.min(1, f)) * L); return [p.x, p.y]; };
-  let dots = '';
-  for (let i = 1; i <= total; i++) { const [x, y] = at(i / total); dots += `<circle cx="${x}" cy="${y}" r="${i <= steps ? 6 : 4}" fill="${i <= steps ? '#FFC94A' : 'rgba(255,255,255,.28)'}"/>`; }
-  host.querySelector('#dots').innerHTML = dots;
-  const chestAt = 0.5, chestReached = steps >= total * chestAt;
-  const [sx, sy] = at(0), [cx, cy] = at(chestAt), [ex, ey] = at(1), [mx, my] = at(steps / total);
-  host.insertAdjacentHTML('beforeend', `
-    <div class="milestone" style="left:${sx}px;top:${sy}px"><span class="flag">Départ</span></div>
-    <button class="milestone chest ${chestOpen() ? 'open' : chestReached || P.unlock ? 'ready' : ''}" id="chest" style="left:${cx}px;top:${cy}px" ${chestReached || P.unlock ? '' : 'disabled'} aria-label="Coffre${chestOpen() ? ' (ouvert)' : chestReached ? ' : à ouvrir' : ' : à mi-chemin'}">
-      <svg width="46" height="42" viewBox="0 0 24 22" aria-hidden="true"><rect x="2" y="8" width="20" height="12" rx="2" fill="#8B5A2B"/><path d="M2 10V7a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3z" fill="${chestOpen() ? '#5F3C1A' : '#A86E35'}"/><rect x="2" y="10" width="20" height="2.5" fill="#FFC94A"/><rect x="10" y="9" width="4" height="6" rx="1" fill="#FFC94A"/></svg></button>
-    <button class="milestone goal ${steps >= total || P.unlock ? 'ready' : ''}" id="goal" style="left:${ex}px;top:${ey}px" ${steps >= total || P.unlock ? '' : 'disabled'} aria-label="Arrivée : défi final">
-      <svg width="52" height="44" viewBox="0 0 24 20" aria-hidden="true"><path d="M2 6l5 4 5-8 5 8 5-4-2 12H4z" fill="${bossDone() ? '#3DDC84' : '#FFC94A'}" stroke="#8A5E0A" stroke-width="1.2" stroke-linejoin="round"/></svg><span class="flag">Arrivée</span></button>
-    <div class="memo-token" id="map-memo" style="left:${mx - 42}px;top:${my - 88}px">${memoSvg(bossDone() ? 'bravo' : 'content')}</div>`);
-  // animation : Memo part de sa dernière position connue et avance (ou recule) le long du chemin
+  const at = (u) => { const p = track.getPointAtLength(Math.max(0, Math.min(1, u)) * L); return [p.x, p.y]; };
+  const trail = host.querySelector('#trail');
+  const setTrail = (u) => { trail.setAttribute('stroke-dasharray', `${Math.max(0.001, u * L)} ${L}`); };
+  // paliers : départ, étoiles, coffre à mi-chemin, tour d'échecs à l'arrivée
+  const marks = [{ u: 0.25, kind: 'star' }, { u: 0.5, kind: 'chest' }, { u: 0.75, kind: 'star' }];
+  let html = '';
+  const [sx, sy] = at(0);
+  html += `<div class="milestone" style="left:${sx}px;top:${sy + 28}px"><span class="flag">Départ</span></div>`;
+  for (const m of marks) {
+    const [x, y] = at(m.u); const on = f >= m.u;
+    if (m.kind === 'star') html += `<div class="milestone" style="left:${x}px;top:${y}px"><span class="badge-ms ${on ? 'on' : ''}" style="color:${on ? '#6B4405' : 'rgba(255,255,255,.45)'}">${STAR}</span></div>`;
+    else html += `<button class="milestone chest ${chestOpen() ? 'open' : on || P.unlock ? 'ready' : ''}" id="chest" style="left:${x}px;top:${y}px" ${on || P.unlock ? '' : 'disabled'} aria-label="Coffre${chestOpen() ? ' (ouvert)' : on ? ' : à ouvrir' : ' : à mi-chemin'}">
+      <span class="badge-ms ${on ? 'on' : ''}" style="width:54px;height:54px"><svg width="34" height="30" viewBox="0 0 24 22" aria-hidden="true"><rect x="2" y="8" width="20" height="12" rx="2" fill="#8B5A2B"/><path d="M2 10V7a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3z" fill="${chestOpen() ? '#5F3C1A' : '#A86E35'}"/><rect x="2" y="10" width="20" height="2.5" fill="#FFC94A"/><rect x="10" y="9" width="4" height="6" rx="1" fill="#FFF2C2"/></svg></span></button>`;
+  }
+  const [ex, ey] = at(1); const atEnd = steps >= total;
+  const towerFill = bossDone() ? '#3DDC84' : atEnd ? '#FFC94A' : '#6E6893';
+  html += `<button class="milestone goal ${atEnd || P.unlock ? 'ready' : ''}" id="goal" style="left:${ex}px;top:${ey - 10}px" ${atEnd || P.unlock ? '' : 'disabled'} aria-label="Arrivée : défi final">
+      <svg width="58" height="64" viewBox="0 0 40 44" aria-hidden="true"><path d="M8 40h24v-4H8zM11 36h18l-2-14h-14z" fill="${towerFill}"/><path d="M9 22h22v-8h-4v4h-4v-4h-6v4h-4v-4H9z" fill="${towerFill}"/><rect x="17" y="27" width="6" height="9" rx="3" fill="#1E1B2E"/><path d="M20 2v10" stroke="#fff" stroke-width="2"/><path d="M20 2l9 3-9 3z" fill="#F0605D"/></svg><span class="flag">Arrivée · défi final</span></button>`;
+  const [mx, my] = at(f);
+  html += `<span class="memo-shadow" id="map-shadow" style="left:${mx - 23}px;top:${my - 6}px"></span><div class="memo-token" id="map-memo" style="left:${mx - 42}px;top:${my - 84}px">${memoSvg(bossDone() ? 'bravo' : 'content')}</div>`;
+  const next = [...marks.map((m) => ({ ...m, name: m.kind === 'chest' ? 'le coffre' : 'une étoile' })), { u: 1, name: 'l’arrivée' }].find((m) => f < m.u);
+  html += `<span class="next-pill">${bossDone() ? 'Monde terminé !' : next ? `Encore ${Math.ceil(next.u * total - steps)} pas jusqu’à ${next.name}` : 'Défi final débloqué !'}</span>`;
+  host.insertAdjacentHTML('beforeend', html);
+  // animation : Memo part de sa dernière position connue, avance (ou recule) et le sentier doré se remplit
   P.shown = P.shown || {}; const from = P.shown[WI] ?? steps;
+  setTrail(from / total);
   if (from !== steps) {
-    const tok = $('map-memo'); const t0 = performance.now(); const dur = 1400;
-    const tick = (now) => { const u = Math.min(1, (now - t0) / dur); const e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; const [x, y] = at((from + (steps - from) * e) / total); tok.style.left = `${x - 42}px`; tok.style.top = `${y - 88}px`; if (u < 1) requestAnimationFrame(tick); };
+    const tok = $('map-memo'), sh = $('map-shadow'); const t0 = performance.now(); const dur = 1400;
+    const place = (g) => { const [x, y] = at(g); tok.style.left = `${x - 42}px`; tok.style.top = `${y - 84}px`; sh.style.left = `${x - 23}px`; sh.style.top = `${y - 6}px`; setTrail(g); };
+    place(from / total);
+    const tick = (now) => { const u = Math.min(1, (now - t0) / dur); const e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; place((from + (steps - from) * e) / total); if (u < 1) requestAnimationFrame(tick); };
     requestAnimationFrame(tick);
   }
   P.shown[WI] = steps; save();
