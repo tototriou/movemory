@@ -5,4 +5,5 @@ export * from './scheduler';
 export * from './session';
 export * from './games';
 export * from './rng';
+export * from './learning';
 export * from './data/starter-repertoire';
