@@ -168,7 +168,7 @@ button { font: inherit; color: inherit; }
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z"/></svg><span id="gems">0</span>
         </span>
       </div>
-      <div class="world-title">Monde 1 · Partie italienne · 3 coups contre 6 lignes</div>
+      <div class="world-title">Monde 1 · Répertoire 1.e4 · 3 coups contre 6 défenses</div>
       <div class="bar-row"><div class="bar"><span id="world-bar" style="width:0%"></span></div><span id="world-count">0/7</span></div>
     </header>
     <div class="path" id="path"></div>
@@ -272,9 +272,9 @@ const label = (ply, san) => `${Math.floor(ply / 2) + 1}${ply % 2 === 0 ? '.' : '
 const fenKey = (fen) => fen.split(' ').slice(0, 4).join(' ');
 
 /* ---------- Données du monde ---------- */
-const TRONC = CONTENT.tronc;
-const LINES = CONTENT.lignes;
-const DEPTH = 3; // coups de l'utilisateur après le tronc
+const WORLD = CONTENT.mondes[0];
+const LINES = WORLD.lignes;
+const DEPTH = WORLD.profondeur; // coups de l'utilisateur, depuis la position initiale
 
 // Toutes les positions où l'utilisateur joue, avec les coups acceptés (toutes lignes confondues).
 const CARDS = new Map();
@@ -291,14 +291,12 @@ function cardsOf(moves, from, to) {
   });
   return out;
 }
-const TILES = [];
-TILES.push({ id: 'tronc', name: 'Le tronc commun', moves: TRONC, from: 0, to: TRONC.length, cards: cardsOf(TRONC, 0, TRONC.length) });
-for (const l of LINES) {
-  const moves = [...TRONC, ...l.coups];
-  TILES.push({ id: l.id, name: l.nom, punish: !!l.aPunir, moves, from: TRONC.length, to: TRONC.length + DEPTH * 2, cards: cardsOf(moves, TRONC.length, TRONC.length + DEPTH * 2) });
-}
-// Ordre sur la carte : tronc, 3 lignes, coffre, 3 lignes (dont le coup à punir), défi final
-const MAP_ORDER = ['tronc', LINES[0].id, LINES[1].id, LINES[2].id, 'coffre', LINES[3].id, LINES[4].id, LINES[5].id, 'defi'];
+const TILES = LINES.map((l) => {
+  const to = Math.min(DEPTH * 2 - 1, l.coups.length);
+  return { id: l.id, name: l.nom, punish: !!l.aPunir, moves: l.coups, from: 0, to, cards: cardsOf(l.coups, 0, to) };
+});
+// Ordre sur la carte : 3 lignes, coffre, 3 lignes (dont le coup à punir), défi final
+const MAP_ORDER = [LINES[0].id, LINES[1].id, LINES[2].id, 'coffre', LINES[3].id, LINES[4].id, LINES[5].id, 'defi'];
 const tileById = (id) => TILES.find((t) => t.id === id);
 
 /* ---------- Progression (localStorage, avec repli en mémoire) ---------- */
@@ -318,7 +316,7 @@ const unlocked = (i) => P.unlock || i <= currentIndex();
 
 /* ---------- Carte ---------- */
 const $ = (id) => document.getElementById(id);
-const COORDS = [[0.30, 0.93], [0.46, 0.83], [0.62, 0.73], [0.46, 0.63], [0.30, 0.53], [0.46, 0.43], [0.62, 0.33], [0.46, 0.23], [0.50, 0.11]];
+const COORDS = [[0.30, 0.92], [0.46, 0.81], [0.62, 0.70], [0.46, 0.59], [0.30, 0.48], [0.46, 0.37], [0.62, 0.26], [0.48, 0.12]];
 function tileSvg(kind) {
   const c = { done: ['#FFC94A', '#FFD976', '#C9951E', '#A87B12'], todo: ['#8B5CF6', '#A78BFA', '#6D28D9', '#5B21B6'], locked: ['#5A5470', '#6B6585', '#3E3952', '#332E47'], punish: ['#E2574C', '#F07A6F', '#A8382F', '#8E2C24'], chest: ['#A86E35', '#BE8448', '#7A4E22', '#5F3C1A'], boss: ['#3A2420', '#4A302A', '#24140F', '#1A0E0A'] }[kind];
   return `<svg viewBox="0 0 110 90" aria-hidden="true"><polygon points="9,36 55,66 55,82 9,52" fill="${c[2]}"/><polygon points="55,66 101,36 101,52 55,82" fill="${c[3]}"/><polygon points="55,6 101,36 55,66 9,36" fill="${c[0]}"/><polygon points="55,14 89,36 55,58 21,36" fill="${c[1]}"/></svg>`;
@@ -458,7 +456,7 @@ function renderMoves(highlightLast = false) {
 function setCombo(n) { S.combo = n; const c = $('combo'); c.textContent = 'x' + n; c.classList.remove('bump'); void c.offsetWidth; if (n > 1) c.classList.add('bump'); }
 
 function buildRuns(opts) {
-  if (opts.boss) return TILES.filter((t) => t.id !== 'tronc').map((t, i) => ({ tile: t, from: i === 0 ? 0 : t.from, to: t.to, mode: 'boss' }));
+  if (opts.boss) return TILES.map((t) => ({ tile: t, from: 0, to: t.to, mode: 'boss' }));
   const t = opts.tile; const isNew = t.cards.some((k) => !card(k).seen);
   // Nouvelle ligne : 1er passage guidé, puis de mémoire. Sinon : de mémoire.
   return isNew ? [{ tile: t, from: t.from, to: t.to, mode: 'learn' }, { tile: t, from: t.from, to: t.to, mode: 'recall' }] : [{ tile: t, from: t.from, to: t.to, mode: 'recall' }];
@@ -478,7 +476,7 @@ async function nextRun() {
   game = new Chess(); S.lastOpp = ''; renderPieces(); sqClass('last', []); arrow(null); renderMoves();
   $('s-name').textContent = run.mode === 'boss' ? `Défi : ${run.tile.name}` : run.tile.name;
   $('s-pill').textContent = run.tile.punish ? '⚔ Coup à punir' : run.mode === 'learn' ? 'Découverte' : run.mode === 'boss' ? `Ligne ${S.runIndex + 1}/${S.runs.length}` : 'De mémoire';
-  if (run.mode === 'learn') say(run.tile.id === 'tronc' ? 'Bienvenue ! On commence par les 3 coups qui définissent la Partie italienne. Je vous montre, vous jouez.' : `Nouvelle ligne : <b>${run.tile.name}</b>. Je vous guide une première fois, puis vous la rejouerez de mémoire.`, 'content');
+  if (run.mode === 'learn') say(`Nouvelle ligne : <b>${run.tile.name}</b>. Je vous guide une première fois, puis vous la rejouerez de mémoire.`, 'content');
   else if (run.mode === 'recall') say(S.runIndex > 0 ? 'Et maintenant, <b>de mémoire</b> !' : `On révise <b>${run.tile.name}</b>, de mémoire.`, 'reflechit');
   else say(`Défi final : <b>${run.tile.name}</b>. Pas d'indice, pas d'erreur !`, 'reflechit');
   await wait(700);
@@ -598,7 +596,7 @@ function endSession() {
   $('screen-end').innerHTML = `${conf}
     <div class="memo">${memoSvg('bravo')}</div>
     <h1>${boss ? (P.boss ? 'Monde 1 terminé !' : 'Défi terminé') : mastered ? 'Étape maîtrisée !' : 'Séance terminée !'}</h1>
-    <p>${boss ? (P.boss ? 'Vous connaissez les 3 premiers coups contre les 6 lignes majeures. Le Monde 2 ajoutera 4 lignes de plus.' : '') : mastered ? 'Memo avance d’une case sur la carte.' : 'Chaque position doit être réussie 2 fois sans indice pour être maîtrisée. Dans l’app, la 2e fois sera le lendemain ; ici, relancez simplement l’étape.'}</p>
+    <p>${boss ? (P.boss ? 'Vous connaissez vos 3 premiers coups contre les 6 grandes défenses. Le Monde 2 ajoutera 4 lignes : d\u2019autres réponses des Noirs dans ces mêmes ouvertures.' : '') : mastered ? 'Memo avance d’une case sur la carte.' : 'Chaque position doit être réussie 2 fois sans indice pour être maîtrisée. Dans l’app, la 2e fois sera le lendemain ; ici, relancez simplement l’étape.'}</p>
     <div class="stats">
       <div class="stat"><span>XP</span><b style="color:var(--gold)">+${S.xp}</b></div>
       <div class="stat"><span>Précision</span><b style="color:var(--good)">${acc} %</b></div>
@@ -612,7 +610,7 @@ function endSession() {
 
 function openChest() {
   if (!P.chest) { P.chest = true; P.gems += 20; save(); }
-  $('screen-end').innerHTML = `<div class="memo">${memoSvg('bravo')}</div><h1>Coffre ouvert !</h1><p>+20 gemmes. Plus tard, elles serviront à habiller Memo (chapeaux, lunettes, écharpes…).</p><div class="stats"><div class="stat"><span>Gemmes</span><b style="color:#8FD3FF">+20</b></div><div class="stat"><span>Total</span><b>${P.gems}</b></div><div class="stat"><span>Étape</span><b>5/9</b></div></div><button class="btn btn-cta" id="end-continue">Continuer</button>`;
+  $('screen-end').innerHTML = `<div class="memo">${memoSvg('bravo')}</div><h1>Coffre ouvert !</h1><p>+20 gemmes. Plus tard, elles serviront à habiller Memo (chapeaux, lunettes, écharpes…).</p><div class="stats"><div class="stat"><span>Gemmes</span><b style="color:#8FD3FF">+20</b></div><div class="stat"><span>Total</span><b>${P.gems}</b></div><div class="stat"><span>Étape</span><b>4/${MAP_ORDER.length}</b></div></div><button class="btn btn-cta" id="end-continue">Continuer</button>`;
   show('end'); $('end-continue').addEventListener('click', () => show('map'));
 }
 

@@ -28,11 +28,11 @@ Chaque ouverture est une suite de mondes. On élargit d'abord, puis on approfond
 
 | Monde | Vous apprenez… | …contre |
 |:-:|---|---|
-| 1 | vos 3 premiers coups | les 5-6 réponses majeures |
-| 2 | vos 3 premiers coups | les 10 réponses majeures |
+| 1 | vos 3 premiers coups (ex. 1.e4) | les 5-6 grandes défenses (1…e5, 1…c5, 1…e6…) |
+| 2 | vos 3 premiers coups | 10 lignes, avec leurs variantes |
 | 3 | vos 5 premiers coups | les 5-6 réponses majeures |
 | 4 | vos 5 premiers coups | les 10 réponses majeures |
-| … | +2 coups à chaque fois | … |
+| … | +2 coups à chaque fois | … puis on se spécialise (ex. la Partie italienne en profondeur) |
 
 Memo avance sur la carte à chaque groupe de coups maîtrisé : coffres, défi final, série de jours, XP.
 
@@ -47,8 +47,8 @@ répertoire, et le transforme en exercice. L'analyse se fait **sur votre télép
 |---|---|
 | ✅ | Plan produit, choix techniques, maquette des écrans |
 | ✅ | Moteur de révision (découpage en positions, répétition espacée FSRS, détection des écarts dans une partie) |
-| ✅ | Contenu du Monde 1 de la Partie italienne, vérifié par Stockfish |
-| 🧪 | Prototype jouable du Monde 1 : [`prototypes/monde1-italienne.html`](prototypes/monde1-italienne.html) |
+| ✅ | Contenu du Monde 1 (1.e4 contre les 6 grandes défenses) et d'un monde avancé (Partie italienne), vérifiés par Stockfish |
+| 🧪 | Prototype jouable du Monde 1 : [`prototypes/monde1.html`](prototypes/monde1.html) |
 | ⏳ | App mobile et web (Expo) : échiquier, carte des mondes, séances, Memo |
 | ⏳ | Import Chess.com et analyse Stockfish sur l'appareil |
 | ⏳ | Catalogue d'ouvertures, traductions, comptes et synchro |

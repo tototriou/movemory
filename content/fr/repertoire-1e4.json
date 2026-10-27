@@ -1,0 +1,75 @@
+{
+  "id": "repertoire-1e4",
+  "nom": "Répertoire 1.e4",
+  "camp": "w",
+  "licence": "CC BY-SA 4.0 — lignes et idées adaptées de Wikibooks, Chess Opening Theory (https://en.wikibooks.org/wiki/Chess_Opening_Theory/1._e4), textes réécrits pour Movemory.",
+  "mondes": [
+    {
+      "numero": 1,
+      "titre": "1.e4 contre les grandes défenses",
+      "profondeur": 3,
+      "lignes": [
+        {
+          "id": "e5-italienne", "nom": "1…e5 : Partie italienne", "rang": 1,
+          "coups": [
+            { "san": "e4", "pourquoi": "On prend le centre avec un pion et on ouvre la route au fou f1 et à la dame.", "principes": ["centre", "developpement"] },
+            { "san": "e5", "pourquoi": "Les Noirs répondent pareil : ils prennent leur part du centre." },
+            { "san": "Nf3", "pourquoi": "On sort un cavalier vers le centre, et il attaque déjà le pion e5.", "principes": ["developpement"] },
+            { "san": "Nc6", "pourquoi": "Les Noirs défendent e5 en sortant leur cavalier." },
+            { "san": "Bc4", "pourquoi": "Le fou vise f7, le point faible des Noirs, que seul le roi protège : c'est la Partie italienne.", "principes": ["developpement", "case-faible"] }
+          ]
+        },
+        {
+          "id": "c5-sicilienne", "nom": "1…c5 : Sicilienne", "rang": 2,
+          "coups": [
+            { "san": "e4", "pourquoi": "On prend le centre avec un pion et on ouvre la route au fou f1 et à la dame.", "principes": ["centre"] },
+            { "san": "c5", "pourquoi": "La Sicilienne : les Noirs contrôlent la case d4 avec un pion de côté, pour déséquilibrer la partie." },
+            { "san": "Nf3", "pourquoi": "On développe un cavalier et on prépare d4 pour ouvrir le jeu.", "principes": ["developpement"] },
+            { "san": "d6", "pourquoi": "Les Noirs contrôlent e5 et ouvrent la diagonale de leur fou c8." },
+            { "san": "d4", "pourquoi": "On frappe au centre : après l'échange de pions, nos pièces sortiront vite. C'est la Sicilienne ouverte.", "principes": ["centre"] }
+          ]
+        },
+        {
+          "id": "e6-francaise", "nom": "1…e6 : Défense française", "rang": 3,
+          "coups": [
+            { "san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"] },
+            { "san": "e6", "pourquoi": "La Française : les Noirs préparent d5 pour attaquer notre pion e4, tout en restant solides." },
+            { "san": "d4", "pourquoi": "Les Noirs nous laissent de la place : on prend tout le centre avec deux pions.", "principes": ["centre"] },
+            { "san": "d5", "pourquoi": "Comme prévu, les Noirs attaquent e4." },
+            { "san": "Nc3", "pourquoi": "On défend e4 en sortant une pièce : défense et développement en un seul coup.", "principes": ["developpement"] }
+          ]
+        },
+        {
+          "id": "c6-caro-kann", "nom": "1…c6 : Caro-Kann", "rang": 4,
+          "coups": [
+            { "san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"] },
+            { "san": "c6", "pourquoi": "La Caro-Kann : comme dans la Française, les Noirs préparent d5, mais sans enfermer leur fou c8." },
+            { "san": "d4", "pourquoi": "Deux pions au centre : on ne s'en prive pas.", "principes": ["centre"] },
+            { "san": "d5", "pourquoi": "Les Noirs attaquent e4." },
+            { "san": "Nc3", "pourquoi": "On défend e4 tout en développant le cavalier.", "principes": ["developpement"] }
+          ]
+        },
+        {
+          "id": "d5-scandinave", "nom": "1…d5 : Scandinave", "rang": 5,
+          "coups": [
+            { "san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"] },
+            { "san": "d5", "pourquoi": "La Scandinave : les Noirs attaquent e4 dès le premier coup." },
+            { "san": "exd5", "pourquoi": "On prend : aucun pion noir ne peut reprendre en d5.", "principes": ["centre"] },
+            { "san": "Qxd5", "pourquoi": "La dame noire reprend… mais elle sort très tôt au centre." },
+            { "san": "Nc3", "pourquoi": "On développe en attaquant la dame : elle doit encore bouger, et on gagne du temps.", "principes": ["developpement", "tempo"] }
+          ]
+        },
+        {
+          "id": "e5-damiano", "nom": "1…e5 2…f6 ? : à punir", "rang": 6, "aPunir": true,
+          "coups": [
+            { "san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"] },
+            { "san": "e5", "pourquoi": "Les Noirs prennent leur part du centre." },
+            { "san": "Nf3", "pourquoi": "On développe le cavalier en attaquant e5.", "principes": ["developpement"] },
+            { "san": "f6", "pourquoi": "Imprécision ! f6 défend e5, mais affaiblit le roi noir et vole la meilleure case du cavalier g8. À vous de punir !" },
+            { "san": "Nxe5", "pourquoi": "On sacrifie le cavalier ! Si 3…fxe5, alors 4.Dh5+ et le roi noir est en grand danger. Sinon, on a simplement gagné un pion.", "principes": ["roi", "piege"] }
+          ]
+        }
+      ]
+    }
+  ]
+}

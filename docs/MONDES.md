@@ -12,25 +12,25 @@
 - **Freemium** : le nombre d'ouvertures disponibles dans les catalogues est la partie payante
   (ex. 1 ouverture par couleur gratuite, davantage avec l'abonnement).
 
-## 2. Mondes
+## 2. Mondes ✅
 
-Chaque ouverture se découpe en mondes qui croisent **profondeur** (nombre de coups) et **largeur** (nombre de lignes).
-On élargit d'abord, puis on approfondit :
+Un **répertoire** (ex. Blancs avec 1.e4) se découpe en mondes, du général au spécialisé.
+On élargit d'abord, puis on approfondit, et on finit par se spécialiser :
 
-| Monde | Profondeur | Lignes majeures |
-|---|---|---|
-| 1 | 3 premiers coups | 5-6 |
-| 2 | 3 premiers coups | 10 |
-| 3 | 5 premiers coups | 5-6 |
-| 4 | 5 premiers coups | 10 |
-| 5 | 7 premiers coups | 5-6 |
-| 6 | 7 premiers coups | 10 |
-| … | +2 coups | … |
+| Monde | Profondeur | Lignes | Exemple (répertoire 1.e4) |
+|---|---|---|---|
+| 1 | 3 premiers coups | 5-6 | 1.e4 contre 1…e5, 1…c5, 1…e6, 1…c6, 1…d5 (+ un coup à punir) |
+| 2 | 3 premiers coups | 10 | + variantes des premiers coups (ex. 1…e5 2…d6, 1…c5 2…Cc6, 1…Cf6, 1…d6…) |
+| 3 | 5 premiers coups | 5-6 | Les mêmes ouvertures, plus loin |
+| 4 | 5 premiers coups | 10 | … |
+| 5+ | 7 coups et plus | … | **Spécialisation** : une ouverture en profondeur (ex. la Partie italienne pure) |
 
-- « Coups » = **coups de l'utilisateur** (3 coups avec les Blancs = 1.e4, 2.Cf3, 3.Fc4). ✅
-- Chaque monde n'introduit que du **nouveau contenu** (nouvelles lignes ou nouveaux coups) ; ce qui a été appris
-  dans les mondes précédents continue de revenir dans la révision du jour (répétition espacée).
-- Chaque ouverture a son propre décor de monde (ex. « Italie » pour la Partie italienne).
+- Objectif de chaque monde : **aucune erreur** sur la profondeur demandée, contre toutes ses lignes.
+- « Coups » = **coups de l'utilisateur**, depuis la position initiale (3 coups avec les Blancs = 1.e4, 2.Cf3, 3.Fc4). ✅
+- Le contenu du répertoire dépend des **choix de l'utilisateur** (ex. Partie italienne contre 1…e5, Sicilienne ouverte contre 1…c5).
+- Chaque monde n'introduit que du nouveau ; ce qui a été appris continue de revenir dans la révision du jour.
+- Contenu : Monde 1 du répertoire 1.e4 dans `content/fr/repertoire-1e4.json` ; la spécialisation Partie italienne
+  (monde avancé) dans `content/fr/italienne.json`.
 
 ## 3. Le parcours de Memo
 
