@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>Apprenez vos ouvertures d'échecs comme une langue : 5 minutes par jour, sur l'échiquier, avec Memo.</b><br>
-  <sub>iOS · Android · Web — open source (GPL-3.0) — en construction 🚧</sub>
+  <sub>iOS · Android · <a href="https://tototriou.github.io/movemory/">Web</a> — open source (GPL-3.0) — en construction 🚧</sub>
 </p>
 
 ---

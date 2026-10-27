@@ -38,7 +38,7 @@ export default function SessionScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const boardSize = Math.max(240, Math.min(Math.min(width, 480) - 32, 420, height - insets.top - insets.bottom - 330));
+  const boardSize = Math.max(240, Math.min(Math.min(width, 480) - 32, 420, height - insets.top - insets.bottom - 380));
   const back = () => (router.canGoBack() ? router.back() : router.replace('/'));
 
   if (ui.end) return <EndView end={ui.end} onClose={back} />;
@@ -49,7 +49,7 @@ export default function SessionScreen() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       <Column>
-        <ScrollView contentContainerStyle={[styles.wrap, { paddingTop: insets.top + 10, paddingBottom: Math.max(20, insets.bottom + 10) }]} scrollEnabled={!ui.canPlay}>
+        <ScrollView style={{ flex: 1 }} contentContainerStyle={[styles.wrap, { paddingTop: insets.top + 10, paddingBottom: 12 }]} scrollEnabled={!ui.canPlay}>
           <View style={styles.top}>
             <Pressable onPress={() => runner.current?.quit()} accessibilityRole="button" accessibilityLabel="Quitter la séance" style={styles.iconBtn}>{Icons.close(colors.muted)}</Pressable>
             <MiniTrack frac={ui.frac} />
@@ -85,12 +85,12 @@ export default function SessionScreen() {
             ))}
             {yourTurn && <Text style={[styles.move, { color: colors.gold }]}>{moveLabel(ui.history.length, '?')}</Text>}
           </View>
-
-          <View style={styles.actions}>
-            <GameButton label="Indice" icon={Icons.bulb(colors.gold)} onPress={() => runner.current?.hint()} disabled={ui.boss} style={{ flex: 1 }} />
-            <GameButton label="Solution" icon={Icons.eye(colors.hint)} onPress={() => runner.current?.solution()} disabled={ui.boss} style={{ flex: 1 }} />
-          </View>
         </ScrollView>
+        {/* toujours visibles, même sur un petit écran */}
+        <View style={[styles.actions, { paddingBottom: Math.max(16, insets.bottom + 8) }]}>
+          <GameButton label="Indice" icon={Icons.bulb(colors.gold)} onPress={() => runner.current?.hint()} disabled={ui.boss} style={{ flex: 1 }} />
+          <GameButton label="Solution" icon={Icons.eye(colors.hint)} onPress={() => runner.current?.solution()} disabled={ui.boss} style={{ flex: 1 }} />
+        </View>
       </Column>
       {ui.sheet && <View style={styles.sheetHost}><Sheet spec={ui.sheet} /></View>}
     </View>
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   moves: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, rowGap: 4, minHeight: 20 },
   move: { fontFamily: fonts.bodyBold, fontSize: 14, color: colors.muted },
   moveCur: { color: colors.fg, backgroundColor: colors.surface2, borderRadius: 6, paddingHorizontal: 6, overflow: 'hidden' },
-  actions: { flexDirection: 'row', gap: 10, marginTop: 'auto' },
+  actions: { flexDirection: 'row', gap: 10, paddingHorizontal: 16, paddingTop: 8 },
   sheetHost: { position: 'absolute', left: 0, right: 0, bottom: 0, top: 0, zIndex: 20, justifyContent: 'flex-end', alignItems: 'center', pointerEvents: 'box-none' },
   end: { alignItems: 'center', gap: 18, paddingHorizontal: 20 },
   h1: { fontFamily: fonts.displayBold, fontSize: 30, color: colors.gold, textAlign: 'center' },

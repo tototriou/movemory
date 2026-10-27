@@ -88,15 +88,26 @@ a{color:#7EE2A2}a:hover{color:#B5F2C9}
     </div>
   </header>
 
-  <div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 190px; background: linear-gradient(rgba(15,13,22,0), rgba(15,13,22,.92) 45%, #0F0D16 75%)"></div>
-  <div style="position: absolute; left: 0; right: 0; bottom: 136px; display: flex; justify-content: center">
-    <span style="background: #FFFFFF; color: #14121C; border-radius: 999px; padding: 5px 14px; font-size: 15px; font-weight: 600; box-shadow: 0 4px 0 #C9C3B8">Continuer · 10 questions</span>
-  </div>
-  <div style="position: absolute; left: 141px; bottom: 26px; width: 108px; height: 108px; border-radius: 50%; background: conic-gradient(#FFC94A 0 {{pct}}%, #2E2A3D {{pct}}% 100%); display: flex; align-items: center; justify-content: center">
-    <a class="btn" href="Seance.dc.html" aria-label="Lancer la séance" style="width: 92px; height: 92px; border-radius: 50%; background-color: #1A9E4B; border-bottom: 6px solid #11703A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
-      <svg width="40" height="40" viewBox="0 0 24 24" class="icf" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
-    </a>
-  </div>
+  <nav aria-label="Navigation principale" style="display: flex; justify-content: space-around; align-items: flex-end; background: #0F0D16; padding: 10px 6px 18px; border-top: 1px solid #2E2A3D; position: absolute; left: 0; right: 0; bottom: 0">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; font-size: 11px; font-weight: 800; min-width: 56px; padding-bottom: 2px; color: #FFFFFF">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" style="color: #1A9E4B" aria-hidden="true"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</a>
+    <a href="Repertoire.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; font-size: 11px; font-weight: 800; min-width: 56px; padding-bottom: 2px; color: #B8B4C8">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v15H6a2 2 0 0 0-2 2z"/><path d="M4 20a2 2 0 0 0 2 1h14v-3"/></svg>Répertoire</a>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 3px; width: 90px; margin-top: -40px">
+      <div style="width: 84px; height: 84px; border-radius: 50%; background: conic-gradient(#FFC94A 0 {{pct}}%, #2E2A3D {{pct}}% 100%); display: flex; align-items: center; justify-content: center">
+        <div style="width: 72px; height: 72px; border-radius: 50%; background: #0F0D16; display: flex; align-items: center; justify-content: center">
+          <a class="btn" href="Seance.dc.html" aria-label="Lancer la révision" style="width: 64px; height: 64px; border-radius: 50%; background-color: #1A9E4B; border-bottom: 5px solid #11703A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
+            <svg width="30" height="30" viewBox="0 0 24 24" class="icf" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+          </a>
+        </div>
+      </div>
+      <span style="font-size: 11px; font-weight: 800; color: #FFC94A">Continuer</span>
+    </div>
+    <a href="Parties.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; font-size: 11px; font-weight: 800; min-width: 56px; padding-bottom: 2px; color: #B8B4C8">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Parties</a>
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; font-size: 11px; font-weight: 800; min-width: 56px; padding-bottom: 2px; color: #B8B4C8">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profil</a>
+  </nav>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"progress":{"editor":"range","default":40,"min":0,"max":100,"step":5,"unit":"%"},"$preview":{"width":390,"height":844}}'>

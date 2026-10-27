@@ -1,12 +1,9 @@
 import { useRouter } from 'expo-router';
-import { Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { GameButton } from '@/components/GameButton';
 import { Memo } from '@/components/Memo';
 import { Column, Icons } from '@/components/ui';
-import { COURSE_LABELS } from '@/lib/content';
-import { useStore } from '@/lib/store';
 import { colors, fonts } from '@/lib/theme';
 
 const CREDITS: { title: string; text: string; url: string }[] = [
@@ -20,7 +17,6 @@ const CREDITS: { title: string; text: string; url: string }[] = [
 ];
 
 export default function Credits() {
-  const store = useStore();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   return (
@@ -29,18 +25,7 @@ export default function Credits() {
         <ScrollView contentContainerStyle={{ padding: 16, paddingTop: insets.top + 10, paddingBottom: insets.bottom + 24, gap: 14 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <Pressable onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} accessibilityRole="button" accessibilityLabel="Retour" style={{ padding: 8 }}>{Icons.close(colors.muted)}</Pressable>
-            <Text style={styles.h1}>Réglages et crédits</Text>
-          </View>
-
-          <View style={styles.card}>
-            <View style={styles.row}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.title}>Mode test</Text>
-                <Text style={styles.text}>Débloque tous les mondes, coffres et défis.</Text>
-              </View>
-              <Switch value={store.unlock} onValueChange={store.setUnlock} trackColor={{ true: colors.accent, false: colors.surface2 }} />
-            </View>
-            <GameButton variant="ghost" label={`Remettre à zéro : ${COURSE_LABELS[store.course]}`} onPress={store.reset} />
+            <Text style={styles.h1}>Crédits et licences</Text>
           </View>
 
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
@@ -63,7 +48,6 @@ export default function Credits() {
 const styles = StyleSheet.create({
   h1: { fontFamily: fonts.displayBold, fontSize: 22, color: colors.fg },
   card: { backgroundColor: colors.surface, borderRadius: 16, padding: 14, gap: 10 },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   title: { fontFamily: fonts.display, fontSize: 17, color: colors.fg },
   text: { fontFamily: fonts.body, fontSize: 14, lineHeight: 20, color: colors.muted },
 });

@@ -1,0 +1,44 @@
+name: Web
+# Publie la version web de l'app sur GitHub Pages à chaque push sur main.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Export web
+        working-directory: apps/mobile
+        run: |
+          # le site est servi sous /<nom du dépôt>/
+          node -e "const fs=require('fs');const c=JSON.parse(fs.readFileSync('app.json'));c.expo.experiments.baseUrl='/${{ github.event.repository.name }}';fs.writeFileSync('app.json',JSON.stringify(c,null,2))"
+          npx expo export --platform web
+          # application à page unique : toute adresse inconnue renvoie vers l'app
+          cp dist/index.html dist/404.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/mobile/dist
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
