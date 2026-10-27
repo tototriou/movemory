@@ -36,18 +36,27 @@ On élargit d'abord, puis on approfondit, et on finit par se spécialiser :
 - Contenu : `content/fr/italienne.json` (Blancs), `content/fr/repertoire-noirs.json` (Noirs, Sicilienne).
 - Les mondes seront **générés automatiquement** pour toutes les ouvertures : voir [GENERATION.md](GENERATION.md).
 
-## 3. Le parcours de Memo
+## 3. L'apprentissage : leçons et manches (inspiré du mode « Apprendre » de Quizlet) ✅
 
-- Une carte par monde ; chaque **case = un ensemble de coups** à maîtriser (ex. une ligne majeure jusqu'à la profondeur du monde).
-- **Memo avance d'une case quand cet ensemble de coups est maîtrisé**, jusqu'au bout du parcours.
-- « Maîtrisé » = chaque position de la case réussie sans indice lors d'au moins 2 séances,
-  sur 2 jours différents (dans FSRS : stabilité ≥ 3 jours). ✅
-- Les positions maîtrisées **reviennent quand même**, de plus en plus espacées, pour vérifier qu'elles ne sont
-  pas oubliées (rappels de la répétition espacée + « contrôles surprise » dans la révision du jour).
-  Une position ratée lors d'un rappel redevient « à revoir », sans faire reculer Memo. ✅
-- Cases spéciales :
-  - **coffre** : récompense (gemmes, accessoire pour Memo) ;
-  - **défi final** : jouer toutes les lignes du monde d'affilée, sans erreur → débloque le monde suivant.
+Chaque **position** (un coup à trouver) passe par des niveaux de difficulté croissante :
+
+| Niveau | Question | Aide |
+|---|---|---|
+| 0 → 1 · Découverte | La position s'affiche, Memo montre le coup (flèche) et l'explique | Flèche |
+| 1 → 2 · Avec aide | Même position, la **pièce à jouer est entourée** : trouver où elle va | Pièce indiquée |
+| 2 → 3 · Seul | Même position, sans aide | Aucune |
+| 3 → 4 · En partie | **Partie mélangée** : l'adversaire choisit au hasard une des lignes de la leçon, il faut la reconnaître | Aucune |
+
+- **Leçon** = 2-3 nouvelles lignes (+ celles déjà commencées et pas encore maîtrisées).
+- La leçon avance par **manches de 7 questions**, mélangées (jamais deux de suite sur la même ligne).
+- **Erreur** → explication de Memo, la position **redescend d'un niveau** et revient **à la fin de la manche**.
+- Indice ou solution utilisés → pas de montée de niveau.
+- **Bilan entre deux manches** : barre Maîtrisées / En apprentissage / Pas encore vues + état de chaque ligne.
+  On peut « Arrêter pour aujourd'hui » et reprendre plus tard au même point.
+- **Memo avance** sur la carte quand **toutes les positions d'une ligne sont maîtrisées**.
+- Ensuite, la **révision du jour** (répétition espacée) refait passer les positions maîtrisées de temps en temps ;
+  une position ratée redevient « en apprentissage », sans faire reculer Memo.
+- Cases spéciales : **coffre** (récompense) et **défi final** (toutes les lignes du monde en partie, sans indice ni erreur).
 
 ## 4. Ajout de lignes : depuis un catalogue ✅
 

@@ -146,6 +146,12 @@ button { font: inherit; color: inherit; }
 .pips { display: flex; gap: 4px; }
 .pips i { width: 14px; height: 14px; border-radius: 4px; background: var(--surface-2); }
 .pips i.on { background: var(--gold); }
+.pips i.lv1 { background: #7A6A3A; } .pips i.lv2 { background: #B8932E; } .pips i.lv3 { background: var(--gold); } .pips i.lv4 { background: var(--good); }
+.seg-bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--surface-2); }
+.seg-bar span { display: block; height: 100%; transition: width .5s; }
+.dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+.lines-state { width: 100%; display: grid; gap: 8px; text-align: left; background: var(--surface); border-radius: 18px; padding: 14px; }
+.end .link-btn { margin-top: -8px; }
 .end .btn { width: 100%; margin-top: auto; }
 .conf { position: absolute; top: -20px; width: 9px; height: 14px; border-radius: 2px; animation: fall 3s linear infinite; pointer-events: none; }
 @keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
@@ -316,15 +322,18 @@ function loadRepertoire(rep) {
 const tileById = (id) => TILES.find((t) => t.id === id);
 
 /* ---------- Progression (localStorage, avec repli en mémoire) ---------- */
-const SAVE_KEY = () => 'movemory-monde1-v2-' + REP;
+const SAVE_KEY = () => 'movemory-monde1-v3-' + REP;
 let P;
 function loadProgress() {
   P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: false, learned: [], sessionNo: 0 };
   try { const s = JSON.parse(localStorage.getItem(SAVE_KEY())); if (s) P = { ...P, ...s }; } catch {}
 }
 const save = () => { try { localStorage.setItem(SAVE_KEY(), JSON.stringify(P)); } catch {} };
-const card = (k) => (P.cards[k] ||= { seen: false, ok: 0 });
-const tileMastered = (t) => t.cards.every((k) => card(k).ok >= 2);
+// Niveaux d'une position (comme le mode « Apprendre » de Quizlet) :
+// 0 pas vue · 1 découverte (guidée) · 2 trouvée avec la pièce indiquée · 3 trouvée seule · 4 maîtrisée (trouvée en partie)
+const LEVELS = ['Pas vue', 'Découverte', 'Avec aide', 'Seule', 'Maîtrisée'];
+const card = (k) => (P.cards[k] ||= { level: 0 });
+const tileMastered = (t) => t.cards.every((k) => card(k).level >= 4);
 function stepDone(id) {
   if (id === 'coffre') return P.chest;
   if (id === 'defi') return P.boss;
@@ -368,7 +377,7 @@ function renderMap() {
   $('xp').textContent = P.xp; $('gems').textContent = P.gems;
   const curId = MAP_ORDER[cur];
   const fresh = TILES.filter((t) => !tileSeen(t)).length;
-  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : curId === 'coffre' ? 'Ouvrir le coffre' : curId === 'defi' ? 'Défi final' : fresh ? (() => { const n = Math.min(fresh, TILES.some(tileSeen) ? 2 : 3); return `Séance : ${n} nouvelle${n > 1 ? 's' : ''} ligne${n > 1 ? 's' : ''} + parties`; })() : 'Séance : parties mélangées';
+  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : curId === 'coffre' ? 'Ouvrir le coffre' : curId === 'defi' ? 'Défi final' : TILES.some((t) => tileSeen(t) && !tileMastered(t)) ? 'Continuer la leçon' : fresh ? 'Nouvelle leçon' : 'Réviser';
   const ring = Math.round(MAP_ORDER.filter(stepDone).length / MAP_ORDER.length * 100);
   $('play-ring').style.background = `conic-gradient(var(--gold) 0 ${ring}%, var(--surface-2) ${ring}% 100%)`;
   $('unlock').checked = P.unlock;
@@ -480,138 +489,188 @@ function setCombo(n) { S.combo = n; const c = $('combo'); c.textContent = 'x' + 
 
 const shuffle = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 const tileSeen = (t) => (P.learned || []).includes(t.id);
-const weakness = (t) => t.cards.filter((k) => card(k).ok < 2).length;
-// Une séance : 2-3 nouvelles ouvertures découvertes avec Memo, puis des parties mélangées
-// où l'adversaire choisit au hasard parmi toutes les ouvertures déjà vues.
-function buildRuns(opts) {
-  const run = (t, mode) => ({ tile: t, from: mode === 'learn' ? t.from : DEBUT, to: t.to, mode });
-  if (opts.boss) return shuffle(TILES).map((t) => run(t, 'boss'));
-  const lineOrder = MAP_ORDER.filter((id) => tileById(id)).map(tileById);
-  const seen = lineOrder.filter(tileSeen);
-  const fresh = lineOrder.filter((t) => !tileSeen(t)).slice(0, seen.length ? 2 : 3);
-  const pool = [...seen, ...fresh];
-  const runs = fresh.map((t) => run(t, 'learn'));
-  const games = Math.min(10, Math.max(5, pool.length * 2));
-  let prev = null;
-  for (let g = 0; g < games; g++) {
-    // les ouvertures les moins maîtrisées reviennent plus souvent ; jamais deux fois la même d'affilée
-    const cands = pool.filter((t) => t !== prev || pool.length === 1);
-    const weights = cands.map((t) => 1 + weakness(t) * 2);
-    let r = Math.random() * weights.reduce((a, b) => a + b, 0), pick = cands[0];
-    for (let i = 0; i < cands.length; i++) { r -= weights[i]; if (r <= 0) { pick = cands[i]; break; } }
-    runs.push(run(pick, 'mix')); prev = pick;
+const plyOf = (t, k) => { const g = new Chess(); for (let i = 0; i < t.moves.length; i++) { if (fenKey(g.fen()) === k && g.turn() === SIDE && i >= t.from) return i; g.move(t.moves[i].san); } return -1; };
+const ROUND = 7;
+
+/* Leçon = les lignes travaillées (2-3 nouvelles + celles pas encore maîtrisées).
+   Elle avance par manches de 7 questions. Chaque question fait monter la position d'un niveau :
+   guidée (flèche) → avec aide (pièce indiquée) → seule → en partie (l'adversaire choisit l'ouverture au hasard).
+   Une erreur fait redescendre d'un niveau et la question revient à la fin de la manche. */
+function lessonLines() {
+  const order = MAP_ORDER.filter((id) => tileById(id)).map(tileById);
+  const open = order.filter((t) => tileSeen(t) && !tileMastered(t));
+  const fresh = order.filter((t) => !tileSeen(t)).slice(0, Math.max(0, 3 - open.length) || (open.length ? 0 : 3));
+  const lines = [...open, ...fresh];
+  return lines.length ? lines : order.filter(tileSeen); // tout est maîtrisé : on révise
+}
+function buildRound() {
+  const lines = S.lines;
+  const todo = []; const seenK = new Set();
+  for (const t of lines) for (const k of t.cards) if (!seenK.has(k) && card(k).level < 4) { seenK.add(k); todo.push({ k, t }); }
+  if (!todo.length) return [];
+  todo.sort((a, b) => card(a.k).level - card(b.k).level);
+  const batch = todo.slice(0, ROUND);
+  const items = []; const parties = new Map();
+  for (const { k, t } of batch) {
+    const lv = card(k).level;
+    if (lv >= 3) { const line = lines.find((l) => l.cards.includes(k) && card(k).level >= 3) || t; parties.set(line.id, line); }
+    else items.push({ kind: 'pos', k, t, ply: plyOf(t, k), level: lv });
   }
-  return runs;
+  for (const line of parties.values()) items.push({ kind: 'partie', t: line });
+  // on mélange en évitant deux questions de suite sur la même ligne, mais on garde l'ordre des coups d'une ligne en découverte
+  let out = shuffle(items).sort((a, b) => (a.kind === 'pos' && b.kind === 'pos' && a.t === b.t ? a.ply - b.ply : 0));
+  for (let i = 1; i < out.length; i++) if (out[i].t === out[i - 1].t) { const j = out.findIndex((x, n) => n > i && x.t !== out[i].t); if (j > 0) [out[i], out[j]] = [out[j], out[i]]; }
+  return out;
 }
 function startSession(opts) {
-  P.sessionNo = (P.sessionNo || 0) + 1;
-  S = { opts, runs: buildRuns(opts), runIndex: 0, combo: 0, correct: 0, total: 0, errors: 0, xp: 0, failedThisRun: false, masteredBefore: new Set(TILES.filter(tileMastered).map((t) => t.id)) };
-  const userPly = SIDE === 'w' ? 0 : 1;
-  S.totalAsks = S.runs.reduce((n, r) => { let k = 0; for (let ply = r.from; ply < r.to; ply++) if (ply % 2 === userPly) k++; return n + k; }, 0);
-  S.learnCount = S.runs.filter((r) => r.mode === 'learn').length; S.mixCount = S.runs.filter((r) => r.mode === 'mix').length;
-  show('session'); buildSquares(); setCombo(0); updateBar();
+  S = { opts, combo: 0, correct: 0, errors: 0, xp: 0, round: 0, masteredBefore: new Set(TILES.filter(tileMastered).map((t) => t.id)) };
+  show('session'); buildSquares(); setCombo(0);
   $('s-eyebrow').textContent = opts.boss ? 'Défi final · sans indice' : `Monde 1 · ${SIDE === 'w' ? 'Blancs' : 'Noirs'}`;
-
   $('btn-hint').disabled = $('btn-solution').disabled = !!opts.boss;
-  nextRun();
+  if (opts.boss) { S.queue = shuffle(TILES).map((t) => ({ kind: 'partie', t, boss: true })); S.total = S.queue.length; return nextItem(); }
+  S.lines = lessonLines();
+  for (const t of S.lines) if (!P.learned.includes(t.id)) P.learned.push(t.id);
+  save(); nextRound();
 }
-async function nextRun() {
-  if (S.runIndex >= S.runs.length) return endSession();
-  const run = S.runs[S.runIndex]; S.run = run; S.failedThisRun = false;
-  game = new Chess(); S.lastOpp = ''; renderPieces(); sqClass('last', []); arrow(null); renderMoves();
-  const mixIndex = S.runIndex - S.learnCount + 1;
-  $('s-name').textContent = run.mode === 'learn' ? run.tile.name : run.mode === 'boss' ? 'Défi final' : 'Parties mélangées';
-  $('s-pill').classList.toggle('punish', run.mode === 'learn' && !!run.tile.punish);
-  $('s-pill').textContent = run.mode === 'learn' ? (run.tile.punish ? '⚔ Coup à punir' : run.tile.deviation ? '↪ Autre chemin' : `Découverte ${S.runIndex + 1}/${S.learnCount}`) : run.mode === 'boss' ? `Partie ${S.runIndex + 1}/${S.runs.length}` : `Partie ${mixIndex}/${S.mixCount}`;
-  if (run.mode === 'learn' && !P.learned.includes(run.tile.id)) { P.learned.push(run.tile.id); save(); }
-  if (run.mode === 'learn') say(`Nouvelle ligne : <b>${run.tile.name}</b>. ${run.tile.alerte ? run.tile.alerte + ' ' : ''}Je vous guide une fois, ensuite on mélange tout !`, 'content');
-  else if (run.mode === 'mix') say(mixIndex === 1 ? 'Maintenant on <b>mélange tout</b> : je joue une de vos ouvertures au hasard, à vous de la reconnaître et de trouver le bon coup.' : pick(['Nouvelle partie !', 'On recommence : quelle ouverture cette fois ?', 'Partie suivante. Attention à mon premier coup !']), 'reflechit');
-  else say(`Défi final, partie ${S.runIndex + 1}/${S.runs.length}. Pas d'indice, pas d'erreur !`, 'reflechit');
-  await wait(700);
-  step();
+function lessonCards() { const ks = new Set(); for (const t of S.lines) t.cards.forEach((k) => ks.add(k)); return [...ks]; }
+function updateBar() {
+  if (!S) return;
+  if (S.opts.boss) { $('s-bar').style.width = `${(S.done || 0) / S.total * 100}%`; return; }
+  const ks = lessonCards(); const sum = ks.reduce((n, k) => n + card(k).level, 0);
+  $('s-bar').style.width = `${(sum / (ks.length * 4)) * 100}%`;
 }
-async function step() {
-  const run = S.run; const ply = game.history().length;
-  if (ply >= run.to) { S.runIndex++; return nextRun(); }
-  const move = run.tile.moves[ply];
-  const asked = game.turn() === SIDE && ply >= run.from;
-  if (!asked) {
-    const prev = run.from > 0 && ply < run.from;
-    await wait(prev ? 260 : 650);
-    animate(game.move(move.san)); renderMoves(true);
-    if (game.turn() === SIDE && game.history().length >= run.from && ply + 1 < run.to) {
-      const who = SIDE === 'w' ? 'Les Noirs jouent' : 'Les Blancs jouent';
-      S.lastOpp = `${who} <b>${label(ply, move.san)}</b>. ${move.pourquoi}`;
-      if (run.mode === 'learn') say(S.lastOpp + ' À vous !', 'reflechit');
-      else say(`${who} <b>${label(ply, move.san)}</b>. À vous !`, 'reflechit');
-    }
-    return step();
+function nextRound() {
+  S.round++; S.queue = buildRound(); S.total = S.queue.length; S.done = 0;
+  if (!S.queue.length) return endSession();
+  nextItem();
+}
+async function nextItem() {
+  updateBar();
+  if (!S.queue.length) return S.opts.boss ? endSession() : checkpoint();
+  const it = S.queue.shift(); S.item = it;
+  game = new Chess(); S.lastOpp = ''; renderPieces(); sqClass('last', []); sqClass('hint', []); arrow(null); renderMoves();
+  const pillTxt = it.boss ? `Partie ${S.total - S.queue.length}/${S.total}` : `Manche ${S.round} · ${S.total - S.queue.length}/${S.total}`;
+  $('s-pill').textContent = pillTxt; $('s-pill').classList.toggle('punish', false);
+  if (it.kind === 'partie') {
+    $('s-name').textContent = it.boss ? 'Défi final' : 'En partie';
+    say(it.boss ? 'Défi final : pas d’indice, pas d’erreur !' : 'En partie : je choisis une ouverture au hasard. À vous de la reconnaître !', 'reflechit');
+    it.from = DEBUT; it.to = it.t.to;
+    await wait(650); return playOn();
   }
-  // C'est à l'utilisateur
-  const k = fenKey(game.fen()); const c = CARDS.get(k); const cs = card(k);
-  S.hintUsed = false; S.errorHere = false; const opp = ply > 0 && ply === game.history().length && S.lastOpp ? S.lastOpp + '<br>' : '';
-  $('s-pill').textContent = run.tile.punish && ply === run.from ? '⚔ Punissez l’erreur' : `Coup ${Math.floor(ply / 2) + 1}`;
-  sqClass('hint', []); arrow(null);
-  if (run.mode === 'learn' && !cs.seen) {
-    const mv = new Chess(game.fen()).move(move.san);
-    arrow(mv.from, mv.to, '#3E86C8');
-    say(`${opp}Nouveau coup : jouez <b>${label(ply, move.san)}</b> (flèche bleue).`, 'content');
-  } else if (ply === 0) say('À vous : quel est le premier coup ?', 'reflechit');
-  inputEnabled = true; renderMoves(true);
-  onUserMove = (m) => handleAnswer(m, move, c, cs, ply);
+  $('s-name').textContent = ['Découverte', 'Découverte', 'Avec aide', 'Seul'][it.level] + ' · ' + it.t.name;
+  // mise en place rapide de la position, puis question
+  it.from = it.ply; it.to = it.ply + 1;
+  for (let i = 0; i < it.ply; i++) { await wait(i < DEBUT ? 120 : 200); animate(game.move(it.t.moves[i].san)); renderMoves(true); }
+  playOn();
 }
-function handleAnswer(m, move, c, cs, ply) {
-  const run = S.run;
-  const accepted = m.san === move.san;
+async function playOn() {
+  const it = S.item; const ply = game.history().length;
+  if (ply >= it.to) { S.done++; return nextItem(); }
+  const move = it.t.moves[ply];
+  if (game.turn() !== SIDE || ply < it.from) {
+    await wait(ply < it.from ? 220 : 600);
+    animate(game.move(move.san)); renderMoves(true);
+    const who = SIDE === 'w' ? 'Les Noirs jouent' : 'Les Blancs jouent';
+    S.lastOpp = `${who} <b>${label(ply, move.san)}</b>. ${move.pourquoi}`;
+    if (it.kind === 'partie' && game.history().length < it.to) say(`${who} <b>${label(ply, move.san)}</b>. À vous !`, 'reflechit');
+    return playOn();
+  }
+  ask(ply, move);
+}
+function ask(ply, move) {
+  const it = S.item; const k = fenKey(game.fen()); const cs = card(k);
+  const level = it.kind === 'partie' ? 3 : it.level;
+  S.q = { ply, move, k, cs, level, help: false };
+  const mv = new Chess(game.fen()).move(move.san);
+  const prevMove = ply > 0 ? `${SIDE === 'w' ? 'Les Noirs ont joué' : 'Les Blancs ont joué'} <b>${label(ply - 1, game.history()[ply - 1])}</b>. ` : '';
+  if (level <= 1) {
+    arrow(mv.from, mv.to, '#3E86C8'); S.q.help = true;
+    say(`${it.t.alerte && ply === it.t.from + (SIDE === 'w' ? 2 : 1) - 1 ? it.t.alerte + '<br>' : ''}${S.lastOpp ? S.lastOpp + '<br>' : ''}Nouveau coup : jouez <b>${label(ply, move.san)}</b> (flèche bleue).`, 'content');
+  } else if (level === 2) {
+    sqClass('hint', [mv.from]);
+    say(`${prevMove}La pièce à jouer est entourée : où va-t-elle ?`, 'reflechit');
+  } else if (it.kind !== 'partie') say(`${prevMove}À vous, sans aide !`, 'reflechit');
+  inputEnabled = true; renderMoves(true);
+  onUserMove = (m) => answer(m);
+}
+function answer(m) {
+  const { ply, move, cs, level } = S.q; const it = S.item;
   inputEnabled = false; onUserMove = null; arrow(null); sqClass('hint', []);
-  if (!accepted) {
-    S.errors++; S.failedThisRun = true; S.errorHere = true; setCombo(0); cs.ok = 0; save();
+  if (m.san !== move.san) {
+    S.errors++; setCombo(0); cs.level = Math.max(1, cs.level - 1); save(); updateBar();
     $('board').classList.remove('shake'); void $('board').offsetWidth; $('board').classList.add('shake');
-    const temp = new Chess(game.fen()); const mv = temp.move(m.san); const el = pieceEls.get(mv.from);
+    const mv = new Chess(game.fen()).move(m.san); const el = pieceEls.get(mv.from);
     if (el) { placePiece(el, mv.to); setTimeout(() => placePiece(el, mv.from), 380); }
     const good = new Chess(game.fen()).move(move.san);
     setTimeout(() => arrow(good.from, good.to, '#3DDC84'), 400);
-    if (run.mode === 'boss') {
-      return sheet({ bad: true, title: 'Défi raté', text: `<b>Memo :</b> ici, c'était <b>${label(ply, move.san)}</b>. ${move.pourquoi}`, note: 'Révisez encore un peu, puis retentez le défi.', mood: 'oups', buttons: [['Retour à la carte', 'btn-cta', () => show('map')]] });
-    }
-    return sheet({ bad: true, title: 'Pas votre ligne !', text: `<b>Memo :</b> ${fr(m.san)} n'est pas le coup prévu. Ici on joue <b>${label(ply, move.san)}</b> : ${lower(move.pourquoi)}`, note: 'Cette position reviendra plus souvent.', mood: 'oups', buttons: [['Rejouer le bon coup', 'btn-cta', () => { closeSheet(); retry(move, c, cs, ply); }]] });
+    if (it.boss) return sheet({ bad: true, title: 'Défi raté', text: `<b>Memo :</b> ici, c'était <b>${label(ply, move.san)}</b>. ${move.pourquoi}`, note: 'Révisez encore un peu, puis retentez le défi.', mood: 'oups', buttons: [['Retour à la carte', 'btn-cta', () => show('map')]] });
+    // la question reviendra en fin de manche, un niveau plus bas
+    if (it.kind === 'pos') S.queue.push({ ...it, level: cs.level }); else S.queue.push({ kind: 'pos', k: S.q.k, t: it.t, ply, level: cs.level });
+    return sheet({ bad: true, title: 'Pas votre ligne !', text: `<b>Memo :</b> ${fr(m.san)} n'est pas le coup prévu. Ici on joue <b>${label(ply, move.san)}</b> : ${lower(move.pourquoi)}`, note: `Cette position revient à la fin de la manche (niveau : ${LEVELS[cs.level]}).`, mood: 'oups', buttons: [['Rejouer le bon coup', 'btn-cta', () => { closeSheet(); retry(); }]] });
   }
-  // Bon coup
   const played = game.move(m.san); animate(played); renderMoves(true);
   S.correct++; setCombo(S.combo + 1);
-  const learning = run.mode === 'learn' && !cs.seen;
-  if (!learning && !S.hintUsed && !S.errorHere && cs.lastS !== P.sessionNo) { cs.ok = Math.min(2, cs.ok + 1); cs.lastS = P.sessionNo; }
-  cs.seen = true; save();
-  const gain = learning ? 5 : 10 + Math.min(S.combo, 5); S.xp += gain; floatXp(gain, played.to);
-  const expl = move;
-  if (!learning) {
-    sqClass('good', [played.to]); updateBar();
-    say(pick(['Bien joué !', 'Exact !', 'Parfait !', 'Oui !']), 'bravo');
-    return setTimeout(() => { sqClass('good', []); step(); }, 850);
-  }
-  sheet({ bad: false, title: learning ? 'C’est noté !' : pick(['Excellent !', 'Bien joué !', 'Parfait !']) + ' ' + label(ply, m.san), text: `<b>Memo :</b> ${expl.pourquoi}`, note: learning ? '' : cs.ok >= 2 ? 'Position maîtrisée ✓' : `Maîtrise : ${cs.ok}/2`, mood: 'bravo', buttons: [['Continuer', 'btn-cta', () => { closeSheet(); step(); }]] });
+  const before = cs.level;
+  // +1 niveau par réussite sans aide ; le dernier niveau (maîtrisée) ne s'obtient qu'en partie
+  const cap = it.kind === 'partie' ? 4 : 3;
+  if (!S.q.usedHint) cs.level = Math.min(cap, cs.level + 1);
+  if (level <= 1) cs.level = Math.max(cs.level, 1);
+  save(); updateBar();
+  const gain = level <= 1 ? 5 : 8 + level * 2 + Math.min(S.combo, 5); S.xp += gain; floatXp(gain, played.to);
+  if (level <= 1) return sheet({ bad: false, title: 'C’est noté !', text: `<b>Memo :</b> ${move.pourquoi}`, note: '', mood: 'bravo', buttons: [['Continuer', 'btn-cta', () => { closeSheet(); playOn(); }]] });
+  sqClass('good', [played.to]);
+  say(cs.level === 4 && before < 4 ? 'Maîtrisée ! ⭐' : pick(['Bien joué !', 'Exact !', 'Parfait !', 'Oui !']), 'bravo');
+  setTimeout(() => { sqClass('good', []); playOn(); }, 800);
 }
-function retry(move, c, cs, ply) {
-  const good = new Chess(game.fen()).move(move.san); arrow(good.from, good.to, '#3DDC84');
+function retry() {
+  const { ply, move } = S.q; const good = new Chess(game.fen()).move(move.san); arrow(good.from, good.to, '#3DDC84');
   say(`Jouez <b>${label(ply, move.san)}</b> pour continuer.`, 'content');
   inputEnabled = true;
   onUserMove = (m) => {
     if (m.san !== move.san) { $('board').classList.remove('shake'); void $('board').offsetWidth; $('board').classList.add('shake'); return; }
-    inputEnabled = false; onUserMove = null; arrow(null); animate(game.move(m.san)); renderMoves(true); cs.seen = true; save(); step();
+    inputEnabled = false; onUserMove = null; arrow(null); animate(game.move(m.san)); renderMoves(true); playOn();
   };
 }
 $('btn-hint').addEventListener('click', () => {
-  if (!inputEnabled || !S) return; S.hintUsed = true; const move = S.run.tile.moves[game.history().length];
-  const mv = new Chess(game.fen()).move(move.san); sqClass('hint', [mv.from]);
+  if (!inputEnabled || !S?.q) return; S.q.usedHint = true; const mv = new Chess(game.fen()).move(S.q.move.san); sqClass('hint', [mv.from]);
   say('Indice : cette pièce-là. Où doit-elle aller ?', 'content');
 });
 $('btn-solution').addEventListener('click', () => {
-  if (!inputEnabled || !S) return; S.hintUsed = true; const ply = game.history().length; const move = S.run.tile.moves[ply];
-  const mv = new Chess(game.fen()).move(move.san); arrow(mv.from, mv.to, '#3E86C8');
-  say(`La solution : <b>${label(ply, move.san)}</b>. ${move.pourquoi}`, 'content');
+  if (!inputEnabled || !S?.q) return; S.q.usedHint = true; const mv = new Chess(game.fen()).move(S.q.move.san); arrow(mv.from, mv.to, '#3E86C8');
+  say(`La solution : <b>${label(S.q.ply, S.q.move.san)}</b>. ${S.q.move.pourquoi}`, 'content');
 });
 $('quit').addEventListener('click', () => { inputEnabled = false; show('map'); });
 
+// Bilan entre deux manches (comme les « points d'étape » de Quizlet)
+function statusCounts() {
+  const ks = lessonCards(); const c = { vu: 0, cours: 0, ok: 0 };
+  for (const k of ks) { const l = card(k).level; if (l === 0) c.vu++; else if (l < 4) c.cours++; else c.ok++; }
+  return { ...c, n: ks.length };
+}
+function statusBlock() {
+  const c = statusCounts(); const pct = (x) => (x / c.n) * 100;
+  return `<div class="mastery">
+    <div class="seg-bar"><span style="width:${pct(c.ok)}%;background:var(--good)"></span><span style="width:${pct(c.cours)}%;background:var(--gold)"></span><span style="width:${pct(c.vu)}%;background:var(--surface-2)"></span></div>
+    <div class="m-row"><span class="dot" style="background:var(--good)"></span><span class="name">Maîtrisées</span><b>${c.ok}</b></div>
+    <div class="m-row"><span class="dot" style="background:var(--gold)"></span><span class="name">En apprentissage</span><b>${c.cours}</b></div>
+    <div class="m-row"><span class="dot" style="background:var(--surface-2)"></span><span class="name">Pas encore vues</span><b>${c.vu}</b></div>
+  </div>`;
+}
+function checkpoint() {
+  inputEnabled = false;
+  const c = statusCounts();
+  if (c.ok === c.n) return endSession();
+  $('screen-end').innerHTML = `<div class="memo">${memoSvg('content')}</div>
+    <h1>Manche ${S.round} terminée</h1>
+    <p>${c.ok ? `Déjà ${c.ok} position${c.ok > 1 ? 's' : ''} maîtrisée${c.ok > 1 ? 's' : ''} sur ${c.n}. ` : ''}On continue : les questions deviennent plus difficiles à chaque niveau.</p>
+    ${statusBlock()}
+    <div class="lines-state">${S.lines.map((t) => `<div class="m-row"><span class="name">${t.punish ? '⚔ ' : t.deviation ? '↪ ' : ''}${t.name}</span><span class="pips">${t.cards.map((k) => `<i class="lv${card(k).level}" title="${LEVELS[card(k).level]}"></i>`).join('')}</span></div>`).join('')}</div>
+    <button class="btn btn-cta" id="end-continue">Manche suivante</button>
+    <button class="link-btn" id="end-stop">Arrêter pour aujourd'hui</button>`;
+  show('end');
+  $('end-continue').addEventListener('click', () => { show('session'); buildSquares(); nextRound(); });
+  $('end-stop').addEventListener('click', () => endSession(true));
+}
 function floatXp(n, sq) {
   const [x, y] = sqXY(sq); const el = document.createElement('div'); el.className = 'xp-float'; el.textContent = `+${n} XP`;
   el.style.left = `${x * 12.5}%`; el.style.top = `${y * 12.5}%`; $('board').appendChild(el); setTimeout(() => el.remove(), 1500);
@@ -630,29 +689,29 @@ function sheet({ bad, title, text, note, mood, buttons }) {
   host.querySelector('button')?.focus();
   updateBar();
 }
-function updateBar() { const total = S.totalAsks || 1; $('s-bar').style.width = `${Math.min(100, (S.correct / total) * 100)}%`; }
 function closeSheet() { $('sheet-host').innerHTML = ''; }
 
-function endSession() {
+function endSession(stopped) {
   inputEnabled = false;
   const boss = S.opts.boss;
   if (boss && S.errors === 0) { P.boss = true; S.xp += 100; P.gems += 50; }
   P.xp += S.xp; save();
   const acc = S.correct + S.errors ? Math.round((S.correct / (S.correct + S.errors)) * 100) : 100;
-  const rows = boss ? '' : TILES.filter(tileSeen).map((t) => `<div class="m-row"><span class="name">${t.punish ? '⚔ ' : ''}${t.name}</span><span class="pips">${t.cards.map((k) => `<i class="${card(k).ok >= 2 ? 'on' : ''}"></i>`).join('')}</span></div>`).join('');
   const newly = TILES.filter((t) => tileMastered(t) && !S.masteredBefore.has(t.id));
-  const mastered = !boss && newly.length > 0;
-  const conf = (boss && P.boss) || mastered ? Array.from({ length: 10 }, (_, i) => `<span class="conf" style="left:${8 + i * 9}%;background:${['#FFC94A', '#3DDC84', '#8FD3FF', '#F0605D', '#A78BFA'][i % 5]};animation-delay:${(i * 0.37) % 2.4}s"></span>`).join('') : '';
+  const conf = (boss && P.boss) || newly.length ? Array.from({ length: 10 }, (_, i) => `<span class="conf" style="left:${8 + i * 9}%;background:${['#FFC94A', '#3DDC84', '#8FD3FF', '#F0605D', '#A78BFA'][i % 5]};animation-delay:${(i * 0.37) % 2.4}s"></span>`).join('') : '';
+  const title = boss ? (P.boss ? 'Monde 1 terminé !' : 'Défi terminé') : newly.length ? (newly.length > 1 ? `${newly.length} lignes maîtrisées !` : 'Ligne maîtrisée !') : stopped ? 'À demain !' : 'Leçon terminée !';
+  const text = boss ? (P.boss ? `Vos ${DEPTH} coups sur les ${LINES.length} lignes du Monde 1 sont acquis. Le Monde 2 ajoutera de nouvelles lignes.` : '')
+    : newly.length ? `${newly.map((t) => t.name).join(', ')} : Memo avance sur la carte ! Elles reviendront de temps en temps dans la révision du jour pour ne pas les oublier.`
+    : 'Votre progression est gardée : vous reprendrez là où vous en êtes.';
   $('screen-end').innerHTML = `${conf}
     <div class="memo">${memoSvg('bravo')}</div>
-    <h1>${boss ? (P.boss ? 'Monde 1 terminé !' : 'Défi terminé') : mastered ? (newly.length > 1 ? `${newly.length} ouvertures maîtrisées !` : 'Ouverture maîtrisée !') : 'Séance terminée !'}</h1>
-    <p>${boss ? (P.boss ? `Vous maîtrisez vos ${DEPTH} coups sur les ${LINES.length} lignes du Monde 1. Le Monde 2 ajoutera 4 lignes : des variantes de ces mêmes ouvertures.` : '') : mastered ? `${newly.map((t) => t.name).join(', ')} : Memo avance sur la carte !` : 'Une ouverture est maîtrisée quand chacune de ses positions a été réussie sans indice lors de 2 séances différentes (dans l’app : 2 jours différents). Relancez une séance !'}</p>
+    <h1>${title}</h1><p>${text}</p>
     <div class="stats">
       <div class="stat"><span>XP</span><b style="color:var(--gold)">+${S.xp}</b></div>
       <div class="stat"><span>Précision</span><b style="color:var(--good)">${acc} %</b></div>
       <div class="stat"><span>Erreurs</span><b style="color:${S.errors ? 'var(--bad)' : 'var(--fg)'}">${S.errors}</b></div>
     </div>
-    ${rows ? `<div class="mastery"><b>Maîtrise par ouverture</b>${rows}</div>` : ''}
+    ${boss ? '' : statusBlock()}
     <button class="btn btn-cta" id="end-continue">Continuer</button>`;
   show('end');
   $('end-continue').addEventListener('click', () => show('map'));
@@ -665,7 +724,7 @@ function openChest() {
 }
 
 // Accroche de test (navigateur headless) : le coup attendu dans la position actuelle
-window.__movemoryTest = () => { if (!S || !inputEnabled) return null; const m = new Chess(game.fen()).move(S.run.tile.moves[game.history().length].san); return { from: m.from, to: m.to, mode: S.run.mode, line: S.run.tile.id }; };
+window.__movemoryTest = () => { if (!S || !inputEnabled || !S.q) return null; const m = new Chess(game.fen()).move(S.q.move.san); return { from: m.from, to: m.to, mode: S.item.kind === 'partie' ? 'partie' : 'niv' + S.item.level, line: S.item.t.id }; };
 loadRepertoire(REP);
 renderMap();
 requestAnimationFrame(renderMap);
