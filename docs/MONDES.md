@@ -8,7 +8,7 @@
   Exemple : Blancs → Partie italienne ; Noirs → Caro-Kann (contre 1.e4) et Gambit dame refusé (contre 1.d4).
 - Chaque ouverture est livrée avec ses **lignes majeures**, classées par importance (de la plus jouée à la moins jouée).
   Toutes les lignes majeures sont considérées comme **correctes**.
-- L'utilisateur peut **ajouter ses propres lignes** à tout moment.
+- L'utilisateur peut **ajouter des lignes** à tout moment, en les choisissant dans le catalogue (voir § 4).
 - **Freemium** : le nombre d'ouvertures disponibles dans les catalogues est la partie payante
   (ex. 1 ouverture par couleur gratuite, davantage avec l'abonnement).
 
