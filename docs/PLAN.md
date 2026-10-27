@@ -44,7 +44,7 @@ puis **Solution** (flèche du bon coup). Un mauvais coup est annulé avec animat
 
 ## 3. Import de parties
 
-- Connexion des pseudos **Lichess** et **Chess.com** (API publiques, sans mot de passe).
+- Connexion du pseudo **Chess.com** (API publique, sans mot de passe). Lichess éventuellement plus tard.
 - Pour chaque partie importée :
   - **écart au répertoire** : « tu as joué 4.d3, ton répertoire dit 4.c3 » → la carte repasse en tête (sans moteur) ;
   - **erreurs dans l'ouverture** (coups 1 à 15) détectées par moteur → transformées en exercices perso.
@@ -63,10 +63,10 @@ import de parties, analyse par moteur, statistiques.
 
 | Phase | Contenu | Statut |
 |---|---|---|
-| 0. Fondations | Monorepo, moteur de cartes, FSRS, base d'ouvertures Lichess, tests | ✅ fait |
+| 0. Fondations | Monorepo, moteur de cartes, FSRS, tests | ✅ fait |
 | 1. MVP jouable | Maquette validée, échiquier tactile (drag & drop), révision du jour, choix des ouvertures, sauvegarde locale | à faire |
 | 2. Comptes | Supabase (auth, synchro des révisions), streak, XP | à faire |
-| 3. Import de parties | Lichess + Chess.com, écarts au répertoire | à faire |
+| 3. Import de parties | Chess.com, écarts au répertoire | à faire |
 | 4. Moteur | Erreurs d'ouverture via Stockfish, problèmes tactiques par ouverture | à faire |
 | 5. Lancement | Notifications, onboarding, stores (EAS), abonnement | à faire |
 

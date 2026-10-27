@@ -31,23 +31,30 @@ une app à code fermé, ni « réimplémenté » à partir de son code (un porta
 | Option | Où | Licence | Notes |
 |---|---|---|---|
 | ✅ **Écarts au répertoire** | appareil | — | Aucun moteur : déjà codé dans `packages/core` (`findRepertoireDeviation`). |
-| ✅ **Lichess Cloud Eval API** | API, au moment de l'import | gratuit | Évaluations pré-calculées des positions courantes : idéal pour les 10-15 premiers coups. Résultat mis en cache → consultable hors-ligne. |
-| ✅ **Leorik** (moteur NNUE, ~3 400 Elo CCRL) | appareil | **MIT** | Licence permissive : on peut le porter (TypeScript / Rust → WASM et natif) en gardant la mention de copyright. Réseau entraîné en auto-jeu, sans données GPL. Bien plus fort que nécessaire pour détecter les erreurs d'amateurs. |
+| Lichess Cloud Eval API | API | gratuit | **Mis de côté** (priorité Chess.com). Pourrait compléter plus tard. |
+| ✅ **Leorik** (moteur NNUE, ~3 400 Elo CCRL) — **moteur principal** | appareil | **MIT** | Licence permissive : on peut le porter (TypeScript / Rust → WASM et natif) en gardant la mention de copyright. Réseau entraîné en auto-jeu, sans données GPL. Bien plus fort que nécessaire pour détecter les erreurs d'amateurs. |
 | Moteur maison (clean-room) | appareil | à nous | Possible (alpha-beta + évaluation simple), mais des mois de travail pour un niveau bien inférieur. |
 | Stockfish sur notre serveur | serveur | GPL-3 | Autorisé avec un code fermé (pas de distribution du binaire), mais pas « local ». Option de secours. |
 | API tierces (chess-api.com…) | API | — | Conditions et pérennité incertaines : à éviter pour un produit. |
 
-## 4. Données
+## 4. Données — priorité Chess.com
 
-| Besoin | Source | Licence |
-|---|---|---|
-| ✅ Noms et lignes d'ouvertures (3 865) | [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings) → `data/openings.json` | CC0 |
-| ✅ Coups les plus joués par niveau (réponses réalistes de l'adversaire, erreurs fréquentes) | Lichess Opening Explorer API (à mettre en cache) | libre |
-| ✅ Problèmes tactiques **classés par ouverture** (~5 M) | Base de puzzles Lichess (`database.lichess.org`) | CC0 |
-| ✅ Parties de l'utilisateur | API Lichess (`/api/games/user`) + API publique Chess.com (archives PGN mensuelles) | publiques |
+| Besoin | Source |
+|---|---|
+| ✅ **Parties de l'utilisateur** | **API publique Chess.com** (`api.chess.com/pub/player/{pseudo}/games/{AAAA}/{MM}/pgn`) : lecture seule, sans clé, gratuite. Contient le PGN, le code ECO de l'ouverture et, si l'utilisateur a fait l'analyse sur Chess.com, sa précision. |
+| ✅ **Évaluations / erreurs** | Moteur local (Leorik) : l'API Chess.com ne fournit **ni évaluation moteur ni explorateur d'ouvertures**. |
+| ✅ **Lignes d'ouvertures + explications** | Contenu rédigé par nous (indispensable : chaque coup doit être expliqué), traduit. |
+| ✅ **Exercices tirés des parties** | Générés depuis les parties Chess.com de l'utilisateur (écarts au répertoire + erreurs détectées par le moteur). |
+| Lichess (API, puzzles, base d'ouvertures) | **Mis de côté** pour l'instant. Le script d'import de `packages/core` sert uniquement d'aide au développement. |
 
-La base de puzzles Lichess contient un tag d'ouverture pour chaque problème : on peut proposer
-« les tactiques typiques de *ta* Caro-Kann », ce que personne ne fait aujourd'hui.
+### Règles d'usage de l'API Chess.com (à respecter)
+
+- Requêtes **une par une** (en parallèle → erreurs 429, voire blocage) ; mettre en cache (`If-None-Match` / `If-Modified-Since`).
+- User-Agent avec un contact (ex. `Movemory/1.0 (contact@…)`).
+- Données rafraîchies toutes les 12 à 24 h au plus : on importe à l'ouverture de l'app, pas en temps réel.
+- **Ne pas reprendre les éléments de marque Chess.com** (palettes d'échiquier, dessins de pièces, sons, symboles
+  de classement des coups). Notre échiquier a donc sa propre palette et ses propres pièces.
+- Questions juridiques : legal@chess.com (à contacter avant le lancement commercial).
 
 ## 5. Répétition espacée
 

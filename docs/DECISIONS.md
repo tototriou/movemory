@@ -8,6 +8,8 @@
 | Échiquier | Composant maison (SVG + gestes + animations) | Meilleur rendu, aucune contrainte de licence |
 | Hors-ligne | **Primordial** | Toute la logique tourne sur l'appareil, stockage local (SQLite), synchro plus tard |
 | Analyse des parties | En local pour l'instant | Voir MOTEURS.md § 3 (moteur sous licence permissive) |
+| Plateforme de référence | **Chess.com en priorité**, Lichess mis de côté | Import des parties via l'API publique Chess.com ; pas d'évaluations fournies → moteur local |
+| Identité visuelle | Inspirée de l'ergonomie Chess.com, **sans reprendre leurs éléments de marque** | Palette d'échiquier, pièces et sons à nous |
 | Langues | **Multilingue dès le départ** | Voir ci-dessous |
 | Nom | « Movemory » envisagé | movemory.com déjà pris ; .app / .fr / .net / .io libres au 27/10/2026 |
 

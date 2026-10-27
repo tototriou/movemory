@@ -20,7 +20,7 @@ On ne joue pas contre d'autres joueurs : on **révise**, de façon passive et r�
 apps/mobile       App Expo (iOS, Android et web avec une seule base de code)
 packages/core     Moteur de révision : répertoire → cartes, répétition espacée, import de parties (testé)
 supabase/         Schéma de base de données (Postgres)
-data/             Base d'ouvertures Lichess (CC0), générée par `pnpm openings:import`
+data/             Données de développement (base d'ouvertures publique, temporaire)
 docs/             Plan produit, choix techniques, maquette
 ```
 
