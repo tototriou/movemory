@@ -1,6 +1,6 @@
 # Système de progression : catalogues, mondes et parcours de Memo
 
-> Document de travail : les points marqués **(à valider)** sont des propositions.
+> Document de travail. ✅ = validé.
 
 ## 1. Catalogues
 
@@ -27,7 +27,7 @@ On élargit d'abord, puis on approfondit :
 | 6 | 7 premiers coups | 10 |
 | … | +2 coups | … |
 
-- **(à valider)** « Coups » = coups de l'utilisateur (3 coups avec les Blancs = 1.e4, 2.Cf3, 3.Fc4).
+- « Coups » = **coups de l'utilisateur** (3 coups avec les Blancs = 1.e4, 2.Cf3, 3.Fc4). ✅
 - Chaque monde n'introduit que du **nouveau contenu** (nouvelles lignes ou nouveaux coups) ; ce qui a été appris
   dans les mondes précédents continue de revenir dans la révision du jour (répétition espacée).
 - Chaque ouverture a son propre décor de monde (ex. « Italie » pour la Partie italienne).
@@ -36,30 +36,49 @@ On élargit d'abord, puis on approfondit :
 
 - Une carte par monde ; chaque **case = un ensemble de coups** à maîtriser (ex. une ligne majeure jusqu'à la profondeur du monde).
 - **Memo avance d'une case quand cet ensemble de coups est maîtrisé**, jusqu'au bout du parcours.
-- **(à valider)** « Maîtrisé » = chaque position de la case réussie sans indice lors d'au moins 2 séances,
-  sur 2 jours différents (dans FSRS : stabilité ≥ 3 jours).
+- « Maîtrisé » = chaque position de la case réussie sans indice lors d'au moins 2 séances,
+  sur 2 jours différents (dans FSRS : stabilité ≥ 3 jours). ✅
+- Les positions maîtrisées **reviennent quand même**, de plus en plus espacées, pour vérifier qu'elles ne sont
+  pas oubliées (rappels de la répétition espacée + « contrôles surprise » dans la révision du jour).
+  Une position ratée lors d'un rappel redevient « à revoir », sans faire reculer Memo. ✅
 - Cases spéciales :
   - **coffre** : récompense (gemmes, accessoire pour Memo) ;
   - **défi final** : jouer toutes les lignes du monde d'affilée, sans erreur → débloque le monde suivant.
 
-## 4. Lignes ajoutées par l'utilisateur
+## 4. Ajout de lignes : depuis un catalogue ✅
 
-- **(à valider)** Trois façons d'en ajouter :
-  1. jouer les coups sur l'échiquier ;
-  2. coller un PGN ;
-  3. depuis une partie Chess.com importée (« ajouter cette variante à mes révisions »).
-- **(à valider)** Elles rejoignent le monde en cours sous forme de nouvelles cases, et entrent tout de suite dans la révision du jour.
+- Les lignes ne sont **pas saisies librement** : l'utilisateur les choisit dans un **catalogue prédéfini**
+  (à la manière du catalogue d'ouvertures de Chess.com) : Ouverture → Variantes → Sous-variantes,
+  chacune avec son nom, ses coups, sa popularité et ses explications.
+- Ajouter une variante la fait entrer dans le monde en cours (nouvelles cases) et dans la révision du jour.
+- Avantage : chaque ligne est vérifiée (Stockfish) et expliquée à l'avance.
 
 ## 5. Correction des coups
 
-- **(à valider)** Dans une position, tout coup prévu par **une des lignes retenues** dans le monde (majeures + ajoutées)
+- ✅ Dans une position, tout coup prévu par **une des lignes retenues** dans le monde (majeures + ajoutées)
   est accepté comme juste.
 - Un coup hors de ces lignes → écran « Pas votre ligne » + explication de Memo + la position revient plus souvent.
 
-## 6. Contenu
+## 6. Contenu : d'où viennent les lignes majeures
 
-- Les lignes majeures et leurs explications sont **rédigées par nous** (l'API Chess.com ne fournit pas de statistiques
-  d'ouvertures), puis traduites. C'est aussi le contenu valorisé dans l'offre payante.
+Calculées à partir de vraies parties, une fois, **au moment de construire l'app** (aucune dépendance en temps réel) :
+
+| Source | Contenu | Licence | Usage |
+|---|---|---|---|
+| ✅ **Base de parties Lichess** (database.lichess.org) | ~100 M de parties classées par mois, avec l'Elo des joueurs | **CC0** (libre) | Statistiques des coups les plus joués, **par niveau** (ex. 1200-1600, 1600-2000, 2000+) |
+| ✅ **chess-openings** (Lichess) | 3 865 noms d'ouvertures et variantes (code ECO) | **CC0** | Noms et arborescence du catalogue (déjà importé dans `data/`) |
+| The Week in Chess (TWIC) | Parties de maîtres, chaque semaine | à vérifier | Lignes « théoriques » de haut niveau |
+| Stockfish | Évaluation | GPL (déjà adopté) | Vérifier que chaque ligne retenue est saine |
+
+Pipeline proposé (script hors-ligne, relancé de temps en temps) :
+1. Lire un échantillon de parties (ex. quelques millions de parties rapides/classiques) et compter, pour chaque position
+   des 20 premiers demi-coups, la fréquence de chaque coup selon la tranche d'Elo.
+2. Pour chaque ouverture du catalogue : **lignes majeures** = réponses adverses les plus fréquentes ;
+   **nos coups** = coup principal de la théorie, vérifié par Stockfish.
+3. Exporter en JSON (`content/openings/*.json`), puis **nous rédigeons les explications** de chaque coup (et les traduisons).
+
+Bonus possible : « les lignes les plus jouées **à votre niveau** », grâce aux tranches d'Elo.
+Chess.com reste la plateforme prioritaire pour l'import des parties de l'utilisateur ; Lichess ne sert ici que de source de données libres.
 
 ## 7. Impact technique (pour plus tard)
 
