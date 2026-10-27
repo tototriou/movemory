@@ -38,25 +38,27 @@ On élargit d'abord, puis on approfondit, et on finit par se spécialiser :
 
 ## 3. L'apprentissage : leçons et manches (inspiré du mode « Apprendre » de Quizlet) ✅
 
-Chaque **position** (un coup à trouver) passe par des niveaux de difficulté croissante :
+Chaque **position** (un coup à trouver) passe par 3 niveaux :
 
-| Niveau | Question | Aide |
-|---|---|---|
-| 0 → 1 · Découverte | La position s'affiche, Memo montre le coup (flèche) et l'explique | Flèche |
-| 1 → 2 · Avec aide | Même position, la **pièce à jouer est entourée** : trouver où elle va | Pièce indiquée |
-| 2 → 3 · Seul | Même position, sans aide | Aucune |
-| 3 → 4 · En partie | **Partie mélangée** : l'adversaire choisit au hasard une des lignes de la leçon, il faut la reconnaître | Aucune |
+| Niveau | Question |
+|---|---|
+| 0 → 1 · Découverte | Memo montre le coup (flèche) et l'explique |
+| 1 → 2 · De mémoire | La même position, sans aide (bouton **Indice** si besoin, mais la position ne monte pas) |
+| 2 → 3 · En partie | **Partie mélangée** : l'adversaire choisit au hasard une des lignes de la leçon, il faut la reconnaître |
 
-- **Leçon** = 2-3 nouvelles lignes (+ celles déjà commencées et pas encore maîtrisées).
-- La leçon avance par **manches de 7 questions**, mélangées (jamais deux de suite sur la même ligne).
-- **Erreur** → explication de Memo, la position **redescend d'un niveau** et revient **à la fin de la manche**.
-- Indice ou solution utilisés → pas de montée de niveau.
-- **Bilan entre deux manches** : barre Maîtrisées / En apprentissage / Pas encore vues + état de chaque ligne.
-  On peut « Arrêter pour aujourd'hui » et reprendre plus tard au même point.
-- **Memo avance** sur la carte quand **toutes les positions d'une ligne sont maîtrisées**.
-- Ensuite, la **révision du jour** (répétition espacée) refait passer les positions maîtrisées de temps en temps ;
-  une position ratée redevient « en apprentissage », sans faire reculer Memo.
-- Cases spéciales : **coffre** (récompense) et **défi final** (toutes les lignes du monde en partie, sans indice ni erreur).
+- **Introduction progressive** : une leçon commence par une ligne ; une nouvelle ligne arrive dès que les
+  précédentes sont presque sues (au plus 2 positions encore fragiles), jusqu'à 3 nouvelles lignes par leçon.
+- **Manches de 7 questions** mélangées (jamais deux de suite sur la même ligne), avec un **bilan** entre deux manches
+  (Maîtrisées / En apprentissage / Pas encore vues). On peut s'arrêter et reprendre au même point.
+- **Erreur** → explication de Memo, la position redescend d'un niveau et revient à la fin de la manche.
+
+### La carte : un chemin du départ à l'arrivée ✅
+
+- Chaque monde est un **chemin continu**, du **Départ** à l'**Arrivée** (défi final), avec un **coffre à mi-chemin**.
+- Le chemin compte **un pas par niveau à gagner** (3 pas par position du monde).
+- **Memo avance d'un pas à chaque niveau gagné et recule d'un pas quand on se trompe.**
+- L'arrivée débloque le **défi final** : toutes les lignes en partie, sans indice ni erreur.
+- Ensuite, la révision du jour (répétition espacée) refait passer les positions de temps en temps.
 
 ## 4. Ajout de lignes : depuis un catalogue ✅
 

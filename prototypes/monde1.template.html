@@ -50,6 +50,11 @@ button { font: inherit; color: inherit; }
 .bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: var(--muted); }
 .bar-row .bar { flex: 1; }
 .path { position: relative; z-index: 1; flex: 1; min-height: 0; }
+.track { position: absolute; inset: 0; }
+.milestone { position: absolute; z-index: 3; transform: translate(-50%, -50%); display: grid; justify-items: center; gap: 2px; background: none; border: 0; padding: 0; color: var(--fg); }
+button.milestone { cursor: pointer; } button.milestone:disabled { cursor: default; opacity: .55; }
+.milestone.ready svg { animation: bob 1.4s ease-in-out infinite; filter: drop-shadow(0 0 10px rgba(255,201,74,.7)); }
+.flag { font-family: var(--display); font-weight: 600; font-size: 12px; background: rgba(15,13,22,.85); border-radius: 8px; padding: 2px 8px; }
 .tile { position: absolute; width: 110px; height: 90px; border: 0; padding: 0; background: none; cursor: pointer; }
 .tile svg { position: absolute; inset: 0; }
 .tile:disabled { cursor: default; }
@@ -146,7 +151,7 @@ button { font: inherit; color: inherit; }
 .pips { display: flex; gap: 4px; }
 .pips i { width: 14px; height: 14px; border-radius: 4px; background: var(--surface-2); }
 .pips i.on { background: var(--gold); }
-.pips i.lv1 { background: #7A6A3A; } .pips i.lv2 { background: #B8932E; } .pips i.lv3 { background: var(--gold); } .pips i.lv4 { background: var(--good); }
+.pips i.lv1 { background: #8A6E2A; } .pips i.lv2 { background: var(--gold); } .pips i.lv3 { background: var(--good); }
 .seg-bar { display: flex; height: 14px; border-radius: 999px; overflow: hidden; background: var(--surface-2); }
 .seg-bar span { display: block; height: 100%; transition: width .5s; }
 .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }
@@ -304,7 +309,7 @@ function cardsOf(moves, from, to) {
   });
   return out;
 }
-let TILES = [], MAP_ORDER = [];
+let TILES = [];
 // Fin de la tranche : juste après le DEPTH-ième coup de l'utilisateur à partir de DEBUT
 function sliceEnd(moves) {
   const c = new Chess(); let n = 0;
@@ -315,14 +320,12 @@ function loadRepertoire(rep) {
   REP = rep; const R = CONTENT[rep]; WORLD = R.mondes[0]; LINES = WORLD.lignes; DEPTH = WORLD.profondeur; SIDE = R.camp; DEBUT = WORLD.debut || 0;
   CARDS = new Map();
   TILES = LINES.map((l) => { const to = sliceEnd(l.coups); return { id: l.id, name: l.nom, punish: !!l.aPunir, deviation: !!l.deviation, alerte: l.alerte || '', moves: l.coups, from: DEBUT, to, cards: cardsOf(l.coups, DEBUT, to) }; });
-  // Ordre sur la carte : 3 lignes, coffre, 3 lignes (dont le coup à punir), défi final
-  MAP_ORDER = [LINES[0].id, LINES[1].id, LINES[2].id, 'coffre', LINES[3].id, LINES[4].id, LINES[5].id, 'defi'];
   loadProgress();
 }
 const tileById = (id) => TILES.find((t) => t.id === id);
 
 /* ---------- Progression (localStorage, avec repli en mémoire) ---------- */
-const SAVE_KEY = () => 'movemory-monde1-v3-' + REP;
+const SAVE_KEY = () => 'movemory-monde1-v4-' + REP;
 let P;
 function loadProgress() {
   P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: false, learned: [], sessionNo: 0 };
@@ -330,74 +333,72 @@ function loadProgress() {
 }
 const save = () => { try { localStorage.setItem(SAVE_KEY(), JSON.stringify(P)); } catch {} };
 // Niveaux d'une position (comme le mode « Apprendre » de Quizlet) :
-// 0 pas vue · 1 découverte (guidée) · 2 trouvée avec la pièce indiquée · 3 trouvée seule · 4 maîtrisée (trouvée en partie)
-const LEVELS = ['Pas vue', 'Découverte', 'Avec aide', 'Seule', 'Maîtrisée'];
+// 0 pas vue · 1 découverte (guidée) · 2 trouvée seule · 3 maîtrisée (trouvée en partie). Besoin d'aide ? Bouton Indice.
+const LEVELS = ['Pas vue', 'Découverte', 'Seule', 'Maîtrisée'];
+const MAXL = 3;
 const card = (k) => (P.cards[k] ||= { level: 0 });
-const tileMastered = (t) => t.cards.every((k) => card(k).level >= 4);
-function stepDone(id) {
-  if (id === 'coffre') return P.chest;
-  if (id === 'defi') return P.boss;
-  return tileMastered(tileById(id));
-}
-const currentIndex = () => { const i = MAP_ORDER.findIndex((id) => !stepDone(id)); return i === -1 ? MAP_ORDER.length - 1 : i; };
-const unlocked = (i) => P.unlock || i <= currentIndex();
+const tileMastered = (t) => t.cards.every((k) => card(k).level >= MAXL);
+// Avancée sur le chemin : 1 pas par niveau gagné sur chaque position du monde ; une erreur fait reculer d'un pas
+const allCards = () => [...new Set(TILES.flatMap((t) => t.cards))];
+function worldProgress() { const ks = allCards(); return { steps: ks.reduce((n, k) => n + Math.min(card(k).level, MAXL), 0), total: ks.length * MAXL }; }
 
 /* ---------- Carte ---------- */
 const $ = (id) => document.getElementById(id);
-const COORDS = [[0.30, 0.92], [0.46, 0.81], [0.62, 0.70], [0.46, 0.59], [0.30, 0.48], [0.46, 0.37], [0.62, 0.26], [0.48, 0.12]];
-function tileSvg(kind) {
-  const c = { done: ['#FFC94A', '#FFD976', '#C9951E', '#A87B12'], deviation: ['#F59E0B', '#FBBF24', '#B45309', '#92400E'], todo: ['#8B5CF6', '#A78BFA', '#6D28D9', '#5B21B6'], locked: ['#5A5470', '#6B6585', '#3E3952', '#332E47'], punish: ['#E2574C', '#F07A6F', '#A8382F', '#8E2C24'], chest: ['#A86E35', '#BE8448', '#7A4E22', '#5F3C1A'], boss: ['#3A2420', '#4A302A', '#24140F', '#1A0E0A'] }[kind];
-  return `<svg viewBox="0 0 110 90" aria-hidden="true"><polygon points="9,36 55,66 55,82 9,52" fill="${c[2]}"/><polygon points="55,66 101,36 101,52 55,82" fill="${c[3]}"/><polygon points="55,6 101,36 55,66 9,36" fill="${c[0]}"/><polygon points="55,14 89,36 55,58 21,36" fill="${c[1]}"/></svg>`;
+function trackD(W, H) {
+  // chemin sinueux du bas (départ) vers le haut (arrivée)
+  const rows = 6, top = H * 0.10, bottom = H * 0.93, dy = (bottom - top) / rows;
+  const pts = Array.from({ length: rows + 1 }, (_, i) => [i % 2 === 0 ? W * 0.24 : W * 0.76, bottom - i * dy]);
+  let d = `M ${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 1; i < pts.length; i++) { const [x0, y0] = pts[i - 1], [x1, y1] = pts[i]; d += ` C ${x0} ${y0 - dy * 0.55}, ${x1} ${y1 + dy * 0.55}, ${x1} ${y1}`; }
+  return d;
 }
 function renderMap() {
-  const path = $('path'); const W = path.clientWidth || 380, H = path.clientHeight || 640;
-  const cur = currentIndex();
-  let html = '';
-  const order = MAP_ORDER.map((id, i) => ({ id, i })).sort((a, b) => COORDS[a.i][1] - COORDS[b.i][1]);
-  for (const { id, i } of order) {
-    const [fx, fy] = COORDS[i]; const x = fx * W - 55, y = fy * H - 46;
-    const done = stepDone(id), open = unlocked(i);
-    const t = tileById(id);
-    let kind = done ? 'done' : !open ? 'locked' : id === 'coffre' ? 'chest' : id === 'defi' ? 'boss' : t?.punish ? 'punish' : t?.deviation ? 'deviation' : 'todo';
-    if (!done && id === 'coffre' && open) kind = 'chest';
-    let inner = '';
-    if (done) inner = '<svg style="position:absolute;left:38px;top:20px" width="34" height="26" viewBox="0 0 24 18" aria-hidden="true"><path d="M3 9l6 6L21 3" fill="none" stroke="#6B4405" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    else if (id === 'coffre') inner = '<svg style="position:absolute;left:35px;top:8px" width="40" height="36" viewBox="0 0 24 22" aria-hidden="true"><rect x="2" y="8" width="20" height="12" rx="2" fill="#8B5A2B"/><path d="M2 10V7a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3z" fill="#A86E35"/><rect x="2" y="10" width="20" height="2.5" fill="#FFC94A"/><rect x="10" y="9" width="4" height="6" rx="1" fill="#FFC94A"/></svg>';
-    else if (id === 'defi') inner = '<svg style="position:absolute;left:35px;top:10px" width="40" height="34" viewBox="0 0 24 20" aria-hidden="true"><path d="M2 6l5 4 5-8 5 8 5-4-2 12H4z" fill="#FFC94A" stroke="#8A5E0A" stroke-width="1.2" stroke-linejoin="round"/></svg>';
-    else if (i !== cur) inner = `<span class="num">${i + 1}</span>`;
-    const name = id === 'coffre' ? 'Coffre' : id === 'defi' ? 'Défi final' : t.name;
-    html += `<button class="tile ${i === cur ? 'current' : ''}" data-step="${id}" style="left:${x}px;top:${y}px" ${open ? '' : 'disabled'} aria-label="${name}${done ? ', maîtrisé' : open ? '' : ', verrouillé'}">${i === cur ? '<span class="ring"></span>' : ''}${tileSvg(kind)}${inner}</button>`;
-  }
-  const [cx, cy] = COORDS[cur];
-  html += `<div class="memo-token" style="left:${cx * W - 42}px;top:${cy * H - 92}px">${memoSvg(stepDone(MAP_ORDER[cur]) ? 'bravo' : 'content')}</div>`;
-  path.innerHTML = html;
-  const doneCount = MAP_ORDER.filter(stepDone).length;
-  $('world-bar').style.width = `${(doneCount / MAP_ORDER.length) * 100}%`;
-  $('world-count').textContent = `${doneCount}/${MAP_ORDER.length}`;
+  const host = $('path'); const W = host.clientWidth || 380, H = host.clientHeight || 600;
+  const { steps, total } = worldProgress();
+  host.innerHTML = `<svg class="track" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" aria-hidden="true">
+    <path id="track" d="${trackD(W, H)}" fill="none" stroke="#3A2416" stroke-width="34" stroke-linecap="round"/>
+    <path d="${trackD(W, H)}" fill="none" stroke="#5A3A24" stroke-width="26" stroke-linecap="round"/>
+    <g id="dots"></g></svg>`;
+  const track = host.querySelector('#track'); const L = track.getTotalLength();
+  const at = (f) => { const p = track.getPointAtLength(Math.max(0, Math.min(1, f)) * L); return [p.x, p.y]; };
+  let dots = '';
+  for (let i = 1; i <= total; i++) { const [x, y] = at(i / total); dots += `<circle cx="${x}" cy="${y}" r="${i <= steps ? 6 : 4}" fill="${i <= steps ? '#FFC94A' : 'rgba(255,255,255,.28)'}"/>`; }
+  host.querySelector('#dots').innerHTML = dots;
+  const chestAt = 0.5, chestReached = steps >= total * chestAt;
+  const [sx, sy] = at(0), [cx, cy] = at(chestAt), [ex, ey] = at(1), [mx, my] = at(steps / total);
+  host.insertAdjacentHTML('beforeend', `
+    <div class="milestone" style="left:${sx}px;top:${sy}px"><span class="flag">Départ</span></div>
+    <button class="milestone chest ${P.chest ? 'open' : chestReached || P.unlock ? 'ready' : ''}" id="chest" style="left:${cx}px;top:${cy}px" ${chestReached || P.unlock ? '' : 'disabled'} aria-label="Coffre${P.chest ? ' (ouvert)' : chestReached ? ' : à ouvrir' : ' : à mi-chemin'}">
+      <svg width="46" height="42" viewBox="0 0 24 22" aria-hidden="true"><rect x="2" y="8" width="20" height="12" rx="2" fill="#8B5A2B"/><path d="M2 10V7a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3z" fill="${P.chest ? '#5F3C1A' : '#A86E35'}"/><rect x="2" y="10" width="20" height="2.5" fill="#FFC94A"/><rect x="10" y="9" width="4" height="6" rx="1" fill="#FFC94A"/></svg></button>
+    <button class="milestone goal ${steps >= total || P.unlock ? 'ready' : ''}" id="goal" style="left:${ex}px;top:${ey}px" ${steps >= total || P.unlock ? '' : 'disabled'} aria-label="Arrivée : défi final">
+      <svg width="52" height="44" viewBox="0 0 24 20" aria-hidden="true"><path d="M2 6l5 4 5-8 5 8 5-4-2 12H4z" fill="${P.boss ? '#3DDC84' : '#FFC94A'}" stroke="#8A5E0A" stroke-width="1.2" stroke-linejoin="round"/></svg><span class="flag">Arrivée</span></button>
+    <div class="memo-token" style="left:${mx - 42}px;top:${my - 88}px">${memoSvg(P.boss ? 'bravo' : 'content')}</div>`);
+  $('chest').addEventListener('click', openChest);
+  $('goal').addEventListener('click', () => startSession({ boss: true }));
+  const mastered = TILES.filter(tileMastered).length, started = TILES.filter((t) => tileSeen(t) && !tileMastered(t)).length;
+  $('world-bar').style.width = `${(steps / total) * 100}%`;
+  $('world-count').textContent = `${mastered}/${TILES.length} lignes`;
   $('xp').textContent = P.xp; $('gems').textContent = P.gems;
-  const curId = MAP_ORDER[cur];
-  const fresh = TILES.filter((t) => !tileSeen(t)).length;
-  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : curId === 'coffre' ? 'Ouvrir le coffre' : curId === 'defi' ? 'Défi final' : TILES.some((t) => tileSeen(t) && !tileMastered(t)) ? 'Continuer la leçon' : fresh ? 'Nouvelle leçon' : 'Réviser';
-  const ring = Math.round(MAP_ORDER.filter(stepDone).length / MAP_ORDER.length * 100);
+  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : steps >= total ? 'Défi final' : chestReached && !P.chest ? 'Ouvrir le coffre' : steps ? 'Continuer' : 'Commencer';
+  const ring = Math.round((steps / total) * 100);
   $('play-ring').style.background = `conic-gradient(var(--gold) 0 ${ring}%, var(--surface-2) ${ring}% 100%)`;
   $('unlock').checked = P.unlock;
-  $('world-title').textContent = `Monde 1 · ${WORLD.titre} · ${DEPTH} coups`;
+  $('world-title').textContent = `Monde 1 · ${WORLD.titre} · ${DEPTH} coups · ${started ? `${started} ligne${started > 1 ? 's' : ''} en cours` : `${TILES.length} lignes`}`;
   for (const r of ['w', 'b']) $('rep-' + r).setAttribute('aria-selected', String(r === REP));
 }
 for (const r of ['w', 'b']) $('rep-' + r).addEventListener('click', () => { try { localStorage.setItem('movemory-rep', r); } catch {} loadRepertoire(r); renderMap(); });
-$('path').addEventListener('click', (e) => { const b = e.target.closest('.tile'); if (b && !b.disabled) openStep(b.dataset.step); });
-$('play').addEventListener('click', () => openStep(MAP_ORDER[currentIndex()]));
+$('play').addEventListener('click', () => {
+  const { steps, total } = worldProgress();
+  if (steps >= total && !P.boss) return startSession({ boss: true });
+  if (steps >= total / 2 && !P.chest) return openChest();
+  startSession({});
+});
 $('unlock').addEventListener('change', (e) => { P.unlock = e.target.checked; save(); renderMap(); });
-$('reset').addEventListener('click', () => { P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: P.unlock, learned: [], sessionNo: 0 }; save(); renderMap(); });
+$('reset').addEventListener('click', () => { P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: P.unlock, learned: [] }; save(); renderMap(); });
 window.addEventListener('resize', () => { if (!$('screen-map').hidden) renderMap(); });
 
 function show(screen) { for (const s of ['map', 'session', 'end']) $('screen-' + s).hidden = s !== screen; closeSheet(); window.scrollTo(0, 0); if (screen === 'map') renderMap(); }
 
-function openStep(id) {
-  if (id === 'coffre') return openChest();
-  if (id === 'defi') return startSession({ boss: true });
-  startSession({});
-}
 
 /* ---------- Échiquier ---------- */
 const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
@@ -492,34 +493,40 @@ const tileSeen = (t) => (P.learned || []).includes(t.id);
 const plyOf = (t, k) => { const g = new Chess(); for (let i = 0; i < t.moves.length; i++) { if (fenKey(g.fen()) === k && g.turn() === SIDE && i >= t.from) return i; g.move(t.moves[i].san); } return -1; };
 const ROUND = 7;
 
-/* Leçon = les lignes travaillées (2-3 nouvelles + celles pas encore maîtrisées).
-   Elle avance par manches de 7 questions. Chaque question fait monter la position d'un niveau :
-   guidée (flèche) → avec aide (pièce indiquée) → seule → en partie (l'adversaire choisit l'ouverture au hasard).
-   Une erreur fait redescendre d'un niveau et la question revient à la fin de la manche. */
-function lessonLines() {
-  const order = MAP_ORDER.filter((id) => tileById(id)).map(tileById);
-  const open = order.filter((t) => tileSeen(t) && !tileMastered(t));
-  const fresh = order.filter((t) => !tileSeen(t)).slice(0, Math.max(0, 3 - open.length) || (open.length ? 0 : 3));
-  const lines = [...open, ...fresh];
-  return lines.length ? lines : order.filter(tileSeen); // tout est maîtrisé : on révise
+/* Leçon : on commence par une ligne, puis une nouvelle ligne arrive dès que les précédentes sont presque sues
+   (au plus 3 nouvelles lignes par leçon). Manches de 7 questions mélangées :
+   découverte (flèche) → seul → en partie (l'adversaire choisit une ligne au hasard).
+   Une erreur fait redescendre la position d'un niveau (Memo recule) et la question revient à la fin de la manche. */
+const NEW_PER_LESSON = 3;
+function maybeIntroduce() {
+  const next = TILES.find((t) => !tileSeen(t));
+  if (!next || S.introduced >= NEW_PER_LESSON) return null;
+  const weak = lessonCards().filter((k) => card(k).level < 2).length;
+  if (S.lines.length && weak > 2) return null;
+  S.lines.push(next); P.learned.push(next.id); S.introduced++; save();
+  return next;
 }
 function buildRound() {
+  const intro = maybeIntroduce();
   const lines = S.lines;
   const todo = []; const seenK = new Set();
-  for (const t of lines) for (const k of t.cards) if (!seenK.has(k) && card(k).level < 4) { seenK.add(k); todo.push({ k, t }); }
+  for (const t of lines) for (const k of t.cards) if (!seenK.has(k) && card(k).level < MAXL) { seenK.add(k); todo.push({ k, t: intro && intro.cards.includes(k) && card(k).level === 0 ? intro : t }); }
   if (!todo.length) return [];
   todo.sort((a, b) => card(a.k).level - card(b.k).level);
   const batch = todo.slice(0, ROUND);
   const items = []; const parties = new Map();
   for (const { k, t } of batch) {
     const lv = card(k).level;
-    if (lv >= 3) { const line = lines.find((l) => l.cards.includes(k) && card(k).level >= 3) || t; parties.set(line.id, line); }
+    if (lv >= 2) { const line = lines.find((l) => l.cards.includes(k)) || t; parties.set(line.id, line); }
     else items.push({ kind: 'pos', k, t, ply: plyOf(t, k), level: lv });
   }
   for (const line of parties.values()) items.push({ kind: 'partie', t: line });
-  // on mélange en évitant deux questions de suite sur la même ligne, mais on garde l'ordre des coups d'une ligne en découverte
-  let out = shuffle(items).sort((a, b) => (a.kind === 'pos' && b.kind === 'pos' && a.t === b.t ? a.ply - b.ply : 0));
-  for (let i = 1; i < out.length; i++) if (out[i].t === out[i - 1].t) { const j = out.findIndex((x, n) => n > i && x.t !== out[i].t); if (j > 0) [out[i], out[j]] = [out[j], out[i]]; }
+  // mélange, sans deux questions de suite sur la même ligne ; une ligne découverte se joue dans l'ordre des coups
+  let out = shuffle(items);
+  const guided = out.filter((x) => x.kind === 'pos' && x.level === 0).sort((a, b) => a.ply - b.ply);
+  out = [...guided, ...out.filter((x) => !(x.kind === 'pos' && x.level === 0))];
+  for (let i = guided.length + 1; i < out.length; i++) if (out[i].t === out[i - 1].t) { const j = out.findIndex((x, n) => n > i && x.t !== out[i].t); if (j > 0) [out[i], out[j]] = [out[j], out[i]]; }
+  S.newLine = intro;
   return out;
 }
 function startSession(opts) {
@@ -528,16 +535,18 @@ function startSession(opts) {
   $('s-eyebrow').textContent = opts.boss ? 'Défi final · sans indice' : `Monde 1 · ${SIDE === 'w' ? 'Blancs' : 'Noirs'}`;
   $('btn-hint').disabled = $('btn-solution').disabled = !!opts.boss;
   if (opts.boss) { S.queue = shuffle(TILES).map((t) => ({ kind: 'partie', t, boss: true })); S.total = S.queue.length; return nextItem(); }
-  S.lines = lessonLines();
-  for (const t of S.lines) if (!P.learned.includes(t.id)) P.learned.push(t.id);
-  save(); nextRound();
+  // on reprend les lignes commencées et pas encore maîtrisées ; sinon on révise tout ce qui est appris
+  S.introduced = 0;
+  S.lines = TILES.filter((t) => tileSeen(t) && !tileMastered(t));
+  if (!S.lines.length && !TILES.some((t) => !tileSeen(t))) S.lines = TILES.filter(tileSeen);
+  nextRound();
 }
 function lessonCards() { const ks = new Set(); for (const t of S.lines) t.cards.forEach((k) => ks.add(k)); return [...ks]; }
 function updateBar() {
   if (!S) return;
   if (S.opts.boss) { $('s-bar').style.width = `${(S.done || 0) / S.total * 100}%`; return; }
   const ks = lessonCards(); const sum = ks.reduce((n, k) => n + card(k).level, 0);
-  $('s-bar').style.width = `${(sum / (ks.length * 4)) * 100}%`;
+  $('s-bar').style.width = `${ks.length ? (sum / (ks.length * MAXL)) * 100 : 0}%`;
 }
 function nextRound() {
   S.round++; S.queue = buildRound(); S.total = S.queue.length; S.done = 0;
@@ -557,7 +566,10 @@ async function nextItem() {
     it.from = DEBUT; it.to = it.t.to;
     await wait(650); return playOn();
   }
-  $('s-name').textContent = ['Découverte', 'Découverte', 'Avec aide', 'Seul'][it.level] + ' · ' + it.t.name;
+  $('s-name').textContent = (it.level === 0 ? 'Découverte' : 'De mémoire') + ' · ' + it.t.name;
+  if (it.level === 0 && S.newLine === it.t && it.ply === Math.min(...it.t.cards.filter((k) => card(k).level === 0).map((k) => plyOf(it.t, k)))) {
+    say(`Nouvelle ligne : <b>${it.t.name}</b>. ${it.t.alerte ? it.t.alerte + ' ' : ''}Je vous la montre.`, 'content'); await wait(1300);
+  }
   // mise en place rapide de la position, puis question
   it.from = it.ply; it.to = it.ply + 1;
   for (let i = 0; i < it.ply; i++) { await wait(i < DEBUT ? 120 : 200); animate(game.move(it.t.moves[i].san)); renderMoves(true); }
@@ -579,17 +591,14 @@ async function playOn() {
 }
 function ask(ply, move) {
   const it = S.item; const k = fenKey(game.fen()); const cs = card(k);
-  const level = it.kind === 'partie' ? 3 : it.level;
+  const level = it.kind === 'partie' ? 2 : it.level;
   S.q = { ply, move, k, cs, level, help: false };
   const mv = new Chess(game.fen()).move(move.san);
   const prevMove = ply > 0 ? `${SIDE === 'w' ? 'Les Noirs ont joué' : 'Les Blancs ont joué'} <b>${label(ply - 1, game.history()[ply - 1])}</b>. ` : '';
-  if (level <= 1) {
+  if (level === 0) {
     arrow(mv.from, mv.to, '#3E86C8'); S.q.help = true;
-    say(`${it.t.alerte && ply === it.t.from + (SIDE === 'w' ? 2 : 1) - 1 ? it.t.alerte + '<br>' : ''}${S.lastOpp ? S.lastOpp + '<br>' : ''}Nouveau coup : jouez <b>${label(ply, move.san)}</b> (flèche bleue).`, 'content');
-  } else if (level === 2) {
-    sqClass('hint', [mv.from]);
-    say(`${prevMove}La pièce à jouer est entourée : où va-t-elle ?`, 'reflechit');
-  } else if (it.kind !== 'partie') say(`${prevMove}À vous, sans aide !`, 'reflechit');
+    say(`${S.lastOpp ? S.lastOpp + '<br>' : ''}Nouveau coup : jouez <b>${label(ply, move.san)}</b> (flèche bleue).`, 'content');
+  } else if (it.kind !== 'partie') say(`${prevMove}À vous, de mémoire ! (besoin d'aide ? Indice)`, 'reflechit');
   inputEnabled = true; renderMoves(true);
   onUserMove = (m) => answer(m);
 }
@@ -597,7 +606,7 @@ function answer(m) {
   const { ply, move, cs, level } = S.q; const it = S.item;
   inputEnabled = false; onUserMove = null; arrow(null); sqClass('hint', []);
   if (m.san !== move.san) {
-    S.errors++; setCombo(0); cs.level = Math.max(1, cs.level - 1); save(); updateBar();
+    S.errors++; setCombo(0); const fell = cs.level > 1; cs.level = cs.level === 0 ? 0 : Math.max(1, cs.level - 1); save(); updateBar();
     $('board').classList.remove('shake'); void $('board').offsetWidth; $('board').classList.add('shake');
     const mv = new Chess(game.fen()).move(m.san); const el = pieceEls.get(mv.from);
     if (el) { placePiece(el, mv.to); setTimeout(() => placePiece(el, mv.from), 380); }
@@ -606,20 +615,20 @@ function answer(m) {
     if (it.boss) return sheet({ bad: true, title: 'Défi raté', text: `<b>Memo :</b> ici, c'était <b>${label(ply, move.san)}</b>. ${move.pourquoi}`, note: 'Révisez encore un peu, puis retentez le défi.', mood: 'oups', buttons: [['Retour à la carte', 'btn-cta', () => show('map')]] });
     // la question reviendra en fin de manche, un niveau plus bas
     if (it.kind === 'pos') S.queue.push({ ...it, level: cs.level }); else S.queue.push({ kind: 'pos', k: S.q.k, t: it.t, ply, level: cs.level });
-    return sheet({ bad: true, title: 'Pas votre ligne !', text: `<b>Memo :</b> ${fr(m.san)} n'est pas le coup prévu. Ici on joue <b>${label(ply, move.san)}</b> : ${lower(move.pourquoi)}`, note: `Cette position revient à la fin de la manche (niveau : ${LEVELS[cs.level]}).`, mood: 'oups', buttons: [['Rejouer le bon coup', 'btn-cta', () => { closeSheet(); retry(); }]] });
+    return sheet({ bad: true, title: 'Pas votre ligne !', text: `<b>Memo :</b> ${fr(m.san)} n'est pas le coup prévu. Ici on joue <b>${label(ply, move.san)}</b> : ${lower(move.pourquoi)}`, note: `${fell ? 'Memo recule d’un pas. ' : ''}Cette position revient à la fin de la manche.`, mood: 'oups', buttons: [['Rejouer le bon coup', 'btn-cta', () => { closeSheet(); retry(); }]] });
   }
   const played = game.move(m.san); animate(played); renderMoves(true);
   S.correct++; setCombo(S.combo + 1);
   const before = cs.level;
-  // +1 niveau par réussite sans aide ; le dernier niveau (maîtrisée) ne s'obtient qu'en partie
-  const cap = it.kind === 'partie' ? 4 : 3;
+  // +1 niveau par réussite sans indice (Memo avance d'un pas) ; « maîtrisée » ne s'obtient qu'en partie
+  const cap = it.kind === 'partie' ? MAXL : 2;
   if (!S.q.usedHint) cs.level = Math.min(cap, cs.level + 1);
-  if (level <= 1) cs.level = Math.max(cs.level, 1);
+  if (level === 0) cs.level = Math.max(cs.level, 1);
   save(); updateBar();
-  const gain = level <= 1 ? 5 : 8 + level * 2 + Math.min(S.combo, 5); S.xp += gain; floatXp(gain, played.to);
-  if (level <= 1) return sheet({ bad: false, title: 'C’est noté !', text: `<b>Memo :</b> ${move.pourquoi}`, note: '', mood: 'bravo', buttons: [['Continuer', 'btn-cta', () => { closeSheet(); playOn(); }]] });
+  const gain = level === 0 ? 5 : 10 + level * 2 + Math.min(S.combo, 5); S.xp += gain; floatXp(gain, played.to);
+  if (level === 0) return sheet({ bad: false, title: 'C’est noté !', text: `<b>Memo :</b> ${move.pourquoi}`, note: '', mood: 'bravo', buttons: [['Continuer', 'btn-cta', () => { closeSheet(); playOn(); }]] });
   sqClass('good', [played.to]);
-  say(cs.level === 4 && before < 4 ? 'Maîtrisée ! ⭐' : pick(['Bien joué !', 'Exact !', 'Parfait !', 'Oui !']), 'bravo');
+  say((cs.level === MAXL && before < MAXL ? 'Maîtrisée ! ⭐ ' : pick(['Bien joué ! ', 'Exact ! ', 'Parfait ! ', 'Oui ! '])) + (cs.level > before ? 'Memo avance d’un pas.' : ''), 'bravo');
   setTimeout(() => { sqClass('good', []); playOn(); }, 800);
 }
 function retry() {
@@ -644,7 +653,7 @@ $('quit').addEventListener('click', () => { inputEnabled = false; show('map'); }
 // Bilan entre deux manches (comme les « points d'étape » de Quizlet)
 function statusCounts() {
   const ks = lessonCards(); const c = { vu: 0, cours: 0, ok: 0 };
-  for (const k of ks) { const l = card(k).level; if (l === 0) c.vu++; else if (l < 4) c.cours++; else c.ok++; }
+  for (const k of ks) { const l = card(k).level; if (l === 0) c.vu++; else if (l < MAXL) c.cours++; else c.ok++; }
   return { ...c, n: ks.length };
 }
 function statusBlock() {
@@ -662,7 +671,7 @@ function checkpoint() {
   if (c.ok === c.n) return endSession();
   $('screen-end').innerHTML = `<div class="memo">${memoSvg('content')}</div>
     <h1>Manche ${S.round} terminée</h1>
-    <p>${c.ok ? `Déjà ${c.ok} position${c.ok > 1 ? 's' : ''} maîtrisée${c.ok > 1 ? 's' : ''} sur ${c.n}. ` : ''}On continue : les questions deviennent plus difficiles à chaque niveau.</p>
+    <p>${c.ok ? `Déjà ${c.ok} position${c.ok > 1 ? 's' : ''} maîtrisée${c.ok > 1 ? 's' : ''} sur ${c.n}. ` : ''}${TILES.some((t) => !tileSeen(t)) && S.introduced < NEW_PER_LESSON ? 'Une nouvelle ligne arrivera dès que celles-ci seront presque sues.' : 'On continue jusqu’à tout maîtriser !'}</p>
     ${statusBlock()}
     <div class="lines-state">${S.lines.map((t) => `<div class="m-row"><span class="name">${t.punish ? '⚔ ' : t.deviation ? '↪ ' : ''}${t.name}</span><span class="pips">${t.cards.map((k) => `<i class="lv${card(k).level}" title="${LEVELS[card(k).level]}"></i>`).join('')}</span></div>`).join('')}</div>
     <button class="btn btn-cta" id="end-continue">Manche suivante</button>
@@ -719,12 +728,12 @@ function endSession(stopped) {
 
 function openChest() {
   if (!P.chest) { P.chest = true; P.gems += 20; save(); }
-  $('screen-end').innerHTML = `<div class="memo">${memoSvg('bravo')}</div><h1>Coffre ouvert !</h1><p>+20 gemmes. Plus tard, elles serviront à habiller Memo (chapeaux, lunettes, écharpes…).</p><div class="stats"><div class="stat"><span>Gemmes</span><b style="color:#8FD3FF">+20</b></div><div class="stat"><span>Total</span><b>${P.gems}</b></div><div class="stat"><span>Étape</span><b>4/${MAP_ORDER.length}</b></div></div><button class="btn btn-cta" id="end-continue">Continuer</button>`;
+  $('screen-end').innerHTML = `<div class="memo">${memoSvg('bravo')}</div><h1>Coffre ouvert !</h1><p>+20 gemmes. Plus tard, elles serviront à habiller Memo (chapeaux, lunettes, écharpes…).</p><div class="stats"><div class="stat"><span>Gemmes</span><b style="color:#8FD3FF">+20</b></div><div class="stat"><span>Total</span><b>${P.gems}</b></div><div class="stat"><span>Chemin</span><b>${Math.round(worldProgress().steps / worldProgress().total * 100)} %</b></div></div><button class="btn btn-cta" id="end-continue">Continuer</button>`;
   show('end'); $('end-continue').addEventListener('click', () => show('map'));
 }
 
 // Accroche de test (navigateur headless) : le coup attendu dans la position actuelle
-window.__movemoryTest = () => { if (!S || !inputEnabled || !S.q) return null; const m = new Chess(game.fen()).move(S.q.move.san); return { from: m.from, to: m.to, mode: S.item.kind === 'partie' ? 'partie' : 'niv' + S.item.level, line: S.item.t.id }; };
+window.__movemoryTest = () => { if (!S || !inputEnabled || !S.q) return null; const m = new Chess(game.fen()).move(S.q.move.san); const alt = new Chess(game.fen()).moves({ verbose: true }).find((x) => x.san !== m.san); return { from: m.from, to: m.to, alt: alt && { from: alt.from, to: alt.to }, mode: S.item.kind === 'partie' ? 'partie' : ['guidé', 'seul'][S.item.level], line: S.item.t.id }; };
 loadRepertoire(REP);
 renderMap();
 requestAnimationFrame(renderMap);
