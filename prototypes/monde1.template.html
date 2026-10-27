@@ -379,7 +379,7 @@ function renderMap() {
   $('world-bar').style.width = `${(steps / total) * 100}%`;
   $('world-count').textContent = `${mastered}/${TILES.length} lignes`;
   $('xp').textContent = P.xp; $('gems').textContent = P.gems;
-  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : steps >= total ? 'Défi final' : chestReached && !P.chest ? 'Ouvrir le coffre' : steps ? 'Continuer' : 'Commencer';
+  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : chestReached && !P.chest ? 'Ouvrir le coffre' : steps >= total ? 'Défi final' : steps ? 'Continuer' : 'Commencer';
   const ring = Math.round((steps / total) * 100);
   $('play-ring').style.background = `conic-gradient(var(--gold) 0 ${ring}%, var(--surface-2) ${ring}% 100%)`;
   $('unlock').checked = P.unlock;
@@ -389,8 +389,8 @@ function renderMap() {
 for (const r of ['w', 'b']) $('rep-' + r).addEventListener('click', () => { try { localStorage.setItem('movemory-rep', r); } catch {} loadRepertoire(r); renderMap(); });
 $('play').addEventListener('click', () => {
   const { steps, total } = worldProgress();
-  if (steps >= total && !P.boss) return startSession({ boss: true });
   if (steps >= total / 2 && !P.chest) return openChest();
+  if (steps >= total && !P.boss) return startSession({ boss: true });
   startSession({});
 });
 $('unlock').addEventListener('change', (e) => { P.unlock = e.target.checked; save(); renderMap(); });
