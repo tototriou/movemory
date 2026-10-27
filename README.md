@@ -37,3 +37,4 @@ pnpm dev           # app mobile (Expo Go / émulateur)
 
 - [docs/PLAN.md](docs/PLAN.md) — vision, fonctionnalités, feuille de route
 - [docs/MOTEURS.md](docs/MOTEURS.md) — moteurs et bibliothèques : options et recommandations
+- [docs/DECISIONS.md](docs/DECISIONS.md) — décisions prises (licence, hors-ligne, traduction…)

@@ -15,26 +15,27 @@ C'est la pièce centrale : drag & drop fluide, animations, flèches, surlignage,
 
 | Option | Licence | Plateformes | Notes |
 |---|---|---|---|
-| ✅ **Composant maison** : `react-native-svg` + `react-native-gesture-handler` + `reanimated` | — | toutes | Un seul code, contrôle total du rendu (style, flèches, animations « Duolingo »). ~1 à 2 semaines. |
+| ✅ **Composant maison** (décidé) : `react-native-svg` + `react-native-gesture-handler` + `reanimated` | — | toutes | Un seul code, contrôle total du rendu (style, flèches, animations « Duolingo »). ~1 à 2 semaines. |
 | react-native-chessboard | MIT | iOS/Android (web partiel) | Démarrage rapide, peu maintenu, personnalisation limitée. |
 | chessground (Lichess) | GPL-3 | web (mobile via WebView) | Excellent, mais GPL et WebView sur mobile. |
 | react-chessboard | MIT | web seulement | Ne couvre pas le natif. |
 
 Pièces : jeux SVG libres (ex. « cburnett », CC BY-SA, ou un jeu dessiné pour l'app).
 
-## 3. Moteur d'analyse (Stockfish)
+## 3. Moteur d'analyse (code fermé + analyse locale)
 
-Utile **uniquement** pour l'analyse des parties importées et la génération de problèmes ;
-la révision des ouvertures n'a **pas besoin de moteur** (le répertoire donne la réponse).
+La révision des ouvertures n'a **pas besoin de moteur** (le répertoire donne la réponse). Le moteur sert
+uniquement à analyser les parties importées. Stockfish est sous GPL-3 : il ne peut pas être embarqué dans
+une app à code fermé, ni « réimplémenté » à partir de son code (un portage serait une œuvre dérivée, donc GPL).
 
-| Option | Où | Coût | Notes |
+| Option | Où | Licence | Notes |
 |---|---|---|---|
-| ✅ **Lichess Cloud Eval API** | API | gratuit | Évaluations déjà calculées pour des millions de positions : parfait pour les 10-15 premiers coups. |
-| ✅ **Stockfish natif sur serveur** (worker) | serveur | ~5-20 €/mois | Analyse des parties importées en tâche de fond, profondeur 18-20. Pas d'impact sur la batterie. |
-| Stockfish WASM dans l'app | client | gratuit | Hors-ligne, mais lourd (~7-40 Mo), batterie, et GPL-3 à respecter si distribué dans l'app. |
-
-⚠️ **Licence** : Stockfish est GPL-3. L'utiliser **côté serveur** n'impose rien sur le code de l'app.
-L'embarquer dans l'app oblige à publier ses sources (et pose problème avec l'App Store).
+| ✅ **Écarts au répertoire** | appareil | — | Aucun moteur : déjà codé dans `packages/core` (`findRepertoireDeviation`). |
+| ✅ **Lichess Cloud Eval API** | API, au moment de l'import | gratuit | Évaluations pré-calculées des positions courantes : idéal pour les 10-15 premiers coups. Résultat mis en cache → consultable hors-ligne. |
+| ✅ **Leorik** (moteur NNUE, ~3 400 Elo CCRL) | appareil | **MIT** | Licence permissive : on peut le porter (TypeScript / Rust → WASM et natif) en gardant la mention de copyright. Réseau entraîné en auto-jeu, sans données GPL. Bien plus fort que nécessaire pour détecter les erreurs d'amateurs. |
+| Moteur maison (clean-room) | appareil | à nous | Possible (alpha-beta + évaluation simple), mais des mois de travail pour un niveau bien inférieur. |
+| Stockfish sur notre serveur | serveur | GPL-3 | Autorisé avec un code fermé (pas de distribution du binaire), mais pas « local ». Option de secours. |
+| API tierces (chess-api.com…) | API | — | Conditions et pérennité incertaines : à éviter pour un produit. |
 
 ## 4. Données
 
@@ -68,9 +69,6 @@ sont stockées localement puis synchronisées → l'app fonctionne dans le métr
 
 ✅ **Expo (React Native)** + Expo Router : iOS, Android et web avec un seul code, builds et mises à jour via EAS.
 
-## Points à trancher ensemble
+## Décisions
 
-1. Code ouvert (GPL possible : chessground, Stockfish embarqué) ou fermé (MIT/BSD uniquement) ?
-2. Échiquier maison (recommandé) ou bibliothèque existante pour aller plus vite ?
-3. Analyse des parties : serveur (recommandé) ou sur l'appareil ?
-4. Hors-ligne complet dès le MVP ?
+Voir [DECISIONS.md](DECISIONS.md).
