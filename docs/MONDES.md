@@ -65,22 +65,25 @@ On élargit d'abord, puis on approfondit :
 de l'ouverture (centre, développement, roque, cases faibles, plans typiques). On ne couvre pas tout : on apprend
 **les grandes lignes**. On n'adapte pas le contenu au niveau réel du joueur : tout le monde apprend la bonne théorie.
 
-### Construction des lignes (hors-ligne, au moment de préparer le contenu)
+### Construction des lignes : la théorie uniquement ✅
 
-| Qui joue | Choix du coup |
-|---|---|
-| L'adversaire | Les **meilleures réponses** : celles de la théorie (parties de maîtres), validées par Stockfish (MultiPV) |
-| L'utilisateur | Le **meilleur coup** : coup de la théorie, validé par Stockfish (on écarte tout coup qui perd > 0,5 pion) |
-| Positions sans théorie | Stockfish seul |
+- Les lignes sont **celles de la théorie** des ouvertures, et rien d'autre : pas de base de parties, pas de lignes
+  générées par un moteur. Avec l'élargissement progressif des mondes, la théorie offre largement assez de lignes.
+- Point de départ : la liste **chess-openings** (CC0, déjà dans `data/`), qui donne les variantes nommées et leurs coups ;
+  nous sélectionnons et ordonnons les lignes majeures de chaque ouverture, puis rédigeons les explications.
 
-### Coups à punir : réfléchir, pas réciter ✅
+### Coups à punir ✅
 
-- Dans chaque monde, on ajoute **un ou plusieurs coups adverses à punir** : des erreurs fréquentes que Stockfish
-  juge mauvaises (ex. un pion laissé en prise, une attaque prématurée).
-- L'utilisateur doit **trouver lui-même** comment en profiter, en appliquant les principes appris :
-  ça l'oblige à réfléchir au lieu d'apprendre par cœur.
-- Source des erreurs fréquentes : la **base de parties Lichess** (CC0), qui montre les coups les plus joués par les
-  joueurs amateurs. C'est son seul rôle : elle ne sert pas à adapter le niveau.
+- Une **variante de l'ouverture où l'adversaire commet une imprécision** (ex. dans l'Italienne : un piège connu
+  ou une réponse passive), qui donne un avantage à l'utilisateur **s'il trouve le bon coup**.
+- Ces variantes sont **rédigées par nous** comme les autres lignes (aucune base de données externe).
+- But : obliger l'utilisateur à réfléchir avec les principes appris, au lieu de réciter.
+
+### Rôle de Stockfish
+
+- Analyser les parties Chess.com importées (sur l'appareil).
+- Contrôle qualité du contenu : vérifier qu'aucune ligne retenue ne contient d'erreur et que chaque coup à punir
+  donne bien un avantage.
 
 ### Explications
 

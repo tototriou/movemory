@@ -44,7 +44,7 @@ Obligations GPL : publier le code de l'app (repo public), afficher la licence et
 | ✅ **Évaluations / erreurs** | Stockfish sur l'appareil : l'API Chess.com ne fournit **ni évaluation moteur ni explorateur d'ouvertures**. |
 | ✅ **Lignes d'ouvertures + explications** | Contenu rédigé par nous (indispensable : chaque coup doit être expliqué), traduit. |
 | ✅ **Exercices tirés des parties** | Générés depuis les parties Chess.com de l'utilisateur (écarts au répertoire + erreurs détectées par le moteur). |
-| Lichess (API, puzzles, base d'ouvertures) | **Mis de côté** pour l'instant. Le script d'import de `packages/core` sert uniquement d'aide au développement. |
+| ✅ **Lignes d'ouvertures** | **Théorie uniquement** : liste chess-openings (CC0) + sélection et rédaction par nous. Aucune base de parties ni API externe. |
 
 ### Règles d'usage de l'API Chess.com (à respecter)
 
