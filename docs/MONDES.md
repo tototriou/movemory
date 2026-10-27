@@ -19,17 +19,18 @@ On élargit d'abord, puis on approfondit, et on finit par se spécialiser :
 
 | Monde | Profondeur | Lignes | Exemple (répertoire 1.e4) |
 |---|---|---|---|
-| 1 | 3 premiers coups | 5-6 | 1.e4 contre 1…e5, 1…c5, 1…e6, 1…c6, 1…d5 (+ un coup à punir) |
+| 1 | 3 coups | 5-6 | Blancs : 1.e4 déjà joué, puis vos 3 coups contre 1…e5, 1…c5, 1…e6, 1…c6, 1…d5 (+ un coup à punir). Noirs : la Sicilienne contre les différents 2e coups blancs (2.Cf3, 2.c3, 2.Cc3, 2.d4) + 1…d5 contre 1.d4 |
 | 2 | 3 premiers coups | 10 | + variantes des premiers coups (ex. 1…e5 2…d6, 1…c5 2…Cc6, 1…Cf6, 1…d6…) |
 | 3 | 5 premiers coups | 5-6 | Les mêmes ouvertures, plus loin |
 | 4 | 5 premiers coups | 10 | … |
 | 5+ | 7 coups et plus | … | **Spécialisation** : une ouverture en profondeur (ex. la Partie italienne pure) |
 
 - Objectif de chaque monde : **aucune erreur** sur la profondeur demandée, contre toutes ses lignes.
-- « Coups » = **coups de l'utilisateur**, depuis la position initiale (3 coups avec les Blancs = 1.e4, 2.Cf3, 3.Fc4). ✅
+- « Coups » = **coups de l'utilisateur**. Quand le répertoire est défini par un premier coup (ex. 1.e4), ce coup est **déjà joué** : on travaille les 3 suivants (2.Cf3, 3.Fc4, 4.c3). ✅
+- Répertoire Noirs : **une ouverture par premier coup blanc** (ex. Sicilienne contre 1.e4, 1…d5 contre 1.d4), avec ses variantes selon la réponse des Blancs. ✅
 - Le contenu du répertoire dépend des **choix de l'utilisateur** (ex. Partie italienne contre 1…e5, Sicilienne ouverte contre 1…c5).
 - Chaque monde n'introduit que du nouveau ; ce qui a été appris continue de revenir dans la révision du jour.
-- Contenu : Monde 1 du répertoire 1.e4 dans `content/fr/repertoire-1e4.json` ; la spécialisation Partie italienne
+- Contenu : Monde 1 du répertoire 1.e4 dans `content/fr/repertoire-1e4.json`, répertoire Noirs dans `content/fr/repertoire-noirs.json` ; la spécialisation Partie italienne
   (monde avancé) dans `content/fr/italienne.json`.
 
 ## 3. Le parcours de Memo

@@ -15,7 +15,7 @@
     },
     {
       "san": "e5",
-      "pourquoi": "Les Noirs répondent pareil : ils prennent leur part du centre."
+      "pourquoi": "Ils répondent pareil : ils prennent leur part du centre."
     },
     {
       "san": "Nf3",
@@ -26,7 +26,7 @@
     },
     {
       "san": "Nc6",
-      "pourquoi": "Les Noirs défendent e5 en sortant leur cavalier."
+      "pourquoi": "Ils défendent e5 en sortant leur cavalier."
     },
     {
       "san": "Bc4",
@@ -56,7 +56,7 @@
         },
         {
           "san": "Nf6",
-          "pourquoi": "Les Noirs développent leur cavalier et attaquent notre pion e4."
+          "pourquoi": "Ils développent leur cavalier et attaquent notre pion e4."
         },
         {
           "san": "d3",
@@ -67,7 +67,7 @@
         },
         {
           "san": "d6",
-          "pourquoi": "Les Noirs renforcent e5 et ouvrent la diagonale de leur fou c8."
+          "pourquoi": "Ils renforcent e5 et ouvrent la diagonale de leur fou c8."
         },
         {
           "san": "O-O",
@@ -107,7 +107,7 @@
         },
         {
           "san": "O-O",
-          "pourquoi": "Les Noirs roquent aussi."
+          "pourquoi": "Ils roquent aussi."
         },
         {
           "san": "Re1",
@@ -137,7 +137,7 @@
         },
         {
           "san": "exd4",
-          "pourquoi": "Les Noirs échangent au centre."
+          "pourquoi": "Ils échangent au centre."
         },
         {
           "san": "Nxd4",
@@ -149,7 +149,7 @@
         },
         {
           "san": "Nf6",
-          "pourquoi": "Les Noirs attaquent notre pion e4."
+          "pourquoi": "Ils attaquent notre pion e4."
         },
         {
           "san": "Nc3",
@@ -167,7 +167,7 @@
       "coups": [
         {
           "san": "d6",
-          "pourquoi": "Les Noirs soutiennent e5, mais enferment leur fou f8 : c'est passif."
+          "pourquoi": "Ils soutiennent e5, mais enferment leur fou f8 : c'est passif."
         },
         {
           "san": "d4",
@@ -178,7 +178,7 @@
         },
         {
           "san": "exd4",
-          "pourquoi": "Les Noirs lâchent le centre."
+          "pourquoi": "Ils lâchent le centre."
         },
         {
           "san": "Nxd4",
@@ -190,7 +190,7 @@
         },
         {
           "san": "Nf6",
-          "pourquoi": "Les Noirs attaquent e4."
+          "pourquoi": "Ils attaquent e4."
         },
         {
           "san": "Nc3",
@@ -208,7 +208,7 @@
       "coups": [
         {
           "san": "h6",
-          "pourquoi": "Les Noirs empêchent Cg5, mais perdent un temps sans développer de pièce."
+          "pourquoi": "Ils empêchent Cg5, mais perdent un temps sans développer de pièce."
         },
         {
           "san": "d4",
@@ -219,7 +219,7 @@
         },
         {
           "san": "exd4",
-          "pourquoi": "Les Noirs échangent."
+          "pourquoi": "Ils échangent."
         },
         {
           "san": "Nxd4",
@@ -230,7 +230,7 @@
         },
         {
           "san": "Nf6",
-          "pourquoi": "Les Noirs attaquent e4."
+          "pourquoi": "Ils attaquent e4."
         },
         {
           "san": "Nc3",
@@ -260,7 +260,7 @@
         },
         {
           "san": "exd4",
-          "pourquoi": "Les Noirs reprennent : leur pion d4 est avancé, mais loin de ses pièces."
+          "pourquoi": "Ils reprennent : leur pion d4 est avancé, mais loin de ses pièces."
         },
         {
           "san": "O-O",
@@ -272,7 +272,7 @@
         },
         {
           "san": "Nf6",
-          "pourquoi": "Les Noirs sortent enfin une pièce et attaquent e4."
+          "pourquoi": "Ils sortent enfin une pièce et attaquent e4."
         },
         {
           "san": "Re1",

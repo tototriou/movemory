@@ -42,6 +42,9 @@ button { font: inherit; color: inherit; }
 .brand { font-family: var(--display); font-weight: 700; font-size: 20px; }
 .chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--display); font-weight: 600; font-size: 16px; }
 .world-title { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--muted); }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--bg-2); border-radius: 12px; padding: 4px; }
+.seg button { border: 0; border-radius: 9px; padding: 8px; background: transparent; color: var(--muted); font-family: var(--display); font-weight: 600; font-size: 14px; cursor: pointer; }
+.seg button[aria-selected="true"] { background: var(--surface-2); color: var(--fg); }
 .bar { height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
 .bar > span { display: block; height: 100%; border-radius: 999px; background: var(--gold); transition: width .5s; }
 .bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: var(--muted); }
@@ -168,7 +171,11 @@ button { font: inherit; color: inherit; }
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z"/></svg><span id="gems">0</span>
         </span>
       </div>
-      <div class="world-title">Monde 1 · Répertoire 1.e4 · 3 coups contre 6 défenses</div>
+      <div class="seg" role="tablist" aria-label="Répertoire">
+        <button role="tab" id="rep-w" data-rep="w">Blancs · 1.e4</button>
+        <button role="tab" id="rep-b" data-rep="b">Noirs · Sicilienne</button>
+      </div>
+      <div class="world-title" id="world-title"></div>
       <div class="bar-row"><div class="bar"><span id="world-bar" style="width:0%"></span></div><span id="world-count">0/7</span></div>
     </header>
     <div class="path" id="path"></div>
@@ -219,7 +226,7 @@ button { font: inherit; color: inherit; }
 <script type="module">
 import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm';
 
-const CONTENT = {"id": "repertoire-1e4", "nom": "Répertoire 1.e4", "camp": "w", "licence": "CC BY-SA 4.0 — lignes et idées adaptées de Wikibooks, Chess Opening Theory (https://en.wikibooks.org/wiki/Chess_Opening_Theory/1._e4), textes réécrits pour Movemory.", "mondes": [{"numero": 1, "titre": "1.e4 contre les grandes défenses", "profondeur": 3, "lignes": [{"id": "e5-italienne", "nom": "1…e5 : Partie italienne", "rang": 1, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion et on ouvre la route au fou f1 et à la dame.", "principes": ["centre", "developpement"]}, {"san": "e5", "pourquoi": "Les Noirs répondent pareil : ils prennent leur part du centre."}, {"san": "Nf3", "pourquoi": "On sort un cavalier vers le centre, et il attaque déjà le pion e5.", "principes": ["developpement"]}, {"san": "Nc6", "pourquoi": "Les Noirs défendent e5 en sortant leur cavalier."}, {"san": "Bc4", "pourquoi": "Le fou vise f7, le point faible des Noirs, que seul le roi protège : c'est la Partie italienne.", "principes": ["developpement", "case-faible"]}]}, {"id": "c5-sicilienne", "nom": "1…c5 : Sicilienne", "rang": 2, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion et on ouvre la route au fou f1 et à la dame.", "principes": ["centre"]}, {"san": "c5", "pourquoi": "La Sicilienne : les Noirs contrôlent la case d4 avec un pion de côté, pour déséquilibrer la partie."}, {"san": "Nf3", "pourquoi": "On développe un cavalier et on prépare d4 pour ouvrir le jeu.", "principes": ["developpement"]}, {"san": "d6", "pourquoi": "Les Noirs contrôlent e5 et ouvrent la diagonale de leur fou c8."}, {"san": "d4", "pourquoi": "On frappe au centre : après l'échange de pions, nos pièces sortiront vite. C'est la Sicilienne ouverte.", "principes": ["centre"]}]}, {"id": "e6-francaise", "nom": "1…e6 : Défense française", "rang": 3, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"]}, {"san": "e6", "pourquoi": "La Française : les Noirs préparent d5 pour attaquer notre pion e4, tout en restant solides."}, {"san": "d4", "pourquoi": "Les Noirs nous laissent de la place : on prend tout le centre avec deux pions.", "principes": ["centre"]}, {"san": "d5", "pourquoi": "Comme prévu, les Noirs attaquent e4."}, {"san": "Nc3", "pourquoi": "On défend e4 en sortant une pièce : défense et développement en un seul coup.", "principes": ["developpement"]}]}, {"id": "c6-caro-kann", "nom": "1…c6 : Caro-Kann", "rang": 4, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"]}, {"san": "c6", "pourquoi": "La Caro-Kann : comme dans la Française, les Noirs préparent d5, mais sans enfermer leur fou c8."}, {"san": "d4", "pourquoi": "Deux pions au centre : on ne s'en prive pas.", "principes": ["centre"]}, {"san": "d5", "pourquoi": "Les Noirs attaquent e4."}, {"san": "Nc3", "pourquoi": "On défend e4 tout en développant le cavalier.", "principes": ["developpement"]}]}, {"id": "d5-scandinave", "nom": "1…d5 : Scandinave", "rang": 5, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"]}, {"san": "d5", "pourquoi": "La Scandinave : les Noirs attaquent e4 dès le premier coup."}, {"san": "exd5", "pourquoi": "On prend : aucun pion noir ne peut reprendre en d5.", "principes": ["centre"]}, {"san": "Qxd5", "pourquoi": "La dame noire reprend… mais elle sort très tôt au centre."}, {"san": "Nc3", "pourquoi": "On développe en attaquant la dame : elle doit encore bouger, et on gagne du temps.", "principes": ["developpement", "tempo"]}]}, {"id": "e5-damiano", "nom": "1…e5 2…f6 ? : à punir", "rang": 6, "aPunir": true, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"]}, {"san": "e5", "pourquoi": "Les Noirs prennent leur part du centre."}, {"san": "Nf3", "pourquoi": "On développe le cavalier en attaquant e5.", "principes": ["developpement"]}, {"san": "f6", "pourquoi": "Imprécision ! f6 défend e5, mais affaiblit le roi noir et vole la meilleure case du cavalier g8. À vous de punir !"}, {"san": "Nxe5", "pourquoi": "On sacrifie le cavalier ! Si 3…fxe5, alors 4.Dh5+ et le roi noir est en grand danger. Sinon, on a simplement gagné un pion.", "principes": ["roi", "piege"]}]}]}]};
+const CONTENT = {"w": {"id": "repertoire-1e4", "nom": "Répertoire 1.e4", "camp": "w", "licence": "CC BY-SA 4.0 — lignes et idées adaptées de Wikibooks, Chess Opening Theory (https://en.wikibooks.org/wiki/Chess_Opening_Theory/1._e4), textes réécrits pour Movemory.", "mondes": [{"numero": 1, "titre": "1.e4 contre les grandes défenses", "profondeur": 3, "lignes": [{"id": "e5-italienne", "nom": "1…e5 : Partie italienne", "rang": 1, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion et on ouvre la route au fou f1 et à la dame.", "principes": ["centre", "developpement"]}, {"san": "e5", "pourquoi": "Ils répondent pareil : ils prennent leur part du centre."}, {"san": "Nf3", "pourquoi": "On sort un cavalier vers le centre, et il attaque déjà le pion e5.", "principes": ["developpement"]}, {"san": "Nc6", "pourquoi": "Ils défendent e5 en sortant leur cavalier."}, {"san": "Bc4", "pourquoi": "Le fou vise f7, le point faible des Noirs, que seul le roi protège : c'est la Partie italienne.", "principes": ["developpement", "case-faible"]}, {"san": "Bc5", "pourquoi": "Ils sortent leur fou vers f2, notre point faible : c'est la Giuoco Piano."}, {"san": "c3", "pourquoi": "On prépare d4 pour bâtir un grand centre et chasser le fou c5.", "principes": ["centre"]}]}, {"id": "c5-sicilienne", "nom": "1…c5 : Sicilienne", "rang": 2, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion et on ouvre la route au fou f1 et à la dame.", "principes": ["centre"]}, {"san": "c5", "pourquoi": "La Sicilienne : les Noirs contrôlent la case d4 avec un pion de côté, pour déséquilibrer la partie."}, {"san": "Nf3", "pourquoi": "On développe un cavalier et on prépare d4 pour ouvrir le jeu.", "principes": ["developpement"]}, {"san": "d6", "pourquoi": "Ils contrôlent e5 et ouvrent la diagonale de leur fou c8."}, {"san": "d4", "pourquoi": "On frappe au centre : après l'échange de pions, nos pièces sortiront vite. C'est la Sicilienne ouverte.", "principes": ["centre"]}, {"san": "cxd4", "pourquoi": "Ils échangent : ils récupèrent un pion central contre un pion de côté."}, {"san": "Nxd4", "pourquoi": "On reprend avec le cavalier, idéalement placé au centre. Notre avance de développement compense.", "principes": ["centre", "developpement"]}]}, {"id": "e6-francaise", "nom": "1…e6 : Défense française", "rang": 3, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"]}, {"san": "e6", "pourquoi": "La Française : les Noirs préparent d5 pour attaquer notre pion e4, tout en restant solides."}, {"san": "d4", "pourquoi": "Les Noirs nous laissent de la place : on prend tout le centre avec deux pions.", "principes": ["centre"]}, {"san": "d5", "pourquoi": "Comme prévu, les Noirs attaquent e4."}, {"san": "Nc3", "pourquoi": "On défend e4 en sortant une pièce : défense et développement en un seul coup.", "principes": ["developpement"]}, {"san": "Nf6", "pourquoi": "Ils attaquent à nouveau e4 avec une pièce."}, {"san": "Bg5", "pourquoi": "On cloue le cavalier f6 : il ne peut plus bouger sans exposer la dame, et e4 est indirectement défendu.", "principes": ["developpement"]}]}, {"id": "c6-caro-kann", "nom": "1…c6 : Caro-Kann", "rang": 4, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"]}, {"san": "c6", "pourquoi": "La Caro-Kann : comme dans la Française, les Noirs préparent d5, mais sans enfermer leur fou c8."}, {"san": "d4", "pourquoi": "Deux pions au centre : on ne s'en prive pas.", "principes": ["centre"]}, {"san": "d5", "pourquoi": "Ils attaquent e4."}, {"san": "Nc3", "pourquoi": "On défend e4 tout en développant le cavalier.", "principes": ["developpement"]}, {"san": "dxe4", "pourquoi": "Ils échangent leur pion d5 contre notre pion e4."}, {"san": "Nxe4", "pourquoi": "On reprend avec le cavalier, qui se retrouve bien centralisé.", "principes": ["centre", "developpement"]}]}, {"id": "d5-scandinave", "nom": "1…d5 : Scandinave", "rang": 5, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"]}, {"san": "d5", "pourquoi": "La Scandinave : les Noirs attaquent e4 dès le premier coup."}, {"san": "exd5", "pourquoi": "On prend : aucun pion noir ne peut reprendre en d5.", "principes": ["centre"]}, {"san": "Qxd5", "pourquoi": "La dame noire reprend… mais elle sort très tôt au centre."}, {"san": "Nc3", "pourquoi": "On développe en attaquant la dame : elle doit encore bouger, et on gagne du temps.", "principes": ["developpement", "tempo"]}, {"san": "Qa5", "pourquoi": "La dame noire se met à l'abri en a5, d'où elle surveille notre cavalier c3."}, {"san": "d4", "pourquoi": "On occupe le centre et on libère le fou c1 : la dame noire a fait beaucoup de coups, nous développons.", "principes": ["centre", "developpement"]}]}, {"id": "e5-damiano", "nom": "1…e5 2…f6 ? : à punir", "rang": 6, "aPunir": true, "coups": [{"san": "e4", "pourquoi": "On prend le centre avec un pion.", "principes": ["centre"]}, {"san": "e5", "pourquoi": "Ils prennent leur part du centre."}, {"san": "Nf3", "pourquoi": "On développe le cavalier en attaquant e5.", "principes": ["developpement"]}, {"san": "f6", "pourquoi": "Imprécision ! f6 défend e5, mais affaiblit le roi noir et vole la meilleure case du cavalier g8. À vous de punir !"}, {"san": "Nxe5", "pourquoi": "On sacrifie le cavalier ! Le pion e5 était défendu par f6, mais prendre le cavalier ouvrirait la diagonale du roi noir.", "principes": ["roi", "piege"]}, {"san": "fxe5", "pourquoi": "Erreur ! Les Noirs prennent le cavalier… et ouvrent la route vers leur roi."}, {"san": "Qh5+", "pourquoi": "Échec ! Si 4…g6, 5.Dxe5+ fourchette le roi et la tour h8. Si 4…Re7, 5.Dxe5+ Rf7 6.Fc4+ et l'attaque est écrasante.", "principes": ["roi", "piege"]}]}], "debut": 1}]}, "b": {"id": "repertoire-noirs", "nom": "Répertoire Noirs : Sicilienne et 1…d5", "camp": "b", "licence": "CC BY-SA 4.0 — lignes et idées adaptées de Wikibooks, Chess Opening Theory (https://en.wikibooks.org/wiki/Chess_Opening_Theory), textes réécrits pour Movemory.", "mondes": [{"numero": 1, "titre": "La Sicilienne contre 1.e4, et 1…d5 contre 1.d4", "profondeur": 3, "debut": 0, "lignes": [{"id": "sic-ouverte", "nom": "Sicilienne ouverte (2.Cf3)", "rang": 1, "coups": [{"san": "e4", "pourquoi": "Ils prennent le centre."}, {"san": "c5", "pourquoi": "La Sicilienne : on contrôle d4 avec un pion de côté. Le jeu sera déséquilibré, et nos chances aussi.", "principes": ["centre"]}, {"san": "Nf3", "pourquoi": "Ils développent et préparent d4."}, {"san": "d6", "pourquoi": "On contrôle e5 et on ouvre la diagonale du fou c8.", "principes": ["centre", "developpement"]}, {"san": "d4", "pourquoi": "Ils ouvrent le centre."}, {"san": "cxd4", "pourquoi": "On échange notre pion de côté contre leur pion central : c'est tout l'esprit de la Sicilienne.", "principes": ["centre"]}]}, {"id": "sic-alapin", "nom": "Sicilienne Alapin (2.c3)", "rang": 2, "coups": [{"san": "e4", "pourquoi": "Ils prennent le centre."}, {"san": "c5", "pourquoi": "La Sicilienne : on contrôle d4.", "principes": ["centre"]}, {"san": "c3", "pourquoi": "L'Alapin : les Blancs préparent d4 pour avoir deux pions au centre."}, {"san": "Nf6", "pourquoi": "On attaque e4 tout de suite, avant que les Blancs ne jouent d4.", "principes": ["developpement"]}, {"san": "e5", "pourquoi": "Ils avancent pour chasser le cavalier."}, {"san": "Nd5", "pourquoi": "Le cavalier s'installe en d5, une belle case centrale qu'aucun pion blanc ne peut attaquer facilement.", "principes": ["centre"]}]}, {"id": "sic-fermee", "nom": "Sicilienne fermée (2.Cc3)", "rang": 3, "coups": [{"san": "e4", "pourquoi": "Ils prennent le centre."}, {"san": "c5", "pourquoi": "La Sicilienne : on contrôle d4.", "principes": ["centre"]}, {"san": "Nc3", "pourquoi": "Ils gardent le centre fermé et développent."}, {"san": "Nc6", "pourquoi": "On développe en surveillant d4 et e5.", "principes": ["developpement"]}, {"san": "g3", "pourquoi": "Ils préparent le fianchetto de leur fou en g2."}, {"san": "g6", "pourquoi": "On fait pareil : notre fou en g7 visera la grande diagonale.", "principes": ["developpement"]}]}, {"id": "sic-smith-morra", "nom": "Gambit Smith-Morra (2.d4)", "rang": 4, "coups": [{"san": "e4", "pourquoi": "Ils prennent le centre."}, {"san": "c5", "pourquoi": "La Sicilienne : on contrôle d4.", "principes": ["centre"]}, {"san": "d4", "pourquoi": "Ils proposent un échange au centre."}, {"san": "cxd4", "pourquoi": "On prend, comme toujours dans la Sicilienne : un pion de côté contre un pion central.", "principes": ["centre"]}, {"san": "c3", "pourquoi": "Le gambit Smith-Morra : les Blancs offrent un pion pour développer vite."}, {"san": "dxc3", "pourquoi": "On accepte le pion. Il faudra ensuite développer vite et prudemment pour le garder.", "principes": ["materiel"]}]}, {"id": "d4-gambit-dame", "nom": "Contre 1.d4 : Gambit dame refusé", "rang": 5, "coups": [{"san": "d4", "pourquoi": "Ils jouent 1.d4."}, {"san": "d5", "pourquoi": "On prend notre part du centre, directement face au pion d4.", "principes": ["centre"]}, {"san": "c4", "pourquoi": "Le Gambit dame : les Blancs attaquent notre pion d5."}, {"san": "e6", "pourquoi": "On refuse le gambit en soutenant d5 : solide, et cela ouvre la route au fou f8.", "principes": ["centre"]}, {"san": "Nc3", "pourquoi": "Ils ajoutent une pression sur d5."}, {"san": "Nf6", "pourquoi": "On défend d5 une fois de plus en développant : solide et classique.", "principes": ["developpement"]}]}, {"id": "sic-dame-h5", "nom": "2.Dh5 ? : à punir", "rang": 6, "aPunir": true, "coups": [{"san": "e4", "pourquoi": "Ils prennent le centre."}, {"san": "c5", "pourquoi": "La Sicilienne : on contrôle d4.", "principes": ["centre"]}, {"san": "Qh5", "pourquoi": "Imprécision ! La dame blanche sort beaucoup trop tôt : on va la chasser en développant nos pièces."}, {"san": "e6", "pourquoi": "On ouvre la route au fou f8 et on protège f7 : la dame blanche n'a plus de cible.", "principes": ["developpement", "roi"]}, {"san": "Nf3", "pourquoi": "Ils développent."}, {"san": "Nf6", "pourquoi": "On développe en attaquant la dame : elle doit encore bouger, et on prend de l'avance.", "principes": ["developpement", "tempo"]}]}]}]}};
 
 /* ---------- Mascotte Memo (échiquier à lunettes) ---------- */
 function memoSvg(mood = 'content') {
@@ -272,16 +279,16 @@ const label = (ply, san) => `${Math.floor(ply / 2) + 1}${ply % 2 === 0 ? '.' : '
 const fenKey = (fen) => fen.split(' ').slice(0, 4).join(' ');
 
 /* ---------- Données du monde ---------- */
-const WORLD = CONTENT.mondes[0];
-const LINES = WORLD.lignes;
-const DEPTH = WORLD.profondeur; // coups de l'utilisateur, depuis la position initiale
+let REP = 'w';
+try { REP = localStorage.getItem('movemory-rep') || 'w'; } catch {}
+let WORLD, LINES, DEPTH, SIDE, DEBUT;
 
 // Toutes les positions où l'utilisateur joue, avec les coups acceptés (toutes lignes confondues).
-const CARDS = new Map();
+let CARDS = new Map();
 function cardsOf(moves, from, to) {
   const c = new Chess(); const out = [];
   moves.forEach((m, i) => {
-    if (c.turn() === 'w' && i >= from && i < to) {
+    if (c.turn() === SIDE && i >= from && i < to) {
       const k = fenKey(c.fen());
       if (!CARDS.has(k)) CARDS.set(k, { key: k, expected: new Map() });
       CARDS.get(k).expected.set(m.san, m);
@@ -291,19 +298,31 @@ function cardsOf(moves, from, to) {
   });
   return out;
 }
-const TILES = LINES.map((l) => {
-  const to = Math.min(DEPTH * 2 - 1, l.coups.length);
-  return { id: l.id, name: l.nom, punish: !!l.aPunir, moves: l.coups, from: 0, to, cards: cardsOf(l.coups, 0, to) };
-});
-// Ordre sur la carte : 3 lignes, coffre, 3 lignes (dont le coup à punir), défi final
-const MAP_ORDER = [LINES[0].id, LINES[1].id, LINES[2].id, 'coffre', LINES[3].id, LINES[4].id, LINES[5].id, 'defi'];
+let TILES = [], MAP_ORDER = [];
+// Fin de la tranche : juste après le DEPTH-ième coup de l'utilisateur à partir de DEBUT
+function sliceEnd(moves) {
+  const c = new Chess(); let n = 0;
+  for (let i = 0; i < moves.length; i++) { if (c.turn() === SIDE && i >= DEBUT && ++n === DEPTH) return i + 1; c.move(moves[i].san); }
+  return moves.length;
+}
+function loadRepertoire(rep) {
+  REP = rep; const R = CONTENT[rep]; WORLD = R.mondes[0]; LINES = WORLD.lignes; DEPTH = WORLD.profondeur; SIDE = R.camp; DEBUT = WORLD.debut || 0;
+  CARDS = new Map();
+  TILES = LINES.map((l) => { const to = sliceEnd(l.coups); return { id: l.id, name: l.nom, punish: !!l.aPunir, moves: l.coups, from: DEBUT, to, cards: cardsOf(l.coups, DEBUT, to) }; });
+  // Ordre sur la carte : 3 lignes, coffre, 3 lignes (dont le coup à punir), défi final
+  MAP_ORDER = [LINES[0].id, LINES[1].id, LINES[2].id, 'coffre', LINES[3].id, LINES[4].id, LINES[5].id, 'defi'];
+  loadProgress();
+}
 const tileById = (id) => TILES.find((t) => t.id === id);
 
 /* ---------- Progression (localStorage, avec repli en mémoire) ---------- */
-const SAVE_KEY = 'movemory-monde1-v1';
-let P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: false };
-try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s) P = { ...P, ...s }; } catch {}
-const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(P)); } catch {} };
+const SAVE_KEY = () => 'movemory-monde1-v2-' + REP;
+let P;
+function loadProgress() {
+  P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: false };
+  try { const s = JSON.parse(localStorage.getItem(SAVE_KEY())); if (s) P = { ...P, ...s }; } catch {}
+}
+const save = () => { try { localStorage.setItem(SAVE_KEY(), JSON.stringify(P)); } catch {} };
 const card = (k) => (P.cards[k] ||= { seen: false, ok: 0 });
 const tileMastered = (t) => t.cards.every((k) => card(k).ok >= 2);
 function stepDone(id) {
@@ -352,7 +371,10 @@ function renderMap() {
   const ring = Math.round(MAP_ORDER.filter(stepDone).length / MAP_ORDER.length * 100);
   $('play-ring').style.background = `conic-gradient(var(--gold) 0 ${ring}%, var(--surface-2) ${ring}% 100%)`;
   $('unlock').checked = P.unlock;
+  $('world-title').textContent = `Monde 1 · ${WORLD.titre} · ${DEPTH} coups`;
+  for (const r of ['w', 'b']) $('rep-' + r).setAttribute('aria-selected', String(r === REP));
 }
+for (const r of ['w', 'b']) $('rep-' + r).addEventListener('click', () => { try { localStorage.setItem('movemory-rep', r); } catch {} loadRepertoire(r); renderMap(); });
 $('path').addEventListener('click', (e) => { const b = e.target.closest('.tile'); if (b && !b.disabled) openStep(b.dataset.step); });
 $('play').addEventListener('click', () => openStep(MAP_ORDER[currentIndex()]));
 $('unlock').addEventListener('change', (e) => { P.unlock = e.target.checked; save(); renderMap(); });
@@ -371,12 +393,12 @@ function openStep(id) {
 const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
 const FILES = 'abcdefgh';
 let game = new Chess(); let pieceEls = new Map(); let inputEnabled = false; let onUserMove = null; let selected = null;
-const sqXY = (sq) => [FILES.indexOf(sq[0]), 8 - Number(sq[1])];
+const sqXY = (sq) => { const f = FILES.indexOf(sq[0]), r = 8 - Number(sq[1]); return SIDE === 'b' ? [7 - f, 7 - r] : [f, r]; };
 function buildSquares() {
-  let h = '';
-  for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) {
-    const sq = FILES[f] + (8 - r);
-    h += `<div class="sq ${(r + f) % 2 ? 'd' : 'l'}" data-sq="${sq}">${f === 0 ? `<span class="coord r">${8 - r}</span>` : ''}${r === 7 ? `<span class="coord f">${FILES[f]}</span>` : ''}</div>`;
+  let h = ''; const flip = SIDE === 'b';
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) {
+    const f = flip ? 7 - x : x, r = flip ? 7 - y : y; const sq = FILES[f] + (8 - r);
+    h += `<div class="sq ${(r + f) % 2 ? 'd' : 'l'}" data-sq="${sq}">${x === 0 ? `<span class="coord r">${8 - r}</span>` : ''}${y === 7 ? `<span class="coord f">${FILES[f]}</span>` : ''}</div>`;
   }
   $('squares').innerHTML = h;
 }
@@ -411,7 +433,7 @@ function arrow(from, to, color) {
 }
 function squareAt(clientX, clientY) {
   const r = $('board').getBoundingClientRect(); const f = Math.floor((clientX - r.left) / r.width * 8), rr = Math.floor((clientY - r.top) / r.height * 8);
-  if (f < 0 || f > 7 || rr < 0 || rr > 7) return null; return FILES[f] + (8 - rr);
+  if (f < 0 || f > 7 || rr < 0 || rr > 7) return null; return SIDE === 'b' ? FILES[7 - f] + (rr + 1) : FILES[f] + (8 - rr);
 }
 function select(sq) {
   selected = sq; sqClass('sel', sq ? [sq] : []);
@@ -451,7 +473,7 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 function say(text, mood = 'content') { $('coach-memo').innerHTML = memoSvg(mood); const b = $('bubble'); b.style.animation = 'none'; void b.offsetWidth; b.style.animation = ''; $('bubble-text').innerHTML = text; }
 function renderMoves(highlightLast = false) {
   const h = game.history();
-  $('moves').innerHTML = h.map((san, i) => `<span class="${highlightLast && i === h.length - 1 ? 'cur' : ''}">${label(i, san)}</span>`).join('') + (game.turn() === 'w' && inputEnabled ? `<span style="color:var(--gold)">${Math.floor(h.length / 2) + 1}. ?</span>` : '');
+  $('moves').innerHTML = h.map((san, i) => `<span class="${highlightLast && i === h.length - 1 ? 'cur' : ''}">${label(i, san)}</span>`).join('') + (game.turn() === SIDE && inputEnabled ? `<span style="color:var(--gold)">${label(h.length, '?')}</span>` : '');
 }
 function setCombo(n) { S.combo = n; const c = $('combo'); c.textContent = 'x' + n; c.classList.remove('bump'); void c.offsetWidth; if (n > 1) c.classList.add('bump'); }
 
@@ -464,8 +486,8 @@ function buildRuns(opts) {
 function startSession(opts) {
   S = { opts, runs: buildRuns(opts), runIndex: 0, combo: 0, correct: 0, total: 0, errors: 0, xp: 0, failedThisRun: false };
   S.totalAsks = S.runs.reduce((n, r) => { let k = 0; for (let ply = r.from; ply < r.to; ply++) if (ply % 2 === 0) k++; return n + k; }, 0);
-  show('session'); buildSquares(); setCombo(0);
-  $('s-eyebrow').textContent = opts.boss ? 'Défi final · sans indice' : 'Monde 1 · Blancs';
+  show('session'); buildSquares(); setCombo(0); updateBar();
+  $('s-eyebrow').textContent = opts.boss ? 'Défi final · sans indice' : `Monde 1 · ${SIDE === 'w' ? 'Blancs' : 'Noirs'}`;
   const pill = $('s-pill'); pill.classList.toggle('punish', !!opts.tile?.punish);
   $('btn-hint').disabled = $('btn-solution').disabled = !!opts.boss;
   nextRun();
@@ -486,15 +508,16 @@ async function step() {
   const run = S.run; const ply = game.history().length;
   if (ply >= run.to) { S.runIndex++; return nextRun(); }
   const move = run.tile.moves[ply];
-  const asked = game.turn() === 'w' && ply >= run.from;
+  const asked = game.turn() === SIDE && ply >= run.from;
   if (!asked) {
     const prev = run.from > 0 && ply < run.from;
     await wait(prev ? 260 : 650);
     animate(game.move(move.san)); renderMoves(true);
-    if (game.turn() === 'w' && game.history().length >= run.from && ply + 1 < run.to) {
-      S.lastOpp = `Les Noirs jouent <b>${label(ply, move.san)}</b>. ${move.pourquoi}`;
+    if (game.turn() === SIDE && game.history().length >= run.from && ply + 1 < run.to) {
+      const who = SIDE === 'w' ? 'Les Noirs jouent' : 'Les Blancs jouent';
+      S.lastOpp = `${who} <b>${label(ply, move.san)}</b>. ${move.pourquoi}`;
       if (run.mode === 'learn') say(S.lastOpp + ' À vous !', 'reflechit');
-      else say(`Les Noirs jouent <b>${label(ply, move.san)}</b>. À vous !`, 'reflechit');
+      else say(`${who} <b>${label(ply, move.san)}</b>. À vous !`, 'reflechit');
     }
     return step();
   }
@@ -596,7 +619,7 @@ function endSession() {
   $('screen-end').innerHTML = `${conf}
     <div class="memo">${memoSvg('bravo')}</div>
     <h1>${boss ? (P.boss ? 'Monde 1 terminé !' : 'Défi terminé') : mastered ? 'Étape maîtrisée !' : 'Séance terminée !'}</h1>
-    <p>${boss ? (P.boss ? 'Vous connaissez vos 3 premiers coups contre les 6 grandes défenses. Le Monde 2 ajoutera 4 lignes : d\u2019autres réponses des Noirs dans ces mêmes ouvertures.' : '') : mastered ? 'Memo avance d’une case sur la carte.' : 'Chaque position doit être réussie 2 fois sans indice pour être maîtrisée. Dans l’app, la 2e fois sera le lendemain ; ici, relancez simplement l’étape.'}</p>
+    <p>${boss ? (P.boss ? `Vous maîtrisez vos ${DEPTH} coups sur les ${LINES.length} lignes du Monde 1. Le Monde 2 ajoutera 4 lignes : des variantes de ces mêmes ouvertures.` : '') : mastered ? 'Memo avance d’une case sur la carte.' : 'Chaque position doit être réussie 2 fois sans indice pour être maîtrisée. Dans l’app, la 2e fois sera le lendemain ; ici, relancez simplement l’étape.'}</p>
     <div class="stats">
       <div class="stat"><span>XP</span><b style="color:var(--gold)">+${S.xp}</b></div>
       <div class="stat"><span>Précision</span><b style="color:var(--good)">${acc} %</b></div>
@@ -614,6 +637,7 @@ function openChest() {
   show('end'); $('end-continue').addEventListener('click', () => show('map'));
 }
 
+loadRepertoire(REP);
 renderMap();
 requestAnimationFrame(renderMap);
 </script>
