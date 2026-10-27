@@ -52,7 +52,10 @@ Chaque **position** (un coup à trouver) passe par 3 niveaux :
 - Le chemin compte **un pas par niveau à gagner** (3 pas par nouvelle position du monde).
 - **Memo avance pendant la séance** (mini-chemin en haut de l'écran) et, au retour sur la carte, on le voit **se déplacer**
   de son ancienne position à la nouvelle. Il recule quand on se trompe.
-- **Coffre à mi-chemin**, **défi final à l'arrivée** (toutes les lignes en partie, sans indice ni erreur) → monde suivant.
+- **Coffre à mi-chemin**, **défi final à l'arrivée** → monde suivant.
+- **Valider un monde = réussir le défi final** : toutes les lignes du monde en partie, **tous les coups justes,
+  0 erreur**, sans indice ni solution. À la moindre erreur, le défi échoue (Memo recule d'un pas, la position est
+  à retravailler) et on le recommence en entier. ✅
 - Ensuite, la révision du jour (répétition espacée) refait passer les positions de temps en temps.
 
 ## 4. Ajout de lignes : depuis un catalogue ✅
