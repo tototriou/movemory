@@ -1,4 +1,4 @@
-<title>Movemory Monde 1</title>
+<title>Movemory Mondes</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
@@ -42,6 +42,10 @@ button { font: inherit; color: inherit; }
 .brand { font-family: var(--display); font-weight: 700; font-size: 20px; }
 .chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--display); font-weight: 600; font-size: 16px; }
 .world-title { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--muted); }
+.worlds { display: flex; gap: 6px; flex-wrap: wrap; }
+.world-chip { border: 2px solid var(--line); background: var(--bg-2); color: var(--muted); border-radius: 999px; padding: 4px 12px; font-family: var(--display); font-weight: 600; font-size: 14px; cursor: pointer; }
+.world-chip.on { border-color: var(--gold); color: var(--fg); background: var(--surface-2); }
+.world-chip:disabled { opacity: .5; cursor: default; }
 .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: var(--bg-2); border-radius: 12px; padding: 4px; }
 .seg button { border: 0; border-radius: 9px; padding: 8px; background: transparent; color: var(--muted); font-family: var(--display); font-weight: 600; font-size: 14px; cursor: pointer; }
 .seg button[aria-selected="true"] { background: var(--surface-2); color: var(--fg); }
@@ -77,7 +81,10 @@ button.milestone { cursor: pointer; } button.milestone:disabled { cursor: defaul
 .session { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .s-top { display: flex; align-items: center; gap: 12px; }
 .icon-btn { width: 44px; height: 44px; border-radius: 12px; border: 0; background: transparent; color: var(--muted); display: grid; place-items: center; cursor: pointer; }
-.s-top .bar { flex: 1; height: 16px; }
+.mini-track { position: relative; flex: 1; height: 14px; border-radius: 999px; background: #5A3A24; box-shadow: inset 0 0 0 3px #3A2416; }
+.mini-track > span { display: block; height: 100%; border-radius: 999px; background: var(--gold); transition: width .6s ease; }
+.mini-track > i { position: absolute; top: 50%; width: 34px; height: 34px; margin: -22px 0 0 -17px; transition: left .6s ease; }
+.mini-track > i svg { display: block; }
 .s-top .bar > span { background: var(--accent); box-shadow: inset 0 -5px 0 rgba(0,0,0,.18), inset 0 4px 0 rgba(255,255,255,.22); }
 .combo { font-family: var(--display); font-weight: 700; color: var(--gold); min-width: 40px; text-align: right; }
 .combo.bump { animation: bump .5s; }
@@ -186,6 +193,7 @@ button.milestone { cursor: pointer; } button.milestone:disabled { cursor: defaul
         <button role="tab" id="rep-w" data-rep="w">Blancs · Italienne</button>
         <button role="tab" id="rep-b" data-rep="b">Noirs · Sicilienne</button>
       </div>
+      <div class="worlds" id="worlds" aria-label="Mondes"></div>
       <div class="world-title" id="world-title"></div>
       <div class="bar-row"><div class="bar"><span id="world-bar" style="width:0%"></span></div><span id="world-count">0/7</span></div>
     </header>
@@ -207,7 +215,7 @@ button.milestone { cursor: pointer; } button.milestone:disabled { cursor: defaul
   <section class="session" id="screen-session" hidden aria-label="Séance">
     <div class="s-top">
       <button class="icon-btn" id="quit" aria-label="Quitter la séance"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
-      <div class="bar" role="progressbar" aria-label="Progression de la séance"><span id="s-bar" style="width:0%"></span></div>
+      <div class="mini-track" role="progressbar" aria-label="Avancée de Memo sur le chemin du monde"><span id="s-bar" style="width:0%"></span><i id="s-memo"></i></div>
       <span class="combo" id="combo" aria-label="Combo">x0</span>
     </div>
     <div class="s-title">
@@ -292,7 +300,7 @@ const fenKey = (fen) => fen.split(' ').slice(0, 4).join(' ');
 /* ---------- Données du monde ---------- */
 let REP = 'w';
 try { REP = localStorage.getItem('movemory-rep') || 'w'; } catch {}
-let WORLD, LINES, DEPTH, SIDE, DEBUT;
+let R, WI = 0, WORLD, LINES, DEPTH, SIDE, DEBUT;
 
 // Toutes les positions où l'utilisateur joue, avec les coups acceptés (toutes lignes confondues).
 let CARDS = new Map();
@@ -316,19 +324,36 @@ function sliceEnd(moves) {
   for (let i = 0; i < moves.length; i++) { if (c.turn() === SIDE && i >= DEBUT && ++n === DEPTH) return i + 1; c.move(moves[i].san); }
   return moves.length;
 }
-function loadRepertoire(rep) {
-  REP = rep; const R = CONTENT[rep]; WORLD = R.mondes[0]; LINES = WORLD.lignes; DEPTH = WORLD.profondeur; SIDE = R.camp; DEBUT = WORLD.debut || 0;
-  CARDS = new Map();
-  TILES = LINES.map((l) => { const to = sliceEnd(l.coups); return { id: l.id, name: l.nom, punish: !!l.aPunir, deviation: !!l.deviation, alerte: l.alerte || '', moves: l.coups, from: DEBUT, to, cards: cardsOf(l.coups, DEBUT, to) }; });
-  loadProgress();
+// Un monde = une profondeur + une liste de lignes ; chaque monde va plus loin et ajoute des lignes.
+function tilesFor(w) {
+  const W = R.mondes[w]; const keep = DEPTH; DEPTH = W.profondeur;
+  const out = W.lignes.map((id) => {
+    const l = R.lignes.find((x) => x.id === id); const to = sliceEnd(l.coups);
+    return { id: l.id, name: l.nom, punish: !!l.aPunir, deviation: !!l.deviation, alerte: l.alerte || '', moves: l.coups, from: DEBUT, to, cards: cardsOf(l.coups, DEBUT, to) };
+  });
+  DEPTH = keep; return out;
 }
+let NEWCARDS = [];
+function loadRepertoire(rep, w) {
+  REP = rep; R = CONTENT[rep]; SIDE = R.camp; DEBUT = R.debut || 0;
+  loadProgress();
+  WI = Math.min(w ?? P.world ?? 0, R.mondes.length - 1); P.world = WI;
+  WORLD = R.mondes[WI]; DEPTH = WORLD.profondeur;
+  // positions déjà vues dans les mondes précédents : elles ne comptent pas sur le chemin de ce monde
+  CARDS = new Map(); const before = new Set();
+  for (let i = 0; i < WI; i++) tilesFor(i).forEach((t) => t.cards.forEach((k) => before.add(k)));
+  CARDS = new Map();
+  TILES = tilesFor(WI); LINES = TILES;
+  NEWCARDS = [...new Set(TILES.flatMap((t) => t.cards))].filter((k) => !before.has(k));
+}
+const worldUnlocked = (w) => w === 0 || P.unlock || !!(P.boss || {})[w - 1];
 const tileById = (id) => TILES.find((t) => t.id === id);
 
 /* ---------- Progression (localStorage, avec repli en mémoire) ---------- */
-const SAVE_KEY = () => 'movemory-monde1-v4-' + REP;
+const SAVE_KEY = () => 'movemory-v5-' + REP;
 let P;
 function loadProgress() {
-  P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: false, learned: [], sessionNo: 0 };
+  P = { cards: {}, xp: 0, gems: 0, chest: {}, boss: {}, unlock: false, learned: [], world: 0 };
   try { const s = JSON.parse(localStorage.getItem(SAVE_KEY())); if (s) P = { ...P, ...s }; } catch {}
 }
 const save = () => { try { localStorage.setItem(SAVE_KEY(), JSON.stringify(P)); } catch {} };
@@ -339,8 +364,8 @@ const MAXL = 3;
 const card = (k) => (P.cards[k] ||= { level: 0 });
 const tileMastered = (t) => t.cards.every((k) => card(k).level >= MAXL);
 // Avancée sur le chemin : 1 pas par niveau gagné sur chaque position du monde ; une erreur fait reculer d'un pas
-const allCards = () => [...new Set(TILES.flatMap((t) => t.cards))];
-function worldProgress() { const ks = allCards(); return { steps: ks.reduce((n, k) => n + Math.min(card(k).level, MAXL), 0), total: ks.length * MAXL }; }
+function worldProgress() { const ks = NEWCARDS; return { steps: ks.reduce((n, k) => n + Math.min(card(k).level, MAXL), 0), total: Math.max(1, ks.length * MAXL) }; }
+const chestOpen = () => !!P.chest[WI], bossDone = () => !!P.boss[WI];
 
 /* ---------- Carte ---------- */
 const $ = (id) => document.getElementById(id);
@@ -368,33 +393,44 @@ function renderMap() {
   const [sx, sy] = at(0), [cx, cy] = at(chestAt), [ex, ey] = at(1), [mx, my] = at(steps / total);
   host.insertAdjacentHTML('beforeend', `
     <div class="milestone" style="left:${sx}px;top:${sy}px"><span class="flag">Départ</span></div>
-    <button class="milestone chest ${P.chest ? 'open' : chestReached || P.unlock ? 'ready' : ''}" id="chest" style="left:${cx}px;top:${cy}px" ${chestReached || P.unlock ? '' : 'disabled'} aria-label="Coffre${P.chest ? ' (ouvert)' : chestReached ? ' : à ouvrir' : ' : à mi-chemin'}">
-      <svg width="46" height="42" viewBox="0 0 24 22" aria-hidden="true"><rect x="2" y="8" width="20" height="12" rx="2" fill="#8B5A2B"/><path d="M2 10V7a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3z" fill="${P.chest ? '#5F3C1A' : '#A86E35'}"/><rect x="2" y="10" width="20" height="2.5" fill="#FFC94A"/><rect x="10" y="9" width="4" height="6" rx="1" fill="#FFC94A"/></svg></button>
+    <button class="milestone chest ${chestOpen() ? 'open' : chestReached || P.unlock ? 'ready' : ''}" id="chest" style="left:${cx}px;top:${cy}px" ${chestReached || P.unlock ? '' : 'disabled'} aria-label="Coffre${chestOpen() ? ' (ouvert)' : chestReached ? ' : à ouvrir' : ' : à mi-chemin'}">
+      <svg width="46" height="42" viewBox="0 0 24 22" aria-hidden="true"><rect x="2" y="8" width="20" height="12" rx="2" fill="#8B5A2B"/><path d="M2 10V7a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3z" fill="${chestOpen() ? '#5F3C1A' : '#A86E35'}"/><rect x="2" y="10" width="20" height="2.5" fill="#FFC94A"/><rect x="10" y="9" width="4" height="6" rx="1" fill="#FFC94A"/></svg></button>
     <button class="milestone goal ${steps >= total || P.unlock ? 'ready' : ''}" id="goal" style="left:${ex}px;top:${ey}px" ${steps >= total || P.unlock ? '' : 'disabled'} aria-label="Arrivée : défi final">
-      <svg width="52" height="44" viewBox="0 0 24 20" aria-hidden="true"><path d="M2 6l5 4 5-8 5 8 5-4-2 12H4z" fill="${P.boss ? '#3DDC84' : '#FFC94A'}" stroke="#8A5E0A" stroke-width="1.2" stroke-linejoin="round"/></svg><span class="flag">Arrivée</span></button>
-    <div class="memo-token" style="left:${mx - 42}px;top:${my - 88}px">${memoSvg(P.boss ? 'bravo' : 'content')}</div>`);
+      <svg width="52" height="44" viewBox="0 0 24 20" aria-hidden="true"><path d="M2 6l5 4 5-8 5 8 5-4-2 12H4z" fill="${bossDone() ? '#3DDC84' : '#FFC94A'}" stroke="#8A5E0A" stroke-width="1.2" stroke-linejoin="round"/></svg><span class="flag">Arrivée</span></button>
+    <div class="memo-token" id="map-memo" style="left:${mx - 42}px;top:${my - 88}px">${memoSvg(bossDone() ? 'bravo' : 'content')}</div>`);
+  // animation : Memo part de sa dernière position connue et avance (ou recule) le long du chemin
+  P.shown = P.shown || {}; const from = P.shown[WI] ?? steps;
+  if (from !== steps) {
+    const tok = $('map-memo'); const t0 = performance.now(); const dur = 1400;
+    const tick = (now) => { const u = Math.min(1, (now - t0) / dur); const e = u < .5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; const [x, y] = at((from + (steps - from) * e) / total); tok.style.left = `${x - 42}px`; tok.style.top = `${y - 88}px`; if (u < 1) requestAnimationFrame(tick); };
+    requestAnimationFrame(tick);
+  }
+  P.shown[WI] = steps; save();
   $('chest').addEventListener('click', openChest);
   $('goal').addEventListener('click', () => startSession({ boss: true }));
   const mastered = TILES.filter(tileMastered).length, started = TILES.filter((t) => tileSeen(t) && !tileMastered(t)).length;
   $('world-bar').style.width = `${(steps / total) * 100}%`;
   $('world-count').textContent = `${mastered}/${TILES.length} lignes`;
   $('xp').textContent = P.xp; $('gems').textContent = P.gems;
-  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : chestReached && !P.chest ? 'Ouvrir le coffre' : steps >= total ? 'Défi final' : steps ? 'Continuer' : 'Commencer';
+  $('play-label').textContent = bossDone() ? (R.mondes[WI + 1] ? `Monde ${WI + 2} débloqué !` : 'Tous les mondes terminés !') : chestReached && !chestOpen() ? 'Ouvrir le coffre' : steps >= total ? 'Défi final' : steps ? 'Continuer' : 'Commencer';
+  $('worlds').innerHTML = R.mondes.map((m, i) => `<button class="world-chip ${i === WI ? 'on' : ''}" data-w="${i}" ${worldUnlocked(i) ? '' : 'disabled'} aria-label="Monde ${i + 1}${worldUnlocked(i) ? '' : ', verrouillé'}">${worldUnlocked(i) ? '' : '🔒 '}Monde ${i + 1}${P.boss[i] ? ' ✓' : ''}</button>`).join('');
   const ring = Math.round((steps / total) * 100);
   $('play-ring').style.background = `conic-gradient(var(--gold) 0 ${ring}%, var(--surface-2) ${ring}% 100%)`;
   $('unlock').checked = P.unlock;
-  $('world-title').textContent = `Monde 1 · ${WORLD.titre} · ${DEPTH} coups · ${started ? `${started} ligne${started > 1 ? 's' : ''} en cours` : `${TILES.length} lignes`}`;
+  $('world-title').textContent = `${WORLD.titre} · ${DEPTH} coups · ${TILES.length} lignes${started ? ` (${started} en cours)` : ''}`;
   for (const r of ['w', 'b']) $('rep-' + r).setAttribute('aria-selected', String(r === REP));
 }
 for (const r of ['w', 'b']) $('rep-' + r).addEventListener('click', () => { try { localStorage.setItem('movemory-rep', r); } catch {} loadRepertoire(r); renderMap(); });
+$('worlds').addEventListener('click', (e) => { const b = e.target.closest('.world-chip'); if (b && !b.disabled) { loadRepertoire(REP, Number(b.dataset.w)); save(); renderMap(); } });
 $('play').addEventListener('click', () => {
   const { steps, total } = worldProgress();
-  if (steps >= total / 2 && !P.chest) return openChest();
-  if (steps >= total && !P.boss) return startSession({ boss: true });
+  if (bossDone() && R.mondes[WI + 1]) { loadRepertoire(REP, WI + 1); save(); return renderMap(); }
+  if (steps >= total / 2 && !chestOpen()) return openChest();
+  if (steps >= total && !bossDone()) return startSession({ boss: true });
   startSession({});
 });
 $('unlock').addEventListener('change', (e) => { P.unlock = e.target.checked; save(); renderMap(); });
-$('reset').addEventListener('click', () => { P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: P.unlock, learned: [] }; save(); renderMap(); });
+$('reset').addEventListener('click', () => { P = { cards: {}, xp: 0, gems: 0, chest: {}, boss: {}, unlock: P.unlock, learned: [], world: 0 }; save(); loadRepertoire(REP, 0); renderMap(); });
 window.addEventListener('resize', () => { if (!$('screen-map').hidden) renderMap(); });
 
 function show(screen) { for (const s of ['map', 'session', 'end']) $('screen-' + s).hidden = s !== screen; closeSheet(); window.scrollTo(0, 0); if (screen === 'map') renderMap(); }
@@ -491,75 +527,79 @@ function setCombo(n) { S.combo = n; const c = $('combo'); c.textContent = 'x' + 
 const shuffle = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 const tileSeen = (t) => (P.learned || []).includes(t.id);
 const plyOf = (t, k) => { const g = new Chess(); for (let i = 0; i < t.moves.length; i++) { if (fenKey(g.fen()) === k && g.turn() === SIDE && i >= t.from) return i; g.move(t.moves[i].san); } return -1; };
-const ROUND = 7;
-
-/* Leçon : on commence par une ligne, puis une nouvelle ligne arrive dès que les précédentes sont presque sues
-   (au plus 3 nouvelles lignes par leçon). Manches de 7 questions mélangées :
-   découverte (flèche) → seul → en partie (l'adversaire choisit une ligne au hasard).
-   Une erreur fait redescendre la position d'un niveau (Memo recule) et la question revient à la fin de la manche. */
-const NEW_PER_LESSON = 3;
+const SESSION_Q = 10;
+const INTRO_START = 5;
+/* Séance : une dizaine de questions, puis retour à la carte où Memo a avancé.
+   Première séance d'un monde : on montre 4-5 lignes d'emblée ; ensuite une nouvelle ligne arrive dès que les autres
+   sont presque sues. Niveaux : découverte (flèche) → de mémoire → en partie (l'adversaire choisit une ligne au hasard).
+   Une erreur fait reculer Memo d'un pas, et la position est reposée en priorité à la séance suivante. */
 function maybeIntroduce() {
-  const next = TILES.find((t) => !tileSeen(t));
-  if (!next || S.introduced >= NEW_PER_LESSON) return null;
+  const fresh = TILES.filter((t) => !tileSeen(t) && !S.lines.includes(t));
+  if (!fresh.length) return [];
   const weak = lessonCards().filter((k) => card(k).level < 2).length;
-  if (S.lines.length && weak > 2) return null;
-  S.lines.push(next); P.learned.push(next.id); S.introduced++; save();
-  return next;
+  const n = S.lines.length === 0 ? INTRO_START : weak <= 2 ? 1 : 0;
+  const added = fresh.slice(0, n);
+  for (const t of added) { S.lines.push(t); if (!P.learned.includes(t.id)) P.learned.push(t.id); }
+  save(); return added;
 }
-function buildRound() {
+function buildSession() {
   const intro = maybeIntroduce();
   const lines = S.lines;
   const todo = []; const seenK = new Set();
-  for (const t of lines) for (const k of t.cards) if (!seenK.has(k) && card(k).level < MAXL) { seenK.add(k); todo.push({ k, t: intro && intro.cards.includes(k) && card(k).level === 0 ? intro : t }); }
-  if (!todo.length) return [];
-  todo.sort((a, b) => card(a.k).level - card(b.k).level);
-  const batch = todo.slice(0, ROUND);
-  const items = []; const parties = new Map();
-  for (const { k, t } of batch) {
-    const lv = card(k).level;
-    if (lv >= 2) { const line = lines.find((l) => l.cards.includes(k)) || t; parties.set(line.id, line); }
-    else items.push({ kind: 'pos', k, t, ply: plyOf(t, k), level: lv });
+  for (const t of lines) for (const k of t.cards) if (!seenK.has(k) && card(k).level < MAXL) { seenK.add(k); todo.push({ k, t }); }
+  const prio = (x) => (card(x.k).retry ? 0 : 1);
+  const news = todo.filter((x) => card(x.k).level === 0).sort((a, b) => (lines.indexOf(a.t) - lines.indexOf(b.t)) || (plyOf(a.t, a.k) - plyOf(b.t, b.k)));
+  const known = shuffle(todo.filter((x) => card(x.k).level > 0)).sort((a, b) => prio(a) - prio(b) || card(a.k).level - card(b.k).level);
+  const items = []; let count = 0; const parties = new Set();
+  const addPos = (x) => { items.push({ kind: 'pos', k: x.k, t: x.t, ply: plyOf(x.t, x.k), level: card(x.k).level }); count++; };
+  // les erreurs de la séance précédente d'abord, puis les découvertes (toutes, la 1re fois), puis le reste
+  for (const x of known.filter((y) => card(y.k).retry && card(y.k).level < 2)) if (count < SESSION_Q) addPos(x);
+  for (const x of news) if (count < SESSION_Q || intro.length >= 2) addPos(x);
+  for (const x of known) {
+    if (count >= SESSION_Q) break;
+    if (items.some((i) => i.k === x.k)) continue;
+    if (card(x.k).level >= 2) { const line = lines.find((l) => l.cards.includes(x.k)) || x.t; if (!parties.has(line)) { parties.add(line); items.push({ kind: 'partie', t: line }); count += line.cards.length; } }
+    else addPos(x);
   }
-  for (const line of parties.values()) items.push({ kind: 'partie', t: line });
-  // mélange, sans deux questions de suite sur la même ligne ; une ligne découverte se joue dans l'ordre des coups
-  let out = shuffle(items);
-  const guided = out.filter((x) => x.kind === 'pos' && x.level === 0).sort((a, b) => a.ply - b.ply);
-  out = [...guided, ...out.filter((x) => !(x.kind === 'pos' && x.level === 0))];
-  for (let i = guided.length + 1; i < out.length; i++) if (out[i].t === out[i - 1].t) { const j = out.findIndex((x, n) => n > i && x.t !== out[i].t); if (j > 0) [out[i], out[j]] = [out[j], out[i]]; }
-  S.newLine = intro;
-  return out;
+  // pas assez de questions ? on complète avec des parties de révision sur les lignes déjà vues
+  for (const line of shuffle(TILES.filter(tileSeen))) {
+    if (count >= SESSION_Q) break;
+    if (!parties.has(line)) { parties.add(line); items.push({ kind: 'partie', t: line }); count += line.cards.length; }
+  }
+  // découvertes dans l'ordre, puis le reste mélangé sans deux questions de suite sur la même ligne
+  const guided = items.filter((x) => x.kind === 'pos' && x.level === 0);
+  let rest = shuffle(items.filter((x) => !(x.kind === 'pos' && x.level === 0)));
+  for (let i = 1; i < rest.length; i++) if (rest[i].t === rest[i - 1].t) { const j = rest.findIndex((x, n) => n > i && x.t !== rest[i].t); if (j > 0) [rest[i], rest[j]] = [rest[j], rest[i]]; }
+  S.newLines = intro;
+  return [...items.filter((x) => x.kind === 'pos' && x.level > 0 && card(x.k).retry), ...guided, ...rest.filter((x) => !(x.kind === 'pos' && card(x.k).retry))];
 }
 function startSession(opts) {
-  S = { opts, combo: 0, correct: 0, errors: 0, xp: 0, round: 0, masteredBefore: new Set(TILES.filter(tileMastered).map((t) => t.id)) };
+  S = { opts, combo: 0, correct: 0, errors: 0, xp: 0, asked: 0, stepsBefore: worldProgress().steps, masteredBefore: new Set(TILES.filter(tileMastered).map((t) => t.id)) };
   show('session'); buildSquares(); setCombo(0);
-  $('s-eyebrow').textContent = opts.boss ? 'Défi final · sans indice' : `Monde 1 · ${SIDE === 'w' ? 'Blancs' : 'Noirs'}`;
+  $('s-memo').innerHTML = memoSvg('content');
+  $('s-eyebrow').textContent = opts.boss ? `Monde ${WI + 1} · défi final · sans indice` : `Monde ${WI + 1} · ${SIDE === 'w' ? 'Blancs' : 'Noirs'}`;
   $('btn-hint').disabled = $('btn-solution').disabled = !!opts.boss;
-  if (opts.boss) { S.queue = shuffle(TILES).map((t) => ({ kind: 'partie', t, boss: true })); S.total = S.queue.length; return nextItem(); }
+  if (opts.boss) { S.queue = shuffle(TILES).map((t) => ({ kind: 'partie', t, boss: true })); S.budget = S.queue.reduce((n, x) => n + x.t.cards.length, 0); return nextItem(); }
   // on reprend les lignes commencées et pas encore maîtrisées ; sinon on révise tout ce qui est appris
-  S.introduced = 0;
   S.lines = TILES.filter((t) => tileSeen(t) && !tileMastered(t));
   if (!S.lines.length && !TILES.some((t) => !tileSeen(t))) S.lines = TILES.filter(tileSeen);
-  nextRound();
-}
-function lessonCards() { const ks = new Set(); for (const t of S.lines) t.cards.forEach((k) => ks.add(k)); return [...ks]; }
-function updateBar() {
-  if (!S) return;
-  if (S.opts.boss) { $('s-bar').style.width = `${(S.done || 0) / S.total * 100}%`; return; }
-  const ks = lessonCards(); const sum = ks.reduce((n, k) => n + card(k).level, 0);
-  $('s-bar').style.width = `${ks.length ? (sum / (ks.length * MAXL)) * 100 : 0}%`;
-}
-function nextRound() {
-  S.round++; S.queue = buildRound(); S.total = S.queue.length; S.done = 0;
+  S.queue = buildSession();
+  S.budget = S.queue.reduce((n, x) => n + (x.kind === 'partie' ? x.t.cards.length : 1), 0);
   if (!S.queue.length) return endSession();
   nextItem();
 }
+function lessonCards() { const ks = new Set(); for (const t of S.lines || []) t.cards.forEach((k) => ks.add(k)); return [...ks]; }
+function updateBar() {
+  if (!S) return;
+  const { steps, total } = worldProgress(); const f = Math.min(1, steps / total);
+  $('s-bar').style.width = `${f * 100}%`; $('s-memo').style.left = `${f * 100}%`;
+}
 async function nextItem() {
   updateBar();
-  if (!S.queue.length) return S.opts.boss ? endSession() : checkpoint();
+  if (!S.queue.length) return endSession();
   const it = S.queue.shift(); S.item = it;
   game = new Chess(); S.lastOpp = ''; renderPieces(); sqClass('last', []); sqClass('hint', []); arrow(null); renderMoves();
-  const pillTxt = it.boss ? `Partie ${S.total - S.queue.length}/${S.total}` : `Manche ${S.round} · ${S.total - S.queue.length}/${S.total}`;
-  $('s-pill').textContent = pillTxt; $('s-pill').classList.toggle('punish', false);
+  $('s-pill').classList.toggle('punish', false);
   if (it.kind === 'partie') {
     $('s-name').textContent = it.boss ? 'Défi final' : 'En partie';
     say(it.boss ? 'Défi final : pas d’indice, pas d’erreur !' : 'En partie : je choisis une ouverture au hasard. À vous de la reconnaître !', 'reflechit');
@@ -567,7 +607,7 @@ async function nextItem() {
     await wait(650); return playOn();
   }
   $('s-name').textContent = (it.level === 0 ? 'Découverte' : 'De mémoire') + ' · ' + it.t.name;
-  if (it.level === 0 && S.newLine === it.t && it.ply === Math.min(...it.t.cards.filter((k) => card(k).level === 0).map((k) => plyOf(it.t, k)))) {
+  if (it.level === 0 && S.newLines.includes(it.t) && it.ply === Math.min(...it.t.cards.filter((k) => card(k).level === 0).map((k) => plyOf(it.t, k)))) {
     say(`Nouvelle ligne : <b>${it.t.name}</b>. ${it.t.alerte ? it.t.alerte + ' ' : ''}Je vous la montre.`, 'content'); await wait(1300);
   }
   // mise en place rapide de la position, puis question
@@ -592,6 +632,7 @@ async function playOn() {
 function ask(ply, move) {
   const it = S.item; const k = fenKey(game.fen()); const cs = card(k);
   const level = it.kind === 'partie' ? 2 : it.level;
+  S.asked++; $('s-pill').textContent = `Question ${Math.min(S.asked, S.budget)}/${S.budget}`;
   S.q = { ply, move, k, cs, level, help: false };
   const mv = new Chess(game.fen()).move(move.san);
   const prevMove = ply > 0 ? `${SIDE === 'w' ? 'Les Noirs ont joué' : 'Les Blancs ont joué'} <b>${label(ply - 1, game.history()[ply - 1])}</b>. ` : '';
@@ -614,15 +655,15 @@ function answer(m) {
     setTimeout(() => arrow(good.from, good.to, '#3DDC84'), 400);
     if (it.boss) return sheet({ bad: true, title: 'Défi raté', text: `<b>Memo :</b> ici, c'était <b>${label(ply, move.san)}</b>. ${move.pourquoi}`, note: 'Révisez encore un peu, puis retentez le défi.', mood: 'oups', buttons: [['Retour à la carte', 'btn-cta', () => show('map')]] });
     // la question reviendra en fin de manche, un niveau plus bas
-    if (it.kind === 'pos') S.queue.push({ ...it, level: cs.level }); else S.queue.push({ kind: 'pos', k: S.q.k, t: it.t, ply, level: cs.level });
-    return sheet({ bad: true, title: 'Pas votre ligne !', text: `<b>Memo :</b> ${fr(m.san)} n'est pas le coup prévu. Ici on joue <b>${label(ply, move.san)}</b> : ${lower(move.pourquoi)}`, note: `${fell ? 'Memo recule d’un pas. ' : ''}Cette position revient à la fin de la manche.`, mood: 'oups', buttons: [['Rejouer le bon coup', 'btn-cta', () => { closeSheet(); retry(); }]] });
+    cs.retry = true; save();
+    return sheet({ bad: true, title: 'Pas votre ligne !', text: `<b>Memo :</b> ${fr(m.san)} n'est pas le coup prévu. Ici on joue <b>${label(ply, move.san)}</b> : ${lower(move.pourquoi)}`, note: `${fell ? 'Memo recule d’un pas. ' : ''}Cette position vous sera reposée à la prochaine séance.`, mood: 'oups', buttons: [['Rejouer le bon coup', 'btn-cta', () => { closeSheet(); retry(); }]] });
   }
   const played = game.move(m.san); animate(played); renderMoves(true);
   S.correct++; setCombo(S.combo + 1);
   const before = cs.level;
   // +1 niveau par réussite sans indice (Memo avance d'un pas) ; « maîtrisée » ne s'obtient qu'en partie
   const cap = it.kind === 'partie' ? MAXL : 2;
-  if (!S.q.usedHint) cs.level = Math.min(cap, cs.level + 1);
+  if (!S.q.usedHint) { cs.level = Math.min(cap, cs.level + 1); cs.retry = false; }
   if (level === 0) cs.level = Math.max(cs.level, 1);
   save(); updateBar();
   const gain = level === 0 ? 5 : 10 + level * 2 + Math.min(S.combo, 5); S.xp += gain; floatXp(gain, played.to);
@@ -650,7 +691,6 @@ $('btn-solution').addEventListener('click', () => {
 });
 $('quit').addEventListener('click', () => { inputEnabled = false; show('map'); });
 
-// Bilan entre deux manches (comme les « points d'étape » de Quizlet)
 function statusCounts() {
   const ks = lessonCards(); const c = { vu: 0, cours: 0, ok: 0 };
   for (const k of ks) { const l = card(k).level; if (l === 0) c.vu++; else if (l < MAXL) c.cours++; else c.ok++; }
@@ -664,21 +704,6 @@ function statusBlock() {
     <div class="m-row"><span class="legend-dot" style="background:var(--gold)"></span><span class="name">En apprentissage</span><b>${c.cours}</b></div>
     <div class="m-row"><span class="legend-dot" style="background:var(--surface-2)"></span><span class="name">Pas encore vues</span><b>${c.vu}</b></div>
   </div>`;
-}
-function checkpoint() {
-  inputEnabled = false;
-  const c = statusCounts();
-  if (c.ok === c.n) return endSession();
-  $('screen-end').innerHTML = `<div class="memo">${memoSvg('content')}</div>
-    <h1>Manche ${S.round} terminée</h1>
-    <p>${c.ok ? `Déjà ${c.ok} position${c.ok > 1 ? 's' : ''} maîtrisée${c.ok > 1 ? 's' : ''} sur ${c.n}. ` : ''}${TILES.some((t) => !tileSeen(t)) && S.introduced < NEW_PER_LESSON ? 'Une nouvelle ligne arrivera dès que celles-ci seront presque sues.' : 'On continue jusqu’à tout maîtriser !'}</p>
-    ${statusBlock()}
-    <div class="lines-state">${S.lines.map((t) => `<div class="m-row"><span class="name">${t.punish ? '⚔ ' : t.deviation ? '↪ ' : ''}${t.name}</span><span class="pips">${t.cards.map((k) => `<i class="lv${card(k).level}" title="${LEVELS[card(k).level]}"></i>`).join('')}</span></div>`).join('')}</div>
-    <button class="btn btn-cta" id="end-continue">Manche suivante</button>
-    <button class="link-btn" id="end-stop">Arrêter pour aujourd'hui</button>`;
-  show('end');
-  $('end-continue').addEventListener('click', () => { show('session'); buildSquares(); nextRound(); });
-  $('end-stop').addEventListener('click', () => endSession(true));
 }
 function floatXp(n, sq) {
   const [x, y] = sqXY(sq); const el = document.createElement('div'); el.className = 'xp-float'; el.textContent = `+${n} XP`;
@@ -703,15 +728,16 @@ function closeSheet() { $('sheet-host').innerHTML = ''; }
 function endSession(stopped) {
   inputEnabled = false;
   const boss = S.opts.boss;
-  if (boss && S.errors === 0) { P.boss = true; S.xp += 100; P.gems += 50; }
+  if (boss && S.errors === 0) { P.boss[WI] = true; S.xp += 100; P.gems += 50; }
   P.xp += S.xp; save();
   const acc = S.correct + S.errors ? Math.round((S.correct / (S.correct + S.errors)) * 100) : 100;
   const newly = TILES.filter((t) => tileMastered(t) && !S.masteredBefore.has(t.id));
-  const conf = (boss && P.boss) || newly.length ? Array.from({ length: 10 }, (_, i) => `<span class="conf" style="left:${8 + i * 9}%;background:${['#FFC94A', '#3DDC84', '#8FD3FF', '#F0605D', '#A78BFA'][i % 5]};animation-delay:${(i * 0.37) % 2.4}s"></span>`).join('') : '';
-  const title = boss ? (P.boss ? 'Monde 1 terminé !' : 'Défi terminé') : newly.length ? (newly.length > 1 ? `${newly.length} lignes maîtrisées !` : 'Ligne maîtrisée !') : stopped ? 'À demain !' : 'Leçon terminée !';
-  const text = boss ? (P.boss ? `Vos ${DEPTH} coups sur les ${LINES.length} lignes du Monde 1 sont acquis. Le Monde 2 ajoutera de nouvelles lignes.` : '')
+  const conf = (boss && bossDone()) || newly.length ? Array.from({ length: 10 }, (_, i) => `<span class="conf" style="left:${8 + i * 9}%;background:${['#FFC94A', '#3DDC84', '#8FD3FF', '#F0605D', '#A78BFA'][i % 5]};animation-delay:${(i * 0.37) % 2.4}s"></span>`).join('') : '';
+  const moved = worldProgress().steps - S.stepsBefore;
+  const title = boss ? (bossDone() ? `Monde ${WI + 1} terminé !` : 'Défi terminé') : newly.length ? (newly.length > 1 ? `${newly.length} lignes maîtrisées !` : 'Ligne maîtrisée !') : 'Séance terminée !';
+  const text = boss ? (bossDone() ? (R.mondes[WI + 1] ? `Vos ${DEPTH} coups sur les ${TILES.length} lignes sont acquis. Monde ${WI + 2} débloqué : ${R.mondes[WI + 1].profondeur} coups, ${R.mondes[WI + 1].lignes.length} lignes.` : 'Vous avez terminé tous les mondes de ce répertoire !') : '')
     : newly.length ? `${newly.map((t) => t.name).join(', ')} : Memo avance sur la carte ! Elles reviendront de temps en temps dans la révision du jour pour ne pas les oublier.`
-    : 'Votre progression est gardée : vous reprendrez là où vous en êtes.';
+    : `${moved > 0 ? `Memo a avancé de ${moved} pas sur le chemin.` : moved < 0 ? `Memo a reculé de ${-moved} pas : on rattrape ça à la prochaine séance !` : 'Memo n’a pas bougé cette fois.'} ${S.errors ? 'Vos erreurs vous seront reposées à la prochaine séance.' : ''}`;
   $('screen-end').innerHTML = `${conf}
     <div class="memo">${memoSvg('bravo')}</div>
     <h1>${title}</h1><p>${text}</p>
@@ -720,20 +746,20 @@ function endSession(stopped) {
       <div class="stat"><span>Précision</span><b style="color:var(--good)">${acc} %</b></div>
       <div class="stat"><span>Erreurs</span><b style="color:${S.errors ? 'var(--bad)' : 'var(--fg)'}">${S.errors}</b></div>
     </div>
-    ${boss ? '' : statusBlock()}
-    <button class="btn btn-cta" id="end-continue">Continuer</button>`;
+    ${boss ? '' : `<div class="mastery"><b>Chemin du monde ${WI + 1}</b><div class="seg-bar"><span style="width:${worldProgress().steps / worldProgress().total * 100}%;background:var(--gold)"></span></div><div class="m-row"><span class="name">Avancée</span><b>${Math.round(worldProgress().steps / worldProgress().total * 100)} %</b></div></div>`}
+    <button class="btn btn-cta" id="end-continue">Voir la carte</button>`;
   show('end');
   $('end-continue').addEventListener('click', () => show('map'));
 }
 
 function openChest() {
-  if (!P.chest) { P.chest = true; P.gems += 20; save(); }
+  if (!chestOpen()) { P.chest[WI] = true; P.gems += 20; save(); }
   $('screen-end').innerHTML = `<div class="memo">${memoSvg('bravo')}</div><h1>Coffre ouvert !</h1><p>+20 gemmes. Plus tard, elles serviront à habiller Memo (chapeaux, lunettes, écharpes…).</p><div class="stats"><div class="stat"><span>Gemmes</span><b style="color:#8FD3FF">+20</b></div><div class="stat"><span>Total</span><b>${P.gems}</b></div><div class="stat"><span>Chemin</span><b>${Math.round(worldProgress().steps / worldProgress().total * 100)} %</b></div></div><button class="btn btn-cta" id="end-continue">Continuer</button>`;
   show('end'); $('end-continue').addEventListener('click', () => show('map'));
 }
 
 // Accroche de test (navigateur headless) : le coup attendu dans la position actuelle
-window.__movemoryTest = () => { if (!S || !inputEnabled || !S.q) return null; const m = new Chess(game.fen()).move(S.q.move.san); const alt = new Chess(game.fen()).moves({ verbose: true }).find((x) => x.san !== m.san); return { from: m.from, to: m.to, alt: alt && { from: alt.from, to: alt.to }, mode: S.item.kind === 'partie' ? 'partie' : ['guidé', 'seul'][S.item.level], line: S.item.t.id }; };
+window.__movemoryTest = () => { if (!S || !inputEnabled || !S.q) return null; const m = new Chess(game.fen()).move(S.q.move.san); const alt = new Chess(game.fen()).moves({ verbose: true }).find((x) => x.san !== m.san); return { from: m.from, to: m.to, alt: alt && { from: alt.from, to: alt.to }, mode: S.item.kind === 'partie' ? 'partie' : ['guidé', 'seul'][S.item.level], line: S.item.t.id, boss: !!S.opts.boss, world: WI + 1 }; };
 loadRepertoire(REP);
 renderMap();
 requestAnimationFrame(renderMap);

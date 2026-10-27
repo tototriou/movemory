@@ -3,259 +3,346 @@
   "nom": "Répertoire Noirs : Sicilienne et 1…d5",
   "camp": "b",
   "licence": "CC BY-SA 4.0 — lignes et idées adaptées de Wikibooks, Chess Opening Theory (https://en.wikibooks.org/wiki/Chess_Opening_Theory), textes réécrits pour Movemory.",
+  "debut": 0,
+  "lignes": [
+    {
+      "id": "sic-ouverte",
+      "nom": "Sicilienne ouverte (2.Cf3)",
+      "rang": 1,
+      "coups": [
+        {
+          "san": "e4",
+          "pourquoi": "Ils prennent le centre."
+        },
+        {
+          "san": "c5",
+          "pourquoi": "La Sicilienne : on contrôle d4 avec un pion de côté. Le jeu sera déséquilibré, et nos chances aussi.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "Nf3",
+          "pourquoi": "Ils développent et préparent d4."
+        },
+        {
+          "san": "d6",
+          "pourquoi": "On contrôle e5 et on ouvre la diagonale du fou c8.",
+          "principes": [
+            "centre",
+            "developpement"
+          ]
+        },
+        {
+          "san": "d4",
+          "pourquoi": "Ils ouvrent le centre."
+        },
+        {
+          "san": "cxd4",
+          "pourquoi": "On échange notre pion de côté contre leur pion central : c'est tout l'esprit de la Sicilienne.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "Nxd4",
+          "pourquoi": "Ils reprennent avec le cavalier, au centre."
+        },
+        {
+          "san": "Nf6",
+          "pourquoi": "On attaque e4 en développant : les Blancs doivent le défendre.",
+          "principes": [
+            "developpement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sic-alapin",
+      "nom": "Sicilienne Alapin (2.c3)",
+      "rang": 2,
+      "coups": [
+        {
+          "san": "e4",
+          "pourquoi": "Ils prennent le centre."
+        },
+        {
+          "san": "c5",
+          "pourquoi": "La Sicilienne : on contrôle d4.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "c3",
+          "pourquoi": "L'Alapin : les Blancs préparent d4 pour avoir deux pions au centre."
+        },
+        {
+          "san": "Nf6",
+          "pourquoi": "On attaque e4 tout de suite, avant que les Blancs ne jouent d4.",
+          "principes": [
+            "developpement"
+          ]
+        },
+        {
+          "san": "e5",
+          "pourquoi": "Ils avancent pour chasser le cavalier."
+        },
+        {
+          "san": "Nd5",
+          "pourquoi": "Le cavalier s'installe en d5, une belle case centrale qu'aucun pion blanc ne peut attaquer facilement.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "d4",
+          "pourquoi": "Ils poussent d4 pour prendre le centre."
+        },
+        {
+          "san": "cxd4",
+          "pourquoi": "On échange : notre cavalier d5 reste très bien placé.",
+          "principes": [
+            "centre"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sic-fermee",
+      "nom": "Sicilienne fermée (2.Cc3)",
+      "rang": 3,
+      "coups": [
+        {
+          "san": "e4",
+          "pourquoi": "Ils prennent le centre."
+        },
+        {
+          "san": "c5",
+          "pourquoi": "La Sicilienne : on contrôle d4.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "Nc3",
+          "pourquoi": "Ils gardent le centre fermé et développent."
+        },
+        {
+          "san": "Nc6",
+          "pourquoi": "On développe en surveillant d4 et e5.",
+          "principes": [
+            "developpement"
+          ]
+        },
+        {
+          "san": "g3",
+          "pourquoi": "Ils préparent le fianchetto de leur fou en g2."
+        },
+        {
+          "san": "g6",
+          "pourquoi": "On fait pareil : notre fou en g7 visera la grande diagonale.",
+          "principes": [
+            "developpement"
+          ]
+        },
+        {
+          "san": "Bg2",
+          "pourquoi": "Ils placent leur fou sur la grande diagonale."
+        },
+        {
+          "san": "Bg7",
+          "pourquoi": "Même idée pour nous : le fou g7 contrôle la grande diagonale.",
+          "principes": [
+            "developpement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sic-smith-morra",
+      "nom": "Gambit Smith-Morra (2.d4)",
+      "rang": 4,
+      "coups": [
+        {
+          "san": "e4",
+          "pourquoi": "Ils prennent le centre."
+        },
+        {
+          "san": "c5",
+          "pourquoi": "La Sicilienne : on contrôle d4.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "d4",
+          "pourquoi": "Ils proposent un échange au centre."
+        },
+        {
+          "san": "cxd4",
+          "pourquoi": "On prend, comme toujours dans la Sicilienne : un pion de côté contre un pion central.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "c3",
+          "pourquoi": "Le gambit Smith-Morra : les Blancs offrent un pion pour développer vite."
+        },
+        {
+          "san": "dxc3",
+          "pourquoi": "On accepte le pion. Il faudra ensuite développer vite et prudemment pour le garder.",
+          "principes": [
+            "materiel"
+          ]
+        },
+        {
+          "san": "Nxc3",
+          "pourquoi": "Ils reprennent avec le cavalier : un pion de moins, mais plus de pièces sorties."
+        },
+        {
+          "san": "Nc6",
+          "pourquoi": "On développe vite : il faut rattraper le retard pour garder le pion.",
+          "principes": [
+            "developpement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "d4-gambit-dame",
+      "nom": "Contre 1.d4 : Gambit dame refusé",
+      "rang": 5,
+      "coups": [
+        {
+          "san": "d4",
+          "pourquoi": "Ils jouent 1.d4."
+        },
+        {
+          "san": "d5",
+          "pourquoi": "On prend notre part du centre, directement face au pion d4.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "c4",
+          "pourquoi": "Le Gambit dame : les Blancs attaquent notre pion d5."
+        },
+        {
+          "san": "e6",
+          "pourquoi": "On refuse le gambit en soutenant d5 : solide, et cela ouvre la route au fou f8.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "Nc3",
+          "pourquoi": "Ils ajoutent une pression sur d5."
+        },
+        {
+          "san": "Nf6",
+          "pourquoi": "On défend d5 une fois de plus en développant : solide et classique.",
+          "principes": [
+            "developpement"
+          ]
+        },
+        {
+          "san": "Bg5",
+          "pourquoi": "Ils clouent notre cavalier f6 contre la dame."
+        },
+        {
+          "san": "Be7",
+          "pourquoi": "On décloue tranquillement : le fou protège la dame et prépare le roque.",
+          "principes": [
+            "developpement",
+            "roi"
+          ]
+        }
+      ],
+      "deviation": true,
+      "alerte": "Ici les Blancs jouent 1.d4 : pas de Sicilienne possible, on répond 1…d5."
+    },
+    {
+      "id": "sic-dame-h5",
+      "nom": "2.Dh5 ? : à punir",
+      "rang": 6,
+      "aPunir": true,
+      "coups": [
+        {
+          "san": "e4",
+          "pourquoi": "Ils prennent le centre."
+        },
+        {
+          "san": "c5",
+          "pourquoi": "La Sicilienne : on contrôle d4.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "Qh5",
+          "pourquoi": "Imprécision ! La dame blanche sort beaucoup trop tôt : on va la chasser en développant nos pièces."
+        },
+        {
+          "san": "e6",
+          "pourquoi": "On ouvre la route au fou f8 et on protège f7 : la dame blanche n'a plus de cible.",
+          "principes": [
+            "developpement",
+            "roi"
+          ]
+        },
+        {
+          "san": "Nf3",
+          "pourquoi": "Ils développent."
+        },
+        {
+          "san": "Nf6",
+          "pourquoi": "On développe en attaquant la dame : elle doit encore bouger, et on prend de l'avance.",
+          "principes": [
+            "developpement",
+            "tempo"
+          ]
+        },
+        {
+          "san": "Qh4",
+          "pourquoi": "Leur dame recule encore : elle a déjà joué trois fois."
+        },
+        {
+          "san": "Nc6",
+          "pourquoi": "Encore un développement : nous avons déjà pris l'avantage.",
+          "principes": [
+            "developpement"
+          ]
+        }
+      ]
+    }
+  ],
   "mondes": [
     {
       "numero": 1,
-      "titre": "La Sicilienne et ses variantes",
+      "titre": "Les bases",
       "profondeur": 3,
-      "debut": 0,
       "lignes": [
-        {
-          "id": "sic-ouverte",
-          "nom": "Sicilienne ouverte (2.Cf3)",
-          "rang": 1,
-          "coups": [
-            {
-              "san": "e4",
-              "pourquoi": "Ils prennent le centre."
-            },
-            {
-              "san": "c5",
-              "pourquoi": "La Sicilienne : on contrôle d4 avec un pion de côté. Le jeu sera déséquilibré, et nos chances aussi.",
-              "principes": [
-                "centre"
-              ]
-            },
-            {
-              "san": "Nf3",
-              "pourquoi": "Ils développent et préparent d4."
-            },
-            {
-              "san": "d6",
-              "pourquoi": "On contrôle e5 et on ouvre la diagonale du fou c8.",
-              "principes": [
-                "centre",
-                "developpement"
-              ]
-            },
-            {
-              "san": "d4",
-              "pourquoi": "Ils ouvrent le centre."
-            },
-            {
-              "san": "cxd4",
-              "pourquoi": "On échange notre pion de côté contre leur pion central : c'est tout l'esprit de la Sicilienne.",
-              "principes": [
-                "centre"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "sic-alapin",
-          "nom": "Sicilienne Alapin (2.c3)",
-          "rang": 2,
-          "coups": [
-            {
-              "san": "e4",
-              "pourquoi": "Ils prennent le centre."
-            },
-            {
-              "san": "c5",
-              "pourquoi": "La Sicilienne : on contrôle d4.",
-              "principes": [
-                "centre"
-              ]
-            },
-            {
-              "san": "c3",
-              "pourquoi": "L'Alapin : les Blancs préparent d4 pour avoir deux pions au centre."
-            },
-            {
-              "san": "Nf6",
-              "pourquoi": "On attaque e4 tout de suite, avant que les Blancs ne jouent d4.",
-              "principes": [
-                "developpement"
-              ]
-            },
-            {
-              "san": "e5",
-              "pourquoi": "Ils avancent pour chasser le cavalier."
-            },
-            {
-              "san": "Nd5",
-              "pourquoi": "Le cavalier s'installe en d5, une belle case centrale qu'aucun pion blanc ne peut attaquer facilement.",
-              "principes": [
-                "centre"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "sic-fermee",
-          "nom": "Sicilienne fermée (2.Cc3)",
-          "rang": 3,
-          "coups": [
-            {
-              "san": "e4",
-              "pourquoi": "Ils prennent le centre."
-            },
-            {
-              "san": "c5",
-              "pourquoi": "La Sicilienne : on contrôle d4.",
-              "principes": [
-                "centre"
-              ]
-            },
-            {
-              "san": "Nc3",
-              "pourquoi": "Ils gardent le centre fermé et développent."
-            },
-            {
-              "san": "Nc6",
-              "pourquoi": "On développe en surveillant d4 et e5.",
-              "principes": [
-                "developpement"
-              ]
-            },
-            {
-              "san": "g3",
-              "pourquoi": "Ils préparent le fianchetto de leur fou en g2."
-            },
-            {
-              "san": "g6",
-              "pourquoi": "On fait pareil : notre fou en g7 visera la grande diagonale.",
-              "principes": [
-                "developpement"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "sic-smith-morra",
-          "nom": "Gambit Smith-Morra (2.d4)",
-          "rang": 4,
-          "coups": [
-            {
-              "san": "e4",
-              "pourquoi": "Ils prennent le centre."
-            },
-            {
-              "san": "c5",
-              "pourquoi": "La Sicilienne : on contrôle d4.",
-              "principes": [
-                "centre"
-              ]
-            },
-            {
-              "san": "d4",
-              "pourquoi": "Ils proposent un échange au centre."
-            },
-            {
-              "san": "cxd4",
-              "pourquoi": "On prend, comme toujours dans la Sicilienne : un pion de côté contre un pion central.",
-              "principes": [
-                "centre"
-              ]
-            },
-            {
-              "san": "c3",
-              "pourquoi": "Le gambit Smith-Morra : les Blancs offrent un pion pour développer vite."
-            },
-            {
-              "san": "dxc3",
-              "pourquoi": "On accepte le pion. Il faudra ensuite développer vite et prudemment pour le garder.",
-              "principes": [
-                "materiel"
-              ]
-            }
-          ]
-        },
-        {
-          "id": "d4-gambit-dame",
-          "nom": "Contre 1.d4 : Gambit dame refusé",
-          "rang": 5,
-          "coups": [
-            {
-              "san": "d4",
-              "pourquoi": "Ils jouent 1.d4."
-            },
-            {
-              "san": "d5",
-              "pourquoi": "On prend notre part du centre, directement face au pion d4.",
-              "principes": [
-                "centre"
-              ]
-            },
-            {
-              "san": "c4",
-              "pourquoi": "Le Gambit dame : les Blancs attaquent notre pion d5."
-            },
-            {
-              "san": "e6",
-              "pourquoi": "On refuse le gambit en soutenant d5 : solide, et cela ouvre la route au fou f8.",
-              "principes": [
-                "centre"
-              ]
-            },
-            {
-              "san": "Nc3",
-              "pourquoi": "Ils ajoutent une pression sur d5."
-            },
-            {
-              "san": "Nf6",
-              "pourquoi": "On défend d5 une fois de plus en développant : solide et classique.",
-              "principes": [
-                "developpement"
-              ]
-            }
-          ],
-          "deviation": true,
-          "alerte": "Ici les Blancs jouent 1.d4 : pas de Sicilienne possible, on répond 1…d5."
-        },
-        {
-          "id": "sic-dame-h5",
-          "nom": "2.Dh5 ? : à punir",
-          "rang": 6,
-          "aPunir": true,
-          "coups": [
-            {
-              "san": "e4",
-              "pourquoi": "Ils prennent le centre."
-            },
-            {
-              "san": "c5",
-              "pourquoi": "La Sicilienne : on contrôle d4.",
-              "principes": [
-                "centre"
-              ]
-            },
-            {
-              "san": "Qh5",
-              "pourquoi": "Imprécision ! La dame blanche sort beaucoup trop tôt : on va la chasser en développant nos pièces."
-            },
-            {
-              "san": "e6",
-              "pourquoi": "On ouvre la route au fou f8 et on protège f7 : la dame blanche n'a plus de cible.",
-              "principes": [
-                "developpement",
-                "roi"
-              ]
-            },
-            {
-              "san": "Nf3",
-              "pourquoi": "Ils développent."
-            },
-            {
-              "san": "Nf6",
-              "pourquoi": "On développe en attaquant la dame : elle doit encore bouger, et on prend de l'avance.",
-              "principes": [
-                "developpement",
-                "tempo"
-              ]
-            }
-          ]
-        }
+        "sic-ouverte",
+        "sic-alapin",
+        "sic-fermee",
+        "sic-smith-morra",
+        "d4-gambit-dame"
+      ]
+    },
+    {
+      "numero": 2,
+      "titre": "Un coup plus loin",
+      "profondeur": 4,
+      "lignes": [
+        "sic-ouverte",
+        "sic-alapin",
+        "sic-fermee",
+        "sic-smith-morra",
+        "d4-gambit-dame",
+        "sic-dame-h5"
       ]
     }
   ]

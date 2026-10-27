@@ -12,31 +12,25 @@
 - **Freemium** : le nombre d'ouvertures disponibles dans les catalogues est la partie payante
   (ex. 1 ouverture par couleur gratuite, davantage avec l'abonnement).
 
-## 2. Mondes ✅
+## 2. Mondes : petits, progressifs ✅
 
-Un **répertoire** (ex. Blancs avec 1.e4) se découpe en mondes, du général au spécialisé.
-On élargit d'abord, puis on approfondit, et on finit par se spécialiser :
+Chaque ouverture se découpe en **petits mondes** d'au moins **5 lignes**. D'un monde à l'autre, on **pousse les lignes
+plus loin** et on **ajoute des lignes** :
 
-| Monde | Profondeur | Lignes | Exemple (répertoire 1.e4) |
-|---|---|---|---|
-| 1 | 3 coups | 5-6 | Blancs : 1.e4 déjà joué, puis vos 3 coups contre 1…e5, 1…c5, 1…e6, 1…c6, 1…d5 (+ un coup à punir). Noirs : la Sicilienne contre les différents 2e coups blancs (2.Cf3, 2.c3, 2.Cc3, 2.d4) + 1…d5 contre 1.d4 |
-| 2 | 3 premiers coups | 10 | + variantes des premiers coups (ex. 1…e5 2…d6, 1…c5 2…Cc6, 1…Cf6, 1…d6…) |
-| 3 | 5 premiers coups | 5-6 | Les mêmes ouvertures, plus loin |
-| 4 | 5 premiers coups | 10 | … |
-| 5+ | 7 coups et plus | … | **Spécialisation** : une ouverture en profondeur (ex. la Partie italienne pure) |
+| Monde | Profondeur | Lignes (Partie italienne) |
+|---|---|---|
+| 1 · Les bases | 3 coups | Giuoco Piano, Deux cavaliers, Petrov ↪, Scandinave ↪, Sicilienne ↪ |
+| 2 · Un coup plus loin | 4 coups | + Damiano ⚔ (coup à punir) |
+| 3 · Jusqu'au roque | 5 coups | + Hongroise |
+| … | +1 coup | + 1 ligne (Paris, 3…h6, Blackburne, Philidor… en réserve) |
 
-- Objectif de chaque monde : **aucune erreur** sur la profondeur demandée, contre toutes ses lignes.
-- « Coups » = **coups de l'utilisateur**. Quand le répertoire est défini par un premier coup (ex. 1.e4), ce coup est **déjà joué** : on travaille les 3 suivants (2.Cf3, 3.Fc4, 4.c3). ✅
-- Répertoire Noirs : **une ouverture par premier coup blanc** (ex. Sicilienne contre 1.e4, 1…d5 contre 1.d4), avec ses variantes selon la réponse des Blancs. ✅
-- Le contenu du répertoire dépend des **choix de l'utilisateur** (ex. Partie italienne contre 1…e5, Sicilienne ouverte contre 1…c5).
-- Chaque monde n'introduit que du nouveau ; ce qui a été appris continue de revenir dans la révision du jour.
-- L'utilisateur choisit **une ouverture** (ex. la Partie italienne). Chaque monde mélange les lignes **intérieures**
-  (les réponses adverses dans l'ouverture), des **déviations** (l'adversaire empêche l'ouverture, ex. 1…d5 ou 1…c5 :
-  il faut jouer autre chose que le coup réflexe) et **un coup à punir**. ✅
-- Contenu : `content/fr/italienne.json` (Blancs), `content/fr/repertoire-noirs.json` (Noirs, Sicilienne).
+- « Coups » = coups de l'utilisateur. Quand l'ouverture commence par un coup de l'utilisateur (1.e4), il est déjà joué.
+- Lignes **intérieures** (variantes de l'ouverture), **déviations** ↪ (l'adversaire empêche l'ouverture : il faut jouer
+  autre chose que le coup réflexe) et **coups à punir** ⚔.
+- Un monde se débloque en réussissant le défi final du précédent. Les positions déjà apprises reviennent dans les parties.
 - Les mondes seront **générés automatiquement** pour toutes les ouvertures : voir [GENERATION.md](GENERATION.md).
 
-## 3. L'apprentissage : leçons et manches (inspiré du mode « Apprendre » de Quizlet) ✅
+## 3. L'apprentissage : séances d'une dizaine de questions ✅
 
 Chaque **position** (un coup à trouver) passe par 3 niveaux :
 
@@ -44,20 +38,21 @@ Chaque **position** (un coup à trouver) passe par 3 niveaux :
 |---|---|
 | 0 → 1 · Découverte | Memo montre le coup (flèche) et l'explique |
 | 1 → 2 · De mémoire | La même position, sans aide (bouton **Indice** si besoin, mais la position ne monte pas) |
-| 2 → 3 · En partie | **Partie mélangée** : l'adversaire choisit au hasard une des lignes de la leçon, il faut la reconnaître |
+| 2 → 3 · En partie | **Partie** : l'adversaire choisit au hasard une des lignes, il faut la reconnaître |
 
-- **Introduction progressive** : une leçon commence par une ligne ; une nouvelle ligne arrive dès que les
-  précédentes sont presque sues (au plus 2 positions encore fragiles), jusqu'à 3 nouvelles lignes par leçon.
-- **Manches de 7 questions** mélangées (jamais deux de suite sur la même ligne), avec un **bilan** entre deux manches
-  (Maîtrisées / En apprentissage / Pas encore vues). On peut s'arrêter et reprendre au même point.
-- **Erreur** → explication de Memo, la position redescend d'un niveau et revient à la fin de la manche.
+- **Une séance = une dizaine de questions**, puis retour à la carte.
+- **Première séance d'un monde** : Memo montre d'emblée **4-5 lignes** ; ensuite on joue, et une nouvelle ligne arrive
+  dès que les autres sont presque sues (c'est pour ça qu'il faut au moins 5 lignes par monde : assez de variété).
+- Les questions sont **mélangées** (jamais deux de suite sur la même ligne). S'il reste peu à apprendre, la séance est
+  complétée par des parties de révision.
+- **Erreur** → explication de Memo, Memo **recule d'un pas**, et la position est **reposée en priorité à la séance suivante**.
 
-### La carte : un chemin du départ à l'arrivée ✅
+### La carte : un chemin continu, du départ à l'arrivée ✅
 
-- Chaque monde est un **chemin continu**, du **Départ** à l'**Arrivée** (défi final), avec un **coffre à mi-chemin**.
-- Le chemin compte **un pas par niveau à gagner** (3 pas par position du monde).
-- **Memo avance d'un pas à chaque niveau gagné et recule d'un pas quand on se trompe.**
-- L'arrivée débloque le **défi final** : toutes les lignes en partie, sans indice ni erreur.
+- Le chemin compte **un pas par niveau à gagner** (3 pas par nouvelle position du monde).
+- **Memo avance pendant la séance** (mini-chemin en haut de l'écran) et, au retour sur la carte, on le voit **se déplacer**
+  de son ancienne position à la nouvelle. Il recule quand on se trompe.
+- **Coffre à mi-chemin**, **défi final à l'arrivée** (toutes les lignes en partie, sans indice ni erreur) → monde suivant.
 - Ensuite, la révision du jour (répétition espacée) refait passer les positions de temps en temps.
 
 ## 4. Ajout de lignes : depuis un catalogue ✅
