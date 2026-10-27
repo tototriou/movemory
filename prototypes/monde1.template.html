@@ -172,7 +172,7 @@ button { font: inherit; color: inherit; }
         </span>
       </div>
       <div class="seg" role="tablist" aria-label="Répertoire">
-        <button role="tab" id="rep-w" data-rep="w">Blancs · 1.e4</button>
+        <button role="tab" id="rep-w" data-rep="w">Blancs · Italienne</button>
         <button role="tab" id="rep-b" data-rep="b">Noirs · Sicilienne</button>
       </div>
       <div class="world-title" id="world-title"></div>
@@ -308,7 +308,7 @@ function sliceEnd(moves) {
 function loadRepertoire(rep) {
   REP = rep; const R = CONTENT[rep]; WORLD = R.mondes[0]; LINES = WORLD.lignes; DEPTH = WORLD.profondeur; SIDE = R.camp; DEBUT = WORLD.debut || 0;
   CARDS = new Map();
-  TILES = LINES.map((l) => { const to = sliceEnd(l.coups); return { id: l.id, name: l.nom, punish: !!l.aPunir, moves: l.coups, from: DEBUT, to, cards: cardsOf(l.coups, DEBUT, to) }; });
+  TILES = LINES.map((l) => { const to = sliceEnd(l.coups); return { id: l.id, name: l.nom, punish: !!l.aPunir, deviation: !!l.deviation, alerte: l.alerte || '', moves: l.coups, from: DEBUT, to, cards: cardsOf(l.coups, DEBUT, to) }; });
   // Ordre sur la carte : 3 lignes, coffre, 3 lignes (dont le coup à punir), défi final
   MAP_ORDER = [LINES[0].id, LINES[1].id, LINES[2].id, 'coffre', LINES[3].id, LINES[4].id, LINES[5].id, 'defi'];
   loadProgress();
@@ -319,7 +319,7 @@ const tileById = (id) => TILES.find((t) => t.id === id);
 const SAVE_KEY = () => 'movemory-monde1-v2-' + REP;
 let P;
 function loadProgress() {
-  P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: false };
+  P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: false, learned: [], sessionNo: 0 };
   try { const s = JSON.parse(localStorage.getItem(SAVE_KEY())); if (s) P = { ...P, ...s }; } catch {}
 }
 const save = () => { try { localStorage.setItem(SAVE_KEY(), JSON.stringify(P)); } catch {} };
@@ -337,7 +337,7 @@ const unlocked = (i) => P.unlock || i <= currentIndex();
 const $ = (id) => document.getElementById(id);
 const COORDS = [[0.30, 0.92], [0.46, 0.81], [0.62, 0.70], [0.46, 0.59], [0.30, 0.48], [0.46, 0.37], [0.62, 0.26], [0.48, 0.12]];
 function tileSvg(kind) {
-  const c = { done: ['#FFC94A', '#FFD976', '#C9951E', '#A87B12'], todo: ['#8B5CF6', '#A78BFA', '#6D28D9', '#5B21B6'], locked: ['#5A5470', '#6B6585', '#3E3952', '#332E47'], punish: ['#E2574C', '#F07A6F', '#A8382F', '#8E2C24'], chest: ['#A86E35', '#BE8448', '#7A4E22', '#5F3C1A'], boss: ['#3A2420', '#4A302A', '#24140F', '#1A0E0A'] }[kind];
+  const c = { done: ['#FFC94A', '#FFD976', '#C9951E', '#A87B12'], deviation: ['#F59E0B', '#FBBF24', '#B45309', '#92400E'], todo: ['#8B5CF6', '#A78BFA', '#6D28D9', '#5B21B6'], locked: ['#5A5470', '#6B6585', '#3E3952', '#332E47'], punish: ['#E2574C', '#F07A6F', '#A8382F', '#8E2C24'], chest: ['#A86E35', '#BE8448', '#7A4E22', '#5F3C1A'], boss: ['#3A2420', '#4A302A', '#24140F', '#1A0E0A'] }[kind];
   return `<svg viewBox="0 0 110 90" aria-hidden="true"><polygon points="9,36 55,66 55,82 9,52" fill="${c[2]}"/><polygon points="55,66 101,36 101,52 55,82" fill="${c[3]}"/><polygon points="55,6 101,36 55,66 9,36" fill="${c[0]}"/><polygon points="55,14 89,36 55,58 21,36" fill="${c[1]}"/></svg>`;
 }
 function renderMap() {
@@ -349,7 +349,7 @@ function renderMap() {
     const [fx, fy] = COORDS[i]; const x = fx * W - 55, y = fy * H - 46;
     const done = stepDone(id), open = unlocked(i);
     const t = tileById(id);
-    let kind = done ? 'done' : !open ? 'locked' : id === 'coffre' ? 'chest' : id === 'defi' ? 'boss' : t?.punish ? 'punish' : 'todo';
+    let kind = done ? 'done' : !open ? 'locked' : id === 'coffre' ? 'chest' : id === 'defi' ? 'boss' : t?.punish ? 'punish' : t?.deviation ? 'deviation' : 'todo';
     if (!done && id === 'coffre' && open) kind = 'chest';
     let inner = '';
     if (done) inner = '<svg style="position:absolute;left:38px;top:20px" width="34" height="26" viewBox="0 0 24 18" aria-hidden="true"><path d="M3 9l6 6L21 3" fill="none" stroke="#6B4405" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -367,7 +367,8 @@ function renderMap() {
   $('world-count').textContent = `${doneCount}/${MAP_ORDER.length}`;
   $('xp').textContent = P.xp; $('gems').textContent = P.gems;
   const curId = MAP_ORDER[cur];
-  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : curId === 'coffre' ? 'Ouvrir le coffre' : curId === 'defi' ? 'Défi final' : (tileById(curId).cards.some((k) => card(k).seen) ? 'Réviser : ' : 'Découvrir : ') + tileById(curId).name;
+  const fresh = TILES.filter((t) => !tileSeen(t)).length;
+  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : curId === 'coffre' ? 'Ouvrir le coffre' : curId === 'defi' ? 'Défi final' : fresh ? (() => { const n = Math.min(fresh, TILES.some(tileSeen) ? 2 : 3); return `Séance : ${n} nouvelle${n > 1 ? 's' : ''} ligne${n > 1 ? 's' : ''} + parties`; })() : 'Séance : parties mélangées';
   const ring = Math.round(MAP_ORDER.filter(stepDone).length / MAP_ORDER.length * 100);
   $('play-ring').style.background = `conic-gradient(var(--gold) 0 ${ring}%, var(--surface-2) ${ring}% 100%)`;
   $('unlock').checked = P.unlock;
@@ -378,7 +379,7 @@ for (const r of ['w', 'b']) $('rep-' + r).addEventListener('click', () => { try 
 $('path').addEventListener('click', (e) => { const b = e.target.closest('.tile'); if (b && !b.disabled) openStep(b.dataset.step); });
 $('play').addEventListener('click', () => openStep(MAP_ORDER[currentIndex()]));
 $('unlock').addEventListener('change', (e) => { P.unlock = e.target.checked; save(); renderMap(); });
-$('reset').addEventListener('click', () => { P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: P.unlock }; save(); renderMap(); });
+$('reset').addEventListener('click', () => { P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: P.unlock, learned: [], sessionNo: 0 }; save(); renderMap(); });
 window.addEventListener('resize', () => { if (!$('screen-map').hidden) renderMap(); });
 
 function show(screen) { for (const s of ['map', 'session', 'end']) $('screen-' + s).hidden = s !== screen; closeSheet(); window.scrollTo(0, 0); if (screen === 'map') renderMap(); }
@@ -386,7 +387,7 @@ function show(screen) { for (const s of ['map', 'session', 'end']) $('screen-' +
 function openStep(id) {
   if (id === 'coffre') return openChest();
   if (id === 'defi') return startSession({ boss: true });
-  startSession({ tile: tileById(id) });
+  startSession({});
 }
 
 /* ---------- Échiquier ---------- */
@@ -477,18 +478,40 @@ function renderMoves(highlightLast = false) {
 }
 function setCombo(n) { S.combo = n; const c = $('combo'); c.textContent = 'x' + n; c.classList.remove('bump'); void c.offsetWidth; if (n > 1) c.classList.add('bump'); }
 
+const shuffle = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const tileSeen = (t) => (P.learned || []).includes(t.id);
+const weakness = (t) => t.cards.filter((k) => card(k).ok < 2).length;
+// Une séance : 2-3 nouvelles ouvertures découvertes avec Memo, puis des parties mélangées
+// où l'adversaire choisit au hasard parmi toutes les ouvertures déjà vues.
 function buildRuns(opts) {
-  if (opts.boss) return TILES.map((t) => ({ tile: t, from: 0, to: t.to, mode: 'boss' }));
-  const t = opts.tile; const isNew = t.cards.some((k) => !card(k).seen);
-  // Nouvelle ligne : 1er passage guidé, puis de mémoire. Sinon : de mémoire.
-  return isNew ? [{ tile: t, from: t.from, to: t.to, mode: 'learn' }, { tile: t, from: t.from, to: t.to, mode: 'recall' }] : [{ tile: t, from: t.from, to: t.to, mode: 'recall' }];
+  const run = (t, mode) => ({ tile: t, from: mode === 'learn' ? t.from : DEBUT, to: t.to, mode });
+  if (opts.boss) return shuffle(TILES).map((t) => run(t, 'boss'));
+  const lineOrder = MAP_ORDER.filter((id) => tileById(id)).map(tileById);
+  const seen = lineOrder.filter(tileSeen);
+  const fresh = lineOrder.filter((t) => !tileSeen(t)).slice(0, seen.length ? 2 : 3);
+  const pool = [...seen, ...fresh];
+  const runs = fresh.map((t) => run(t, 'learn'));
+  const games = Math.min(10, Math.max(5, pool.length * 2));
+  let prev = null;
+  for (let g = 0; g < games; g++) {
+    // les ouvertures les moins maîtrisées reviennent plus souvent ; jamais deux fois la même d'affilée
+    const cands = pool.filter((t) => t !== prev || pool.length === 1);
+    const weights = cands.map((t) => 1 + weakness(t) * 2);
+    let r = Math.random() * weights.reduce((a, b) => a + b, 0), pick = cands[0];
+    for (let i = 0; i < cands.length; i++) { r -= weights[i]; if (r <= 0) { pick = cands[i]; break; } }
+    runs.push(run(pick, 'mix')); prev = pick;
+  }
+  return runs;
 }
 function startSession(opts) {
-  S = { opts, runs: buildRuns(opts), runIndex: 0, combo: 0, correct: 0, total: 0, errors: 0, xp: 0, failedThisRun: false };
-  S.totalAsks = S.runs.reduce((n, r) => { let k = 0; for (let ply = r.from; ply < r.to; ply++) if (ply % 2 === 0) k++; return n + k; }, 0);
+  P.sessionNo = (P.sessionNo || 0) + 1;
+  S = { opts, runs: buildRuns(opts), runIndex: 0, combo: 0, correct: 0, total: 0, errors: 0, xp: 0, failedThisRun: false, masteredBefore: new Set(TILES.filter(tileMastered).map((t) => t.id)) };
+  const userPly = SIDE === 'w' ? 0 : 1;
+  S.totalAsks = S.runs.reduce((n, r) => { let k = 0; for (let ply = r.from; ply < r.to; ply++) if (ply % 2 === userPly) k++; return n + k; }, 0);
+  S.learnCount = S.runs.filter((r) => r.mode === 'learn').length; S.mixCount = S.runs.filter((r) => r.mode === 'mix').length;
   show('session'); buildSquares(); setCombo(0); updateBar();
   $('s-eyebrow').textContent = opts.boss ? 'Défi final · sans indice' : `Monde 1 · ${SIDE === 'w' ? 'Blancs' : 'Noirs'}`;
-  const pill = $('s-pill'); pill.classList.toggle('punish', !!opts.tile?.punish);
+
   $('btn-hint').disabled = $('btn-solution').disabled = !!opts.boss;
   nextRun();
 }
@@ -496,11 +519,14 @@ async function nextRun() {
   if (S.runIndex >= S.runs.length) return endSession();
   const run = S.runs[S.runIndex]; S.run = run; S.failedThisRun = false;
   game = new Chess(); S.lastOpp = ''; renderPieces(); sqClass('last', []); arrow(null); renderMoves();
-  $('s-name').textContent = run.mode === 'boss' ? `Défi : ${run.tile.name}` : run.tile.name;
-  $('s-pill').textContent = run.tile.punish ? '⚔ Coup à punir' : run.mode === 'learn' ? 'Découverte' : run.mode === 'boss' ? `Ligne ${S.runIndex + 1}/${S.runs.length}` : 'De mémoire';
-  if (run.mode === 'learn') say(`Nouvelle ligne : <b>${run.tile.name}</b>. Je vous guide une première fois, puis vous la rejouerez de mémoire.`, 'content');
-  else if (run.mode === 'recall') say(S.runIndex > 0 ? 'Et maintenant, <b>de mémoire</b> !' : `On révise <b>${run.tile.name}</b>, de mémoire.`, 'reflechit');
-  else say(`Défi final : <b>${run.tile.name}</b>. Pas d'indice, pas d'erreur !`, 'reflechit');
+  const mixIndex = S.runIndex - S.learnCount + 1;
+  $('s-name').textContent = run.mode === 'learn' ? run.tile.name : run.mode === 'boss' ? 'Défi final' : 'Parties mélangées';
+  $('s-pill').classList.toggle('punish', run.mode === 'learn' && !!run.tile.punish);
+  $('s-pill').textContent = run.mode === 'learn' ? (run.tile.punish ? '⚔ Coup à punir' : run.tile.deviation ? '↪ Autre chemin' : `Découverte ${S.runIndex + 1}/${S.learnCount}`) : run.mode === 'boss' ? `Partie ${S.runIndex + 1}/${S.runs.length}` : `Partie ${mixIndex}/${S.mixCount}`;
+  if (run.mode === 'learn' && !P.learned.includes(run.tile.id)) { P.learned.push(run.tile.id); save(); }
+  if (run.mode === 'learn') say(`Nouvelle ligne : <b>${run.tile.name}</b>. ${run.tile.alerte ? run.tile.alerte + ' ' : ''}Je vous guide une fois, ensuite on mélange tout !`, 'content');
+  else if (run.mode === 'mix') say(mixIndex === 1 ? 'Maintenant on <b>mélange tout</b> : je joue une de vos ouvertures au hasard, à vous de la reconnaître et de trouver le bon coup.' : pick(['Nouvelle partie !', 'On recommence : quelle ouverture cette fois ?', 'Partie suivante. Attention à mon premier coup !']), 'reflechit');
+  else say(`Défi final, partie ${S.runIndex + 1}/${S.runs.length}. Pas d'indice, pas d'erreur !`, 'reflechit');
   await wait(700);
   step();
 }
@@ -554,7 +580,7 @@ function handleAnswer(m, move, c, cs, ply) {
   const played = game.move(m.san); animate(played); renderMoves(true);
   S.correct++; setCombo(S.combo + 1);
   const learning = run.mode === 'learn' && !cs.seen;
-  if (!learning && !S.hintUsed && !S.errorHere) cs.ok = Math.min(2, cs.ok + 1);
+  if (!learning && !S.hintUsed && !S.errorHere && cs.lastS !== P.sessionNo) { cs.ok = Math.min(2, cs.ok + 1); cs.lastS = P.sessionNo; }
   cs.seen = true; save();
   const gain = learning ? 5 : 10 + Math.min(S.combo, 5); S.xp += gain; floatXp(gain, played.to);
   const expl = move;
@@ -612,20 +638,21 @@ function endSession() {
   const boss = S.opts.boss;
   if (boss && S.errors === 0) { P.boss = true; S.xp += 100; P.gems += 50; }
   P.xp += S.xp; save();
-  const t = S.opts.tile; const acc = S.correct + S.errors ? Math.round((S.correct / (S.correct + S.errors)) * 100) : 100;
-  const rows = boss ? '' : t.cards.map((k) => { const c = CARDS.get(k); const ok = card(k).ok; const anyMove = [...c.expected.keys()][0]; const ply = (() => { const g = new Chess(); for (const m of t.moves) { if (fenKey(g.fen()) === k) return g.history().length; g.move(m.san); } return 0; })(); return `<div class="m-row"><span class="name">${label(ply, anyMove)}</span><span class="pips"><i class="${ok >= 1 ? 'on' : ''}"></i><i class="${ok >= 2 ? 'on' : ''}"></i></span></div>`; }).join('');
-  const mastered = !boss && tileMastered(t);
+  const acc = S.correct + S.errors ? Math.round((S.correct / (S.correct + S.errors)) * 100) : 100;
+  const rows = boss ? '' : TILES.filter(tileSeen).map((t) => `<div class="m-row"><span class="name">${t.punish ? '⚔ ' : ''}${t.name}</span><span class="pips">${t.cards.map((k) => `<i class="${card(k).ok >= 2 ? 'on' : ''}"></i>`).join('')}</span></div>`).join('');
+  const newly = TILES.filter((t) => tileMastered(t) && !S.masteredBefore.has(t.id));
+  const mastered = !boss && newly.length > 0;
   const conf = (boss && P.boss) || mastered ? Array.from({ length: 10 }, (_, i) => `<span class="conf" style="left:${8 + i * 9}%;background:${['#FFC94A', '#3DDC84', '#8FD3FF', '#F0605D', '#A78BFA'][i % 5]};animation-delay:${(i * 0.37) % 2.4}s"></span>`).join('') : '';
   $('screen-end').innerHTML = `${conf}
     <div class="memo">${memoSvg('bravo')}</div>
-    <h1>${boss ? (P.boss ? 'Monde 1 terminé !' : 'Défi terminé') : mastered ? 'Étape maîtrisée !' : 'Séance terminée !'}</h1>
-    <p>${boss ? (P.boss ? `Vous maîtrisez vos ${DEPTH} coups sur les ${LINES.length} lignes du Monde 1. Le Monde 2 ajoutera 4 lignes : des variantes de ces mêmes ouvertures.` : '') : mastered ? 'Memo avance d’une case sur la carte.' : 'Chaque position doit être réussie 2 fois sans indice pour être maîtrisée. Dans l’app, la 2e fois sera le lendemain ; ici, relancez simplement l’étape.'}</p>
+    <h1>${boss ? (P.boss ? 'Monde 1 terminé !' : 'Défi terminé') : mastered ? (newly.length > 1 ? `${newly.length} ouvertures maîtrisées !` : 'Ouverture maîtrisée !') : 'Séance terminée !'}</h1>
+    <p>${boss ? (P.boss ? `Vous maîtrisez vos ${DEPTH} coups sur les ${LINES.length} lignes du Monde 1. Le Monde 2 ajoutera 4 lignes : des variantes de ces mêmes ouvertures.` : '') : mastered ? `${newly.map((t) => t.name).join(', ')} : Memo avance sur la carte !` : 'Une ouverture est maîtrisée quand chacune de ses positions a été réussie sans indice lors de 2 séances différentes (dans l’app : 2 jours différents). Relancez une séance !'}</p>
     <div class="stats">
       <div class="stat"><span>XP</span><b style="color:var(--gold)">+${S.xp}</b></div>
       <div class="stat"><span>Précision</span><b style="color:var(--good)">${acc} %</b></div>
       <div class="stat"><span>Erreurs</span><b style="color:${S.errors ? 'var(--bad)' : 'var(--fg)'}">${S.errors}</b></div>
     </div>
-    ${rows ? `<div class="mastery"><b>Maîtrise de l’étape</b>${rows}</div>` : ''}
+    ${rows ? `<div class="mastery"><b>Maîtrise par ouverture</b>${rows}</div>` : ''}
     <button class="btn btn-cta" id="end-continue">Continuer</button>`;
   show('end');
   $('end-continue').addEventListener('click', () => show('map'));
@@ -637,6 +664,8 @@ function openChest() {
   show('end'); $('end-continue').addEventListener('click', () => show('map'));
 }
 
+// Accroche de test (navigateur headless) : le coup attendu dans la position actuelle
+window.__movemoryTest = () => { if (!S || !inputEnabled) return null; const m = new Chess(game.fen()).move(S.run.tile.moves[game.history().length].san); return { from: m.from, to: m.to, mode: S.run.mode, line: S.run.tile.id }; };
 loadRepertoire(REP);
 renderMap();
 requestAnimationFrame(renderMap);

@@ -6,7 +6,7 @@
   "mondes": [
     {
       "numero": 1,
-      "titre": "La Sicilienne contre 1.e4, et 1…d5 contre 1.d4",
+      "titre": "La Sicilienne et ses variantes",
       "profondeur": 3,
       "debut": 0,
       "lignes": [
@@ -209,7 +209,9 @@
                 "developpement"
               ]
             }
-          ]
+          ],
+          "deviation": true,
+          "alerte": "Ici les Blancs jouent 1.d4 : pas de Sicilienne possible, on répond 1…d5."
         },
         {
           "id": "sic-dame-h5",

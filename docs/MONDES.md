@@ -30,8 +30,11 @@ On élargit d'abord, puis on approfondit, et on finit par se spécialiser :
 - Répertoire Noirs : **une ouverture par premier coup blanc** (ex. Sicilienne contre 1.e4, 1…d5 contre 1.d4), avec ses variantes selon la réponse des Blancs. ✅
 - Le contenu du répertoire dépend des **choix de l'utilisateur** (ex. Partie italienne contre 1…e5, Sicilienne ouverte contre 1…c5).
 - Chaque monde n'introduit que du nouveau ; ce qui a été appris continue de revenir dans la révision du jour.
-- Contenu : Monde 1 du répertoire 1.e4 dans `content/fr/repertoire-1e4.json`, répertoire Noirs dans `content/fr/repertoire-noirs.json` ; la spécialisation Partie italienne
-  (monde avancé) dans `content/fr/italienne.json`.
+- L'utilisateur choisit **une ouverture** (ex. la Partie italienne). Chaque monde mélange les lignes **intérieures**
+  (les réponses adverses dans l'ouverture), des **déviations** (l'adversaire empêche l'ouverture, ex. 1…d5 ou 1…c5 :
+  il faut jouer autre chose que le coup réflexe) et **un coup à punir**. ✅
+- Contenu : `content/fr/italienne.json` (Blancs), `content/fr/repertoire-noirs.json` (Noirs, Sicilienne).
+- Les mondes seront **générés automatiquement** pour toutes les ouvertures : voir [GENERATION.md](GENERATION.md).
 
 ## 3. Le parcours de Memo
 

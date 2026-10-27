@@ -8,7 +8,8 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "openings:import": "tsx scripts/import-openings.ts"
+    "openings:import": "tsx scripts/import-openings.ts",
+    "worlds:generate": "node scripts/generate-worlds.cjs"
   },
   "dependencies": {
     "chess.js": "^1.4.0",
@@ -18,6 +19,7 @@
     "@types/node": "^22.0.0",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0",
-    "vitest": "^3.2.0"
+    "vitest": "^3.2.0",
+    "stockfish": "^19.0.1"
   }
 }

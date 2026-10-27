@@ -70,7 +70,7 @@ prototypes/       Prototypes HTML autonomes
 docs/             Plan, système de mondes, choix techniques, maquette
 ```
 
-À lire : [le plan](docs/PLAN.md) · [les mondes](docs/MONDES.md) · [les décisions](docs/DECISIONS.md) · [les moteurs](docs/MOTEURS.md)
+À lire : [le plan](docs/PLAN.md) · [les mondes](docs/MONDES.md) · [les décisions](docs/DECISIONS.md) · [les moteurs](docs/MOTEURS.md) · [la génération des mondes](docs/GENERATION.md)
 
 ## Licences et crédits
 
