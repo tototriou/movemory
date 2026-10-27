@@ -90,7 +90,9 @@ de l'ouverture (centre, développement, roque, cases faibles, plans typiques). O
 - Chaque coup a une explication de Memo **centrée sur le principe** (« on développe une pièce et on vise f7 »),
   pas seulement sur le coup. Chaque explication est étiquetée par principe (centre, développement, sécurité du roi…),
   ce qui permettra plus tard de montrer à l'utilisateur les principes qu'il maîtrise.
-- Rédigées par nous, puis traduites. Les noms d'ouvertures/variantes viennent de la liste chess-openings (CC0).
+- **Adaptées de Wikibooks « Chess Opening Theory »** (CC BY-SA 4.0) et réécrites dans le ton de Memo, puis traduites. ✅
+  Elles sont publiées sous CC BY-SA 4.0 (librement copiables) avec mention de la source.
+  Les noms d'ouvertures/variantes viennent de la liste chess-openings (CC0).
 
 ## 7. Impact technique (pour plus tard)
 
