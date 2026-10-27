@@ -1,4 +1,4 @@
-# Gambit ♟️ *(nom de code)*
+# Movemory ♟️
 
 **Le Duolingo des ouvertures d'échecs.** Chaque jour, une courte séance sur l'échiquier : on joue le bon coup de *ses* ouvertures,
 avec de la répétition espacée : une position ratée revient plus souvent jusqu'à être maîtrisée.
@@ -38,3 +38,7 @@ pnpm dev           # app mobile (Expo Go / émulateur)
 - [docs/PLAN.md](docs/PLAN.md) — vision, fonctionnalités, feuille de route
 - [docs/MOTEURS.md](docs/MOTEURS.md) — moteurs et bibliothèques : options et recommandations
 - [docs/DECISIONS.md](docs/DECISIONS.md) — décisions prises (licence, hors-ligne, traduction…)
+
+## Licence
+
+[GPL-3.0](LICENSE). Le moteur d'analyse [Stockfish](https://stockfishchess.org) est également sous GPL-3.0.

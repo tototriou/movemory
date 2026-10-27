@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Séance : jouez le coup</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F0D16}
+a{color:#7EE2A2}a:hover{color:#B5F2C9}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.icf{fill:currentColor;stroke:none}
+@keyframes pop{0%{transform:scale(.7);opacity:0}70%{transform:scale(1.04);opacity:1}100%{transform:scale(1)}}
+@keyframes combo{0%,100%{transform:scale(1)}50%{transform:scale(1.2)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(247,201,72,0)}50%{box-shadow:0 0 0 6px rgba(247,201,72,.35)}}
+.pop{animation:pop .45s ease-out both}
+.pop2{animation:pop .45s .25s ease-out both}
+.combo{animation:combo 1.2s ease-in-out infinite}
+.glow{animation:glow 1.8s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.pop,.pop2,.combo,.glow{animation:none}}
+.btn{background-image:linear-gradient(180deg,rgba(255,255,255,.24) 0,rgba(255,255,255,.07) 48%,rgba(0,0,0,0) 52%,rgba(0,0,0,.1) 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 10px 18px -6px rgba(0,0,0,.6);transition:transform .08s ease,filter .15s;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(3px)}
+.btn-cta{position:relative;overflow:hidden;text-transform:uppercase;letter-spacing:.8px;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.btn-cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(255,255,255,0));animation:shine 3.4s ease-in-out infinite}
+@keyframes shine{0%,62%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){.btn-cta::after{animation:none;display:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #14121C; color: #FFFFFF; font-family: Fredoka, Nunito, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; align-items: center; gap: 12px; padding: 18px 16px 8px">
+    <a href="Main.dc.html" aria-label="Quitter la séance" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #B8B4C8">
+      <svg width="26" height="26" viewBox="0 0 24 24" class="ic" style="stroke-width: 2.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </a>
+    <div role="progressbar" aria-label="Progression de la séance" aria-valuenow="6" aria-valuemin="0" aria-valuemax="12" style="flex: 1; height: 16px; border-radius: 999px; background: #2E2A3D; overflow: hidden">
+      <div style="width: 50%; height: 100%; border-radius: 999px; background: {{accent}}; box-shadow: inset 0 -5px 0 rgba(0,0,0,.18), inset 0 4px 0 rgba(255,255,255,.22)"></div>
+    </div>
+    <span class="combo" style="display: flex; align-items: center; gap: 3px; font-weight: 900; font-size: 16px; color: #FFC94A">
+      <svg width="20" height="20" viewBox="0 0 24 24" class="icf" aria-hidden="true"><path d="M13.5 2 4 14h7l-1.5 8L19 10h-7z"/></svg>x3
+    </span>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 6px 16px 0">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <div style="display: flex; flex-direction: column">
+        <span style="font-size: 13px; font-weight: 800; color: #B8B4C8; text-transform: uppercase; letter-spacing: 1px">Révision · Blancs</span>
+        <span style="font-size: 19px; font-weight: 900">Partie italienne – Giuoco Piano</span>
+      </div>
+      <span style="background: #2E2A3D; border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 900; color: #E6E4EE">Coup 4/5</span>
+    </div>
+
+    <div style="display: flex; align-items: flex-start; gap: 10px">
+      <span class="pop" style="flex: none; margin-top: -6px">
+        <dc-import name="Mascotte" size="66" mood="reflechit" hint-size="66px,66px"></dc-import>
+      </span>
+      <div class="pop2" style="display: flex; flex-direction: column; gap: 4px; background: #221F2E; border-radius: 4px 16px 16px 16px; padding: 10px 14px">
+        <span style="font-size: 12px; font-weight: 700; color: #7EE2A2; text-transform: uppercase; letter-spacing: 1px">Memo</span>
+        <p style="margin: 0; font-size: 16px; font-weight: 800; line-height: 1.35">Les Noirs jouent <b style="color: #FFC94A">3...Fc5</b>.</p>
+        <p style="margin: 0; font-size: 14px; font-weight: 700; line-height: 1.4; color: #DAD7E4">Pourquoi ? Le fou vise <b>f2</b>, le point faible des Blancs, et se développe vite. À vous : quel coup prépare d4 ?</p>
+      </div>
+    </div>
+
+    <a href="Reussi.dc.html" aria-label="Jouer 4.c3" style="text-decoration: none; color: inherit; display: flex; justify-content: center; border-radius: 8px; box-shadow: 0 6px 0 #0A0910">
+      <dc-import name="Board" fen="r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4" size="{{boardSize}}" marks="{{marks}}" label="Position après 3...Fc5, trait aux Blancs" hint-size="358px,358px"></dc-import>
+    </a>
+
+    <div style="display: flex; gap: 6px; flex-wrap: wrap; font-size: 14px; font-weight: 800; color: #B8B4C8">
+      <span>1.e4 e5</span><span>2.Cf3 Cc6</span><span>3.Fc4</span><span style="background: #3E3952; color: #FFFFFF; border-radius: 6px; padding: 0 6px">Fc5</span><span class="glow" style="color: #FFC94A; border-radius: 6px; padding: 0 6px">4. ?</span>
+    </div>
+  </main>
+
+  <footer style="display: flex; gap: 12px; padding: 12px 16px 26px">
+    <button class="btn" type="button" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #2E2A3D; color: #FFFFFF; border: none; border-bottom: 5px solid #0A0910; border-radius: 14px; padding: 13px; font-family: inherit; font-size: 17px; font-weight: 900">
+      <svg width="20" height="20" viewBox="0 0 24 24" class="ic" style="color: #FFC94A" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>Indice
+    </button>
+    <a class="btn" href="Erreur.dc.html" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: #2E2A3D; color: #FFFFFF; text-decoration: none; border-bottom: 5px solid #0A0910; border-radius: 14px; padding: 13px; font-size: 17px; font-weight: 900">
+      <svg width="20" height="20" viewBox="0 0 24 24" class="ic" style="color: #9CC8F0" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Solution
+    </a>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1A9E4B","options":["#1A9E4B","#7C4DFF","#FF7A1A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      accent: this.props.accent ?? '#1A9E4B',
+      boardSize: 358,
+      marks: [{ sq: 'f8', type: 'last' }, { sq: 'c5', type: 'last' }]
+    };
+  }
+}
+</script>
+</body>
+</html>

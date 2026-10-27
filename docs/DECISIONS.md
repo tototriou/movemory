@@ -4,12 +4,14 @@
 |---|---|---|
 | Format des exercices | Échiquier jouable uniquement, pas de QCM | Indice → surligne la pièce ; Solution → flèche |
 | Explications | **Chaque coup est expliqué** (coup adverse *et* bon coup, en cas de réussite comme d'erreur) | Chaque ligne du répertoire porte un texte « pourquoi » par coup, traduit |
-| Licence | **Code fermé** | Aucune dépendance GPL embarquée dans l'app (ni Stockfish, ni chessground, ni chessops) |
+| Licence | **Code ouvert, GPL-3.0** (repo public) | Permet d'embarquer Stockfish (GPL-3) dans l'app. Toute redistribution du code doit rester GPL. |
 | Échiquier | Composant maison (SVG + gestes + animations) | Meilleur rendu, aucune contrainte de licence |
 | Hors-ligne | **Primordial** | Toute la logique tourne sur l'appareil, stockage local (SQLite), synchro plus tard |
-| Analyse des parties | En local pour l'instant | Voir MOTEURS.md § 3 (moteur sous licence permissive) |
+| Analyse des parties | **Stockfish, sur l'appareil** | Hors-ligne, aucun coût serveur pour l'analyse. Voir MOTEURS.md § 3 |
+| Modèle économique | **Freemium** (plus tard) | Finance les serveurs (comptes, synchro) et le contenu. Voir PLAN.md § 5 |
 | Plateforme de référence | **Chess.com en priorité**, Lichess mis de côté | Import des parties via l'API publique Chess.com ; pas d'évaluations fournies → moteur local |
-| Identité visuelle | Inspirée de l'ergonomie Chess.com, **sans reprendre leurs éléments de marque** | Palette d'échiquier, pièces et sons à nous |
+| Identité visuelle | Inspirée de l'ergonomie Chess.com, **sans reprendre leurs éléments de marque** | Maquette validée : fond sombre, vert principal, or pour les récompenses, échiquier crème/bleu, police Fredoka |
+| Mascotte | **Memo**, un échiquier à lunettes avec bras et jambes | Il guide l'utilisateur et explique chaque coup (4 humeurs : content, réfléchit, bravo, oups) |
 | Langues | **Multilingue dès le départ** | Voir ci-dessous |
 | Nom | « Movemory » envisagé | movemory.com déjà pris ; .app / .fr / .net / .io libres au 27/10/2026 |
 

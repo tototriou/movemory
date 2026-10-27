@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Accueil</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F0D16}
+a{color:#7EE2A2}a:hover{color:#B5F2C9}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.icf{fill:currentColor;stroke:none}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes glow{0%,100%{opacity:.25;transform:scale(.9)}50%{opacity:.7;transform:scale(1.08)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.04);opacity:1}100%{transform:scale(1)}}
+@keyframes wiggle{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-8deg)}90%{transform:rotate(8deg)}95%{transform:rotate(-4deg)}}
+@keyframes flicker{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.14) rotate(4deg)}}
+@keyframes lamp{0%,100%{opacity:.55}50%{opacity:.9}}
+@keyframes sway{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+@keyframes shimmer{0%{background-position:-160px 0}100%{background-position:300px 0}}
+.shimmer{background-image:linear-gradient(100deg,rgba(255,255,255,0) 30%,rgba(255,255,255,.5) 50%,rgba(255,255,255,0) 70%);background-size:160px 100%;background-repeat:no-repeat;animation:shimmer 2.4s linear infinite}
+.bob{animation:bob 1.5s ease-in-out infinite}
+.glow{animation:glow 1.6s ease-in-out infinite}
+.pop{animation:pop .5s .2s ease-out both}
+.wiggle{animation:wiggle 3s ease-in-out infinite;transform-origin:50% 70%}
+.flicker{animation:flicker .9s ease-in-out infinite;transform-origin:50% 90%}
+.lamp{animation:lamp 2.6s ease-in-out infinite}
+.sway{animation:sway 4s ease-in-out infinite;transform-origin:50% 100%}
+@media (prefers-reduced-motion:reduce){.shimmer,.bob,.glow,.pop,.wiggle,.flicker,.lamp,.sway{animation:none}}
+.btn{background-image:linear-gradient(180deg,rgba(255,255,255,.24) 0,rgba(255,255,255,.07) 48%,rgba(0,0,0,0) 52%,rgba(0,0,0,.1) 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 10px 18px -6px rgba(0,0,0,.6);transition:transform .08s ease,filter .15s;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(3px)}
+.btn-cta{position:relative;overflow:hidden;text-transform:uppercase;letter-spacing:.8px;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.btn-cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(255,255,255,0));animation:shine 3.4s ease-in-out infinite}
+@keyframes shine{0%,62%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){.btn-cta::after{animation:none;display:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #6E3A20; color: #FFFFFF; font-family: Fredoka, Nunito, system-ui, sans-serif">
+
+  <div aria-hidden="true" style="position: absolute; left: -330px; top: -200px; width: 1050px; height: 1250px; background: conic-gradient({{checkA}} 25%, {{checkB}} 0 50%, {{checkA}} 0 75%, {{checkB}} 0); background-size: 112px 112px; transform: scaleY(.58) rotate(45deg)"></div>
+  <div aria-hidden="true" style="position: absolute; inset: 0; background: radial-gradient(90% 55% at 50% 50%, rgba(0,0,0,0) 40%, rgba(25,8,4,.55) 100%)"></div>
+
+  <div aria-hidden="true" style="position: absolute; left: 22px; top: 238px; width: 52px; height: 190px">
+    <span class="lamp" style="position: absolute; left: -24px; top: -14px; width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(255,214,150,.75) 0, rgba(255,214,150,0) 65%)"></span>
+    <span style="position: absolute; left: 12px; top: 4px; width: 28px; height: 44px; border-radius: 12px 12px 6px 6px; background: linear-gradient(#FFF3D6, #FFC877)"></span>
+    <span style="position: absolute; left: 22px; top: 48px; width: 8px; height: 120px; background: #2B1A14; border-radius: 3px"></span>
+    <span style="position: absolute; left: 8px; top: 166px; width: 36px; height: 12px; background: #2B1A14; border-radius: 50%"></span>
+  </div>
+
+  <svg aria-hidden="true" class="sway" width="78" height="200" viewBox="0 0 78 200" style="position: absolute; left: 306px; top: 286px">
+    <g transform="rotate(6 39 200)">
+      <rect x="16" y="20" width="46" height="176" rx="4" fill="#F3E6CC"></rect>
+      <rect x="16" y="20" width="12" height="176" fill="#D9C6A2"></rect>
+      <rect x="12" y="44" width="54" height="6" fill="#C9B48C"></rect>
+      <rect x="12" y="78" width="54" height="6" fill="#C9B48C"></rect>
+      <rect x="12" y="112" width="54" height="6" fill="#C9B48C"></rect>
+      <rect x="12" y="146" width="54" height="6" fill="#C9B48C"></rect>
+      <rect x="22" y="4" width="34" height="18" rx="3" fill="#F3E6CC"></rect>
+      <rect x="26" y="56" width="6" height="14" rx="3" fill="#8E7A58"></rect>
+      <rect x="37" y="56" width="6" height="14" rx="3" fill="#8E7A58"></rect>
+      <rect x="48" y="56" width="6" height="14" rx="3" fill="#8E7A58"></rect>
+      <rect x="26" y="90" width="6" height="14" rx="3" fill="#8E7A58"></rect>
+      <rect x="37" y="90" width="6" height="14" rx="3" fill="#8E7A58"></rect>
+      <rect x="48" y="90" width="6" height="14" rx="3" fill="#8E7A58"></rect>
+      <rect x="26" y="124" width="6" height="14" rx="3" fill="#8E7A58"></rect>
+      <rect x="37" y="124" width="6" height="14" rx="3" fill="#8E7A58"></rect>
+      <rect x="48" y="124" width="6" height="14" rx="3" fill="#8E7A58"></rect>
+      <rect x="30" y="166" width="18" height="30" rx="9" fill="#8E7A58"></rect>
+    </g>
+  </svg>
+
+  <svg aria-hidden="true" width="110" height="100" viewBox="0 0 110 100" style="position: absolute; left: 4px; top: 496px">
+    <polygon points="55,8 104,36 55,64 6,36" fill="#2A1A14"></polygon>
+    <polygon points="6,36 55,64 55,72 6,44" fill="#1A100C"></polygon>
+    <polygon points="55,64 104,36 104,44 55,72" fill="#140C09"></polygon>
+    <polygon points="55,14 67,21 55,28 43,21" fill="#F2E8D5"></polygon>
+    <polygon points="67,21 79,28 67,35 55,28" fill="#6D8FB3"></polygon>
+    <polygon points="43,21 55,28 43,35 31,28" fill="#6D8FB3"></polygon>
+    <polygon points="55,28 67,35 55,42 43,35" fill="#F2E8D5"></polygon>
+    <polygon points="79,28 91,35 79,42 67,35" fill="#F2E8D5"></polygon>
+    <polygon points="31,28 43,35 31,42 19,35" fill="#F2E8D5"></polygon>
+    <polygon points="67,35 79,42 67,49 55,42" fill="#6D8FB3"></polygon>
+    <polygon points="43,35 55,42 43,49 31,42" fill="#6D8FB3"></polygon>
+    <polygon points="55,42 67,49 55,56 43,49" fill="#F2E8D5"></polygon>
+    <rect x="24" y="66" width="6" height="30" fill="#1A100C"></rect>
+    <rect x="80" y="66" width="6" height="30" fill="#1A100C"></rect>
+    <circle cx="27" cy="96" r="4" fill="#E0A93B"></circle>
+    <circle cx="83" cy="96" r="4" fill="#E0A93B"></circle>
+  </svg>
+
+  <svg aria-hidden="true" class="sway" width="90" height="120" viewBox="0 0 90 120" style="position: absolute; left: 300px; top: 520px">
+    <ellipse cx="28" cy="58" rx="16" ry="52" fill="#2F5A2A"></ellipse>
+    <ellipse cx="24" cy="58" rx="7" ry="44" fill="#3E7236"></ellipse>
+    <ellipse cx="62" cy="72" rx="14" ry="42" fill="#2A5025"></ellipse>
+    <ellipse cx="59" cy="72" rx="6" ry="34" fill="#3A6A33"></ellipse>
+    <rect x="25" y="106" width="6" height="12" fill="#3B2418"></rect>
+    <rect x="59" y="110" width="6" height="10" fill="#3B2418"></rect>
+  </svg>
+
+  <sc-for list="{{tiles}}" as="t" hint-placeholder-count="12">
+    <div style="{{t.wrap}}">
+      <svg width="110" height="90" viewBox="0 0 110 90" aria-hidden="true" style="position: absolute; left: 0; top: 0">
+        <polygon points="9,36 55,66 55,82 9,52" fill="{{t.left}}"></polygon>
+        <polygon points="55,66 101,36 101,52 55,82" fill="{{t.right}}"></polygon>
+        <polygon points="55,6 101,36 55,66 9,36" fill="{{t.top}}"></polygon>
+        <polygon points="55,14 89,36 55,58 21,36" fill="{{t.bevel}}"></polygon>
+      </svg>
+      <span style="{{t.labelStyle}}">{{t.label}}</span>
+      <sc-if value="{{t.done}}" hint-placeholder-val="{{ false }}">
+        <svg width="34" height="26" viewBox="0 0 24 18" aria-hidden="true" style="position: absolute; left: 38px; top: 22px">
+          <path d="M3 9l6 6L21 3" style="fill: none; stroke: #6B4405; stroke-width: 4px; stroke-linecap: round; stroke-linejoin: round"></path>
+        </svg>
+      </sc-if>
+      <sc-if value="{{t.chest}}" hint-placeholder-val="{{ false }}">
+        <svg class="wiggle" width="40" height="36" viewBox="0 0 24 22" aria-label="Coffre : récompense" role="img" style="position: absolute; left: 35px; top: 8px">
+          <rect x="2" y="8" width="20" height="12" rx="2" fill="#8B5A2B"></rect>
+          <path d="M2 10V7a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3z" fill="#A86E35"></path>
+          <rect x="2" y="10" width="20" height="2.5" fill="#FFC94A"></rect>
+          <rect x="10" y="9" width="4" height="6" rx="1" fill="#FFC94A"></rect>
+        </svg>
+      </sc-if>
+      <sc-if value="{{t.boss}}" hint-placeholder-val="{{ false }}">
+        <svg width="40" height="34" viewBox="0 0 24 20" aria-label="Défi final : jouer la ligne entière" role="img" style="position: absolute; left: 35px; top: 10px">
+          <path d="M2 6l5 4 5-8 5 8 5-4-2 12H4z" fill="#FFC94A" style="stroke: #8A5E0A; stroke-width: 1.2px; stroke-linejoin: round"></path>
+        </svg>
+      </sc-if>
+    </div>
+  </sc-for>
+
+  <span class="glow" aria-hidden="true" style="position: absolute; left: 175px; top: 552px; width: 90px; height: 56px; border-radius: 50%; background: radial-gradient(rgba(255,240,170,.9) 0, rgba(255,240,170,0) 70%)"></span>
+  <a href="Seance.dc.html" class="bob" aria-label="Memo vous attend sur la case 3 : commencer" style="position: absolute; left: 180px; top: 506px; width: 80px; height: 80px; display: block; text-decoration: none">
+    <dc-import name="Mascotte" size="80" mood="content" hint-size="80px,80px"></dc-import>
+  </a>
+
+  <div aria-hidden="true" style="position: absolute; left: 0; right: 0; bottom: 0; height: 230px; background: linear-gradient(rgba(20,18,28,0) 0, rgba(20,18,28,.85) 45%, #14121C 75%)"></div>
+
+  <header style="position: absolute; left: 0; right: 0; top: 0; padding: 12px 12px 10px; display: flex; flex-direction: column; gap: 10px; background: linear-gradient(rgba(15,13,22,.95), rgba(15,13,22,.75)); border-radius: 0 0 24px 24px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <a href="Main.dc.html" aria-label="Mon profil, niveau 7" style="position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; border: 3px solid #FFC94A; box-sizing: border-box; background: #2E2A3D; color: #E6E4EE">
+        <svg width="22" height="22" viewBox="0 0 24 24" class="ic" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>
+        <span style="position: absolute; right: -8px; bottom: -6px; background: #FFC94A; color: #3A2A05; border-radius: 8px; padding: 0 5px; font-size: 12px; font-weight: 700; border: 2px solid #0F0D16">7</span>
+      </a>
+      <a href="Repertoire.dc.html" aria-label="Changer d'ouverture" style="display: flex; align-items: center; gap: 6px; text-decoration: none; color: #FFFFFF; background: #221F2E; border: 2px solid #3E3952; border-radius: 999px; padding: 6px 12px 6px 8px">
+        <span style="width: 26px; height: 26px; border-radius: 50%; background: #FFFFFF; color: #14121C; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700">♙&#xFE0E;</span>
+        <span style="font-size: 16px; font-weight: 700">Partie italienne</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" class="ic" style="stroke-width: 3" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </a>
+      <div style="display: flex; align-items: center; gap: 8px">
+        <span style="display: flex; align-items: center; gap: 2px; font-weight: 700; font-size: 16px; color: #FFB054">
+          <svg width="22" height="22" viewBox="0 0 24 24" class="icf flicker" aria-hidden="true"><path d="M12.5 2c.6 3.6 5.5 5.6 5.5 11a6 6 0 0 1-12 0c0-2.6 1.3-4.4 2.6-5.4.1 2 1.1 3.3 2.4 3.6-.6-3.3.1-6.6 1.5-9.2z"/></svg>12
+        </span>
+        <span style="display: flex; align-items: center; gap: 2px; font-weight: 700; font-size: 16px; color: #8FD3FF">
+          <svg width="18" height="18" viewBox="0 0 24 24" class="icf" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z"/></svg>85
+        </span>
+      </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px">
+      <span style="font-size: 12px; font-weight: 700; color: #B8B4C8; white-space: nowrap">Monde 2</span>
+      <div style="flex: 1; height: 8px; border-radius: 999px; background: #2E2A3D; overflow: hidden">
+        <div class="shimmer" style="width: 40%; height: 100%; border-radius: 999px; background-color: #FFC94A"></div>
+      </div>
+      <span style="font-size: 12px; font-weight: 700; color: #FFC94A; white-space: nowrap">12/30 maîtrisées</span>
+    </div>
+  </header>
+
+  <div style="position: absolute; right: 10px; top: 132px; display: flex; flex-direction: column; gap: 10px">
+    <a class="btn" href="Main.dc.html" aria-label="Quêtes du jour : 1 sur 3" style="position: relative; width: 52px; height: 52px; border-radius: 16px; background-color: #221F2E; border-bottom: 4px solid #0A0910; display: flex; align-items: center; justify-content: center; color: #FFC94A">
+      <svg width="26" height="26" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 3h10a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M6 3a2 2 0 0 0-2 2v2h2M9 8h6M9 12h6M9 16h4"/></svg>
+      <span style="position: absolute; top: -6px; right: -6px; background: #F0605D; color: #FFFFFF; border-radius: 999px; padding: 0 6px; font-size: 11px; font-weight: 700; border: 2px solid #14121C">1/3</span>
+    </a>
+    <a class="btn" href="Bravo.dc.html" aria-label="Ligue : 4e place" style="position: relative; width: 52px; height: 52px; border-radius: 16px; background-color: #221F2E; border-bottom: 4px solid #0A0910; display: flex; align-items: center; justify-content: center; color: #C9D1D9">
+      <svg width="26" height="26" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg>
+      <span style="position: absolute; top: -6px; right: -6px; background: #C9D1D9; color: #14121C; border-radius: 999px; padding: 0 6px; font-size: 11px; font-weight: 700; border: 2px solid #14121C">4e</span>
+    </a>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 128px; display: flex; justify-content: center">
+  <a href="Seance.dc.html" class="bob" style="display: flex; align-items: center; gap: 6px; text-decoration: none; background: #FFFFFF; color: #14121C; border-radius: 999px; padding: 6px 14px; font-size: 14px; font-weight: 700; white-space: nowrap; box-shadow: 0 4px 0 #C9C3B8">Révision du jour · 12 positions</a>
+  </div>
+
+  <nav aria-label="Navigation principale" style="position: absolute; left: 12px; right: 12px; bottom: 14px; height: 68px; border-radius: 34px; background: rgba(15,13,22,.96); border: 1px solid #2E2A3D; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-items: center; box-shadow: 0 10px 24px rgba(0,0,0,.45)">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: #FFFFFF; font-size: 11px; font-weight: 700">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="icf" style="color: {{accent}}" aria-hidden="true"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Carte</a>
+    <a href="Repertoire.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 600">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v15H6a2 2 0 0 0-2 2z"/><path d="M4 20a2 2 0 0 0 2 1h14v-3"/></svg>Répertoire</a>
+    <span aria-hidden="true"></span>
+    <a href="Parties.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 600">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Parties</a>
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 2px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 600">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profil</a>
+  </nav>
+
+  <div style="position: absolute; left: 151px; bottom: 34px; width: 88px; height: 88px; border-radius: 50%; background: conic-gradient(#FFC94A 0 30%, #2E2A3D 30% 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 5px #14121C">
+    <a class="btn" href="Seance.dc.html" aria-label="Lancer la révision du jour (3 sur 10 positions faites)" style="width: 72px; height: 72px; border-radius: 50%; background-color: {{accent}}; border-bottom: 5px solid #11703A; box-sizing: border-box; display: flex; align-items: center; justify-content: center; color: #FFFFFF">
+      <svg width="34" height="34" viewBox="0 0 24 24" class="icf" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+    </a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1A9E4B","options":["#1A9E4B","#7C4DFF","#FF7A1A"]},"world":{"editor":"enum","options":["italie","foret","nuit"],"default":"italie"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const accent = this.props.accent ?? '#1A9E4B';
+    const worlds = {
+      italie: { a: '#8A4A2A', b: '#7A3F22', tile: ['#8B5CF6', '#A78BFA', '#6D28D9', '#5B21B6'] },
+      foret: { a: '#24502E', b: '#1E4428', tile: ['#3FA0A8', '#56B4BC', '#2C7A80', '#22656A'] },
+      nuit: { a: '#2C2A5A', b: '#25234D', tile: ['#7A68E0', '#8E7DF0', '#5848B0', '#4A3C96'] }
+    };
+    const w = worlds[this.props.world] || worlds.italie;
+    const coords = [
+      [120, 650], [170, 616], [220, 582], [270, 548], [220, 514], [170, 480],
+      [120, 446], [170, 412], [220, 378], [270, 344], [220, 310], [170, 276]
+    ];
+    const tiles = coords.map(([cx, cy], i) => {
+      const n = i + 1;
+      const done = n <= 2;
+      const chest = n === 8;
+      const boss = n === 12;
+      let c = w.tile;
+      if (done) c = ['#FFC94A', '#FFD976', '#C9951E', '#A87B12'];
+      if (chest) c = ['#A86E35', '#BE8448', '#7A4E22', '#5F3C1A'];
+      if (boss) c = ['#3A2420', '#4A302A', '#24140F', '#1A0E0A'];
+      return {
+        cy, done, chest, boss,
+        top: c[0], bevel: c[1], left: c[2], right: c[3],
+        wrap: 'position: absolute; left: ' + (cx - 55) + 'px; top: ' + (cy - 36) + 'px; width: 110px; height: 90px',
+        label: done || chest || boss || n === 3 ? '' : String(n),
+        labelStyle: 'position: absolute; left: 0; right: 0; top: 20px; text-align: center; font-size: 26px; font-weight: 900; color: #FFFFFF; text-shadow: 0 3px 0 ' + c[2]
+      };
+    }).sort((a, b) => a.cy - b.cy);
+    return { accent, checkA: w.a, checkB: w.b, tiles };
+  }
+}
+</script>
+</body>
+</html>

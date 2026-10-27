@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mon répertoire</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F0D16}
+a{color:#7EE2A2}a:hover{color:#B5F2C9}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.icf{fill:currentColor;stroke:none}
+.btn{background-image:linear-gradient(180deg,rgba(255,255,255,.24) 0,rgba(255,255,255,.07) 48%,rgba(0,0,0,0) 52%,rgba(0,0,0,.1) 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 10px 18px -6px rgba(0,0,0,.6);transition:transform .08s ease,filter .15s;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(3px)}
+.btn-cta{position:relative;overflow:hidden;text-transform:uppercase;letter-spacing:.8px;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.btn-cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(255,255,255,0));animation:shine 3.4s ease-in-out infinite}
+@keyframes shine{0%,62%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){.btn-cta::after{animation:none;display:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #14121C; color: #FFFFFF; font-family: Fredoka, Nunito, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 22px 16px 0; overflow: hidden">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 900">Mon répertoire</h1>
+
+    <div role="tablist" aria-label="Couleur" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; background: #0F0D16; border-radius: 14px; padding: 5px">
+      <sc-for list="{{sides}}" as="t" hint-placeholder-count="2">
+        <button type="button" role="tab" aria-selected="{{t.selected}}" onClick="{{t.pick}}" style="{{t.style}}">{{t.label}}</button>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 800">
+        <span style="color: #B8B4C8">Profondeur révisée</span><span style="color: #FFC94A">{{levelName}}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{levels}}" as="l" hint-placeholder-count="4">
+          <button type="button" aria-pressed="{{l.selected}}" onClick="{{l.pick}}" style="{{l.style}}">{{l.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <sc-for list="{{lines}}" as="o" hint-placeholder-count="3">
+        <article style="background: #221F2E; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px; border-bottom: 4px solid #0A0910">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px">
+            <div style="display: flex; flex-direction: column">
+              <span style="font-size: 17px; font-weight: 900">{{o.name}}</span>
+              <span style="font-size: 13px; font-weight: 700; color: #B8B4C8">{{o.moves}}</span>
+            </div>
+            <span style="flex: none; background: #2E2A3D; border-radius: 8px; padding: 3px 8px; font-size: 12px; font-weight: 900; color: #E6E4EE">{{o.eco}}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px">
+            <div style="flex: 1; height: 10px; border-radius: 999px; background: #2E2A3D; overflow: hidden">
+              <div style="{{o.barStyle}}"></div>
+            </div>
+            <span style="font-size: 13px; font-weight: 900; color: #E6E4EE">{{o.mastery}}</span>
+          </div>
+          <span style="font-size: 12px; font-weight: 800; color: #B8B4C8">{{o.count}}</span>
+        </article>
+      </sc-for>
+    </div>
+
+    <button type="button" style="display: flex; align-items: center; justify-content: center; gap: 8px; background: transparent; border: 2px dashed #57536B; border-radius: 16px; padding: 13px; color: #E6E4EE; font-family: inherit; font-size: 16px; font-weight: 900">
+      <svg width="20" height="20" viewBox="0 0 24 24" class="ic" style="stroke-width: 3" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Ajouter une ouverture
+    </button>
+  </main>
+
+  <nav aria-label="Navigation principale" style="display: flex; justify-content: space-around; background: #0F0D16; padding: 10px 6px 18px; border-top: 1px solid #2E2A3D">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</a>
+    <a href="Repertoire.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #FFFFFF; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" style="color: {{accent}}" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v15H6a2 2 0 0 0-2 2z"/><path d="M4 20a2 2 0 0 0 2 1h14v-3"/></svg>Répertoire</a>
+    <a href="Parties.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Parties</a>
+    <a href="Bravo.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg>Ligue</a>
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1A9E4B","options":["#1A9E4B","#7C4DFF","#FF7A1A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { side: 'w', level: 1 };
+  }
+  renderVals() {
+    const accent = this.props.accent ?? '#1A9E4B';
+    const { side, level } = this.state;
+    const sides = [{ id: 'w', label: 'Avec les Blancs' }, { id: 'b', label: 'Avec les Noirs' }].map((t) => ({
+      ...t,
+      selected: t.id === side ? 'true' : 'false',
+      pick: () => this.setState({ side: t.id }),
+      style: 'border: none; border-radius: 10px; padding: 10px; font-family: inherit; font-size: 15px; font-weight: 900; ' +
+        (t.id === side ? 'background: #2E2A3D; color: #FFFFFF;' : 'background: transparent; color: #B8B4C8;')
+    }));
+    const levelDefs = [['3 coups', 'Débutant'], ['5 coups', 'Intermédiaire'], ['7 coups', 'Avancé'], ['10 coups', 'Expert']];
+    const levels = levelDefs.map(([label], i) => ({
+      label,
+      selected: i === level ? 'true' : 'false',
+      pick: () => this.setState({ level: i }),
+      style: 'border-radius: 12px; padding: 9px 0; font-family: inherit; font-size: 14px; font-weight: 900; ' +
+        (i === level ? 'background: ' + accent + '; color: #FFFFFF; border: none; border-bottom: 4px solid #11703A;' : 'background: #221F2E; color: #E6E4EE; border: none; border-bottom: 4px solid #0A0910;')
+    }));
+    const data = {
+      w: [
+        { name: 'Partie italienne – Giuoco Piano', eco: 'C50', moves: '1.e4 e5 2.Cf3 Cc6 3.Fc4 Fc5 4.c3', pct: 80, n: 18 },
+        { name: 'Italienne – Deux cavaliers', eco: 'C55', moves: '1.e4 e5 2.Cf3 Cc6 3.Fc4 Cf6 4.d3', pct: 45, n: 14 },
+        { name: 'Contre la Sicilienne : Alapin', eco: 'B22', moves: '1.e4 c5 2.c3', pct: 20, n: 16 }
+      ],
+      b: [
+        { name: 'Caro-Kann – Variante d’avance', eco: 'B12', moves: '1.e4 c6 2.d4 d5 3.e5 Ff5', pct: 65, n: 15 },
+        { name: 'Gambit dame refusé', eco: 'D37', moves: '1.d4 d5 2.c4 e6 3.Cc3 Cf6', pct: 30, n: 17 }
+      ]
+    };
+    const lines = data[side].map((o) => ({
+      ...o,
+      mastery: o.pct + ' %',
+      count: o.n + ' positions · ' + Math.round(o.n * o.pct / 100) + ' maîtrisées',
+      barStyle: 'width: ' + o.pct + '%; height: 100%; border-radius: 999px; background: ' + (o.pct >= 75 ? '#FFC94A' : accent)
+    }));
+    return { accent, sides, levels, levelName: levelDefs[level][1], lines };
+  }
+}
+</script>
+</body>
+</html>

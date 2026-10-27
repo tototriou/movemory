@@ -7,7 +7,7 @@ Document de travail pour décider de l'implémentation. ✅ = recommandation act
 | Option | Licence | Notes |
 |---|---|---|
 | ✅ **chess.js** | BSD-2 | Déjà en place dans `packages/core`. Simple, très utilisée, SAN/FEN/PGN. |
-| chessops (Lichess) | GPL-3 | Plus rapide, variantes, mais GPL. |
+| chessops (Lichess) | GPL-3 | Désormais compatible (projet GPL) ; chess.js suffit pour l'instant. |
 
 ## 2. Échiquier jouable (UI)
 
@@ -22,27 +22,26 @@ C'est la pièce centrale : drag & drop fluide, animations, flèches, surlignage,
 
 Pièces : jeux SVG libres (ex. « cburnett », CC BY-SA, ou un jeu dessiné pour l'app).
 
-## 3. Moteur d'analyse (code fermé + analyse locale)
+## 3. Moteur d'analyse : Stockfish ✅
 
-La révision des ouvertures n'a **pas besoin de moteur** (le répertoire donne la réponse). Le moteur sert
-uniquement à analyser les parties importées. Stockfish est sous GPL-3 : il ne peut pas être embarqué dans
-une app à code fermé, ni « réimplémenté » à partir de son code (un portage serait une œuvre dérivée, donc GPL).
+Le projet est open source sous GPL-3.0 : Stockfish (GPL-3) peut donc être embarqué dans l'app.
+La révision des ouvertures n'a pas besoin de moteur ; Stockfish sert à analyser les parties Chess.com importées.
 
-| Option | Où | Licence | Notes |
-|---|---|---|---|
-| ✅ **Écarts au répertoire** | appareil | — | Aucun moteur : déjà codé dans `packages/core` (`findRepertoireDeviation`). |
-| Lichess Cloud Eval API | API | gratuit | **Mis de côté** (priorité Chess.com). Pourrait compléter plus tard. |
-| ✅ **Leorik** (moteur NNUE, ~3 400 Elo CCRL) — **moteur principal** | appareil | **MIT** | Licence permissive : on peut le porter (TypeScript / Rust → WASM et natif) en gardant la mention de copyright. Réseau entraîné en auto-jeu, sans données GPL. Bien plus fort que nécessaire pour détecter les erreurs d'amateurs. |
-| Moteur maison (clean-room) | appareil | à nous | Possible (alpha-beta + évaluation simple), mais des mois de travail pour un niveau bien inférieur. |
-| Stockfish sur notre serveur | serveur | GPL-3 | Autorisé avec un code fermé (pas de distribution du binaire), mais pas « local ». Option de secours. |
-| API tierces (chess-api.com…) | API | — | Conditions et pérennité incertaines : à éviter pour un produit. |
+| Plateforme | Intégration | Notes |
+|---|---|---|
+| ✅ Web | Stockfish compilé en WebAssembly, dans un Web Worker | Version « lite » (~7 Mo) suffisante pour détecter les erreurs d'ouverture |
+| ✅ iOS / Android | Stockfish natif via un module Expo (config plugin + build EAS) | Plus rapide et plus économe que le WASM ; analyse en tâche de fond, profondeur limitée (~16) pour la batterie |
+| Serveur (option) | Stockfish natif sur un worker | Seulement si l'analyse sur l'appareil s'avère trop lente ; coût à financer par le freemium |
+
+Avantages : fonctionne **hors-ligne** et **ne coûte rien en serveur**.
+Obligations GPL : publier le code de l'app (repo public), afficher la licence et créditer Stockfish dans l'app.
 
 ## 4. Données — priorité Chess.com
 
 | Besoin | Source |
 |---|---|
 | ✅ **Parties de l'utilisateur** | **API publique Chess.com** (`api.chess.com/pub/player/{pseudo}/games/{AAAA}/{MM}/pgn`) : lecture seule, sans clé, gratuite. Contient le PGN, le code ECO de l'ouverture et, si l'utilisateur a fait l'analyse sur Chess.com, sa précision. |
-| ✅ **Évaluations / erreurs** | Moteur local (Leorik) : l'API Chess.com ne fournit **ni évaluation moteur ni explorateur d'ouvertures**. |
+| ✅ **Évaluations / erreurs** | Stockfish sur l'appareil : l'API Chess.com ne fournit **ni évaluation moteur ni explorateur d'ouvertures**. |
 | ✅ **Lignes d'ouvertures + explications** | Contenu rédigé par nous (indispensable : chaque coup doit être expliqué), traduit. |
 | ✅ **Exercices tirés des parties** | Générés depuis les parties Chess.com de l'utilisateur (écarts au répertoire + erreurs détectées par le moteur). |
 | Lichess (API, puzzles, base d'ouvertures) | **Mis de côté** pour l'instant. Le script d'import de `packages/core` sert uniquement d'aide au développement. |

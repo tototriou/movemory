@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mes parties</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F0D16}
+a{color:#7EE2A2}a:hover{color:#B5F2C9}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.icf{fill:currentColor;stroke:none}
+.btn{background-image:linear-gradient(180deg,rgba(255,255,255,.24) 0,rgba(255,255,255,.07) 48%,rgba(0,0,0,0) 52%,rgba(0,0,0,.1) 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 10px 18px -6px rgba(0,0,0,.6);transition:transform .08s ease,filter .15s;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(3px)}
+.btn-cta{position:relative;overflow:hidden;text-transform:uppercase;letter-spacing:.8px;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.btn-cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(255,255,255,0));animation:shine 3.4s ease-in-out infinite}
+@keyframes shine{0%,62%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){.btn-cta::after{animation:none;display:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #14121C; color: #FFFFFF; font-family: Fredoka, Nunito, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 14px; padding: 22px 16px 0; overflow: hidden">
+    <h1 style="margin: 0; font-size: 26px; font-weight: 900">Mes parties</h1>
+
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <div style="background: #221F2E; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px">
+        <span style="font-size: 13px; font-weight: 800; color: #B8B4C8">Chess.com</span>
+        <span style="display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 900">
+          <span style="width: 9px; height: 9px; border-radius: 50%; background: #3DDC84"></span>[votre pseudo]
+        </span>
+      </div>
+      <button type="button" style="background: transparent; border: 2px dashed #57536B; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; color: #FFFFFF; font-family: inherit">
+        <span style="font-size: 13px; font-weight: 800; color: #B8B4C8">Lichess (plus tard)</span>
+        <span style="font-size: 15px; font-weight: 900">Connecter</span>
+      </button>
+    </div>
+
+    <section style="background: #173A26; border-radius: 18px; padding: 16px; display: flex; flex-direction: column; gap: 10px; border-bottom: 4px solid #0C2416">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <svg width="26" height="26" viewBox="0 0 24 24" class="ic" style="color: #8EF0B4" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="5"/></svg>
+        <span style="font-size: 18px; font-weight: 900">3 positions à retravailler</span>
+      </div>
+      <p style="margin: 0; font-size: 14px; font-weight: 700; line-height: 1.4; color: #CDEFD9">Tirées de vos 20 dernières parties, analysées sur votre téléphone. Elles sont ajoutées à vos révisions.</p>
+      <a class="btn btn-cta" href="Seance.dc.html" style="display: block; text-align: center; text-decoration: none; background-color: {{accent}}; border-bottom: 5px solid #11703A; border-radius: 14px; padding: 12px; color: #FFFFFF; font-size: 18px; font-weight: 900">Les réviser maintenant</a>
+    </section>
+
+    <div style="display: flex; flex-direction: column; gap: 10px">
+      <sc-for list="{{games}}" as="g" hint-placeholder-count="3">
+        <article style="background: #221F2E; border-radius: 16px; padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start">
+          <span style="{{g.badgeStyle}}">{{g.result}}</span>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 3px; min-width: 0">
+            <div style="display: flex; justify-content: space-between; gap: 8px">
+              <span style="font-size: 15px; font-weight: 900">{{g.opponent}}</span>
+              <span style="font-size: 12px; font-weight: 800; color: #B8B4C8">{{g.when}}</span>
+            </div>
+            <span style="font-size: 13px; font-weight: 700; color: #B8B4C8">{{g.opening}}</span>
+            <span style="{{g.noteStyle}}">{{g.note}}</span>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </main>
+
+  <nav aria-label="Navigation principale" style="display: flex; justify-content: space-around; background: #0F0D16; padding: 10px 6px 18px; border-top: 1px solid #2E2A3D">
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Accueil</a>
+    <a href="Repertoire.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h14v15H6a2 2 0 0 0-2 2z"/><path d="M4 20a2 2 0 0 0 2 1h14v-3"/></svg>Répertoire</a>
+    <a href="Parties.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #FFFFFF; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" style="color: {{accent}}" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Parties</a>
+    <a href="Bravo.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 20h8"/></svg>Ligue</a>
+    <a href="Main.dc.html" style="display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #B8B4C8; font-size: 11px; font-weight: 800; min-width: 56px">
+      <svg width="24" height="24" viewBox="0 0 24 24" class="ic" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profil</a>
+  </nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1A9E4B","options":["#1A9E4B","#7C4DFF","#FF7A1A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const accent = this.props.accent ?? '#1A9E4B';
+    const badge = { V: '#1A9E4B', D: '#C8442F', N: '#6E6893' };
+    const raw = [
+      { result: 'D', opponent: 'Adversaire (1 540)', when: 'Hier', opening: 'Partie italienne · Blancs', note: 'Écart au coup 4 : 4.d3 au lieu de 4.c3', kind: 'deviation' },
+      { result: 'V', opponent: 'Adversaire (1 488)', when: 'Hier', opening: 'Caro-Kann · Noirs', note: 'Répertoire respecté jusqu’au coup 7', kind: 'ok' },
+      { result: 'D', opponent: 'Adversaire (1 602)', when: 'Lun.', opening: 'Sicilienne Alapin · Blancs', note: 'Erreur au coup 9 : 9.Cxe5 ? (−2,1)', kind: 'mistake' }
+    ];
+    const noteColor = { deviation: '#FFC94A', ok: '#7EE2A2', mistake: '#FFB4A5' };
+    const games = raw.map((g) => ({
+      ...g,
+      badgeStyle: 'flex: none; width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 900; color: #FFFFFF; background: ' + badge[g.result],
+      noteStyle: 'font-size: 13px; font-weight: 800; color: ' + noteColor[g.kind]
+    }));
+    return { accent, games };
+  }
+}
+</script>
+</body>
+</html>

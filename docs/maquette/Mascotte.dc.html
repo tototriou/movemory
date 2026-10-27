@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Mascotte Memo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div role="img" aria-label="{{label}}" style="{{wrapStyle}}">
+  <svg width="{{size}}" height="{{size}}" viewBox="0 0 120 120" aria-hidden="true">
+    <ellipse cx="60" cy="116" rx="30" ry="4" fill="rgba(0,0,0,.2)"></ellipse>
+
+    <path d="M50 92 L48 108 M70 92 L72 108" style="fill: none; stroke: {{limb}}; stroke-width: 5px; stroke-linecap: round"></path>
+    <path d="M40 106 q-1 -5 7 -5 q6 0 7 6 z" fill="#1A9E4B"></path>
+    <path d="M66 107 q1 -6 7 -6 q8 0 7 5 z" fill="#1A9E4B"></path>
+    <path d="M40 106 h14 M66 107 h14" style="fill: none; stroke: #FFFFFF; stroke-width: 2.4px; stroke-linecap: round"></path>
+
+    <path d="{{armL}}" style="fill: none; stroke: {{limb}}; stroke-width: 5px; stroke-linecap: round; stroke-linejoin: round"></path>
+    <path d="{{armR}}" style="fill: none; stroke: {{limb}}; stroke-width: 5px; stroke-linecap: round; stroke-linejoin: round"></path>
+
+    <rect x="20" y="12" width="80" height="82" rx="9" fill="{{frameShade}}"></rect>
+    <rect x="20" y="10" width="80" height="80" rx="9" fill="{{frame}}"></rect>
+    <rect x="26" y="16" width="68" height="68" rx="3" fill="#F2E8D5"></rect>
+    <rect x="43" y="16" width="17" height="17" fill="#6D8FB3"></rect>
+    <rect x="77" y="16" width="17" height="17" fill="#6D8FB3"></rect>
+    <rect x="26" y="33" width="17" height="17" fill="#6D8FB3"></rect>
+    <rect x="60" y="33" width="17" height="17" fill="#6D8FB3"></rect>
+    <rect x="43" y="50" width="17" height="17" fill="#6D8FB3"></rect>
+    <rect x="77" y="50" width="17" height="17" fill="#6D8FB3"></rect>
+    <rect x="26" y="67" width="17" height="17" fill="#6D8FB3"></rect>
+    <rect x="60" y="67" width="17" height="17" fill="#6D8FB3"></rect>
+    <rect x="26" y="16" width="68" height="68" rx="3" fill="none" style="stroke: rgba(0,0,0,.25); stroke-width: 1px"></rect>
+    <path d="M24 13 h30" style="fill: none; stroke: rgba(255,255,255,.35); stroke-width: 2px; stroke-linecap: round"></path>
+
+    <circle cx="{{handL.x}}" cy="{{handL.y}}" r="6" fill="#FFFFFF" style="stroke: #C9C3D6; stroke-width: 1.5px"></circle>
+    <circle cx="{{handR.x}}" cy="{{handR.y}}" r="6" fill="#FFFFFF" style="stroke: #C9C3D6; stroke-width: 1.5px"></circle>
+
+    <path d="{{brows}}" style="fill: none; stroke: #3B2A20; stroke-width: 4.5px; stroke-linecap: round"></path>
+
+    <circle cx="46" cy="44" r="11.5" fill="rgba(255,255,255,.88)"></circle>
+    <circle cx="74" cy="44" r="11.5" fill="rgba(255,255,255,.88)"></circle>
+    <sc-if value="{{eyesOpen}}" hint-placeholder-val="{{ true }}">
+      <circle cx="{{pupilL}}" cy="{{pupilY}}" r="4.6" fill="#1E1B2E"></circle>
+      <circle cx="{{pupilR}}" cy="{{pupilY}}" r="4.6" fill="#1E1B2E"></circle>
+      <circle cx="{{shineL}}" cy="{{shineY}}" r="1.5" fill="#FFFFFF"></circle>
+      <circle cx="{{shineR}}" cy="{{shineY}}" r="1.5" fill="#FFFFFF"></circle>
+    </sc-if>
+    <sc-if value="{{eyesHappy}}" hint-placeholder-val="{{ false }}">
+      <path d="M40 46 q6 -7 12 0 M68 46 q6 -7 12 0" style="fill: none; stroke: #1E1B2E; stroke-width: 3px; stroke-linecap: round"></path>
+    </sc-if>
+    <circle cx="46" cy="44" r="11.5" fill="none" style="stroke: #1E1B2E; stroke-width: 3.4px"></circle>
+    <circle cx="74" cy="44" r="11.5" fill="none" style="stroke: #1E1B2E; stroke-width: 3.4px"></circle>
+    <path d="M57.5 43 q2.5 -3 5 0 M34.5 42 L27 39 M85.5 42 L93 39" style="fill: none; stroke: #1E1B2E; stroke-width: 3px; stroke-linecap: round"></path>
+    <path d="M39 38 q3 -3 6 -3" style="fill: none; stroke: #FFFFFF; stroke-width: 1.6px; stroke-linecap: round; opacity: .9"></path>
+
+    <ellipse cx="35" cy="62" rx="5" ry="3.2" fill="#FF8FB1" style="opacity: .6"></ellipse>
+    <ellipse cx="85" cy="62" rx="5" ry="3.2" fill="#FF8FB1" style="opacity: .6"></ellipse>
+
+    <path d="{{mouth}}" fill="{{mouthFill}}" style="stroke: #5A1E2A; stroke-width: 2.4px; stroke-linecap: round; stroke-linejoin: round"></path>
+    <sc-if value="{{teeth}}" hint-placeholder-val="{{ true }}">
+      <path d="{{teethPath}}" fill="#FFFFFF"></path>
+    </sc-if>
+
+    <path d="M52 92 l8 4 l8 -4 l0 8 l-8 -4 l-8 4 z" fill="#FFC94A" style="stroke: #C9951E; stroke-width: 1.2px; stroke-linejoin: round"></path>
+
+    <sc-if value="{{sweat}}" hint-placeholder-val="{{ false }}">
+      <path d="M100 22 q5 8 0 11 q-5 -3 0 -11 z" fill="#8FD3FF"></path>
+    </sc-if>
+    <sc-if value="{{sparkle}}" hint-placeholder-val="{{ false }}">
+      <path d="M106 8 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2 z M12 6 l1.5 4 l4 1.5 l-4 1.5 l-1.5 4 l-1.5 -4 l-4 -1.5 l4 -1.5 z" fill="#FFC94A"></path>
+    </sc-if>
+  </svg>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"size":{"editor":"int","default":120,"min":24,"max":400},"mood":{"editor":"enum","options":["content","reflechit","bravo","oups"],"default":"content"},"badge":{"editor":"boolean","default":false},"frame":{"editor":"color","default":"#9A6233","options":["#9A6233","#1A9E4B","#3E3952","#C9951E"]},"$preview":{"width":120,"height":120}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const size = Number(this.props.size ?? 120);
+    const mood = this.props.mood || 'content';
+    const frame = this.props.frame || '#9A6233';
+    const n = parseInt(frame.slice(1), 16);
+    const frameShade = '#' + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => Math.round(v * 0.7).toString(16).padStart(2, '0')).join('');
+    const poses = {
+      content: { armL: 'M21 58 Q10 64 9 76', handL: { x: 9, y: 78 }, armR: 'M99 52 Q110 46 110 32', handR: { x: 110, y: 29 } },
+      reflechit: { armL: 'M21 60 Q10 72 22 80 L34 76', handL: { x: 36, y: 75 }, armR: 'M99 58 Q110 64 111 76', handR: { x: 111, y: 78 } },
+      bravo: { armL: 'M21 50 Q8 40 10 24', handL: { x: 10, y: 21 }, armR: 'M99 50 Q112 40 110 24', handR: { x: 110, y: 21 } },
+      oups: { armL: 'M21 52 Q8 36 20 14 L28 10', handL: { x: 30, y: 9 }, armR: 'M99 58 Q110 64 111 76', handR: { x: 111, y: 78 } }
+    };
+    const brows = {
+      content: 'M37 29 q9 -5 18 0 M65 29 q9 -5 18 0',
+      reflechit: 'M37 27 q9 -6 18 -1 M65 31 q9 -1 18 0',
+      bravo: 'M37 26 q9 -7 18 0 M65 26 q9 -7 18 0',
+      oups: 'M37 27 q9 3 18 6 M65 33 q9 -3 18 -6'
+    };
+    const mouths = {
+      content: { mouth: 'M47 64 Q60 76 73 64 Z', fill: '#7A2E3E', teeth: 'M49 65 Q60 69 71 65 L70 67.5 Q60 71 50 67.5 Z' },
+      reflechit: { mouth: 'M52 68 Q58 66 68 69', fill: 'none', teeth: '' },
+      bravo: { mouth: 'M44 62 Q60 82 76 62 Z', fill: '#7A2E3E', teeth: 'M46 63 Q60 68 74 63 L73 66.5 Q60 71 47 66.5 Z' },
+      oups: { mouth: 'M48 70 q4 -4 8 0 q4 4 8 0 q4 -4 8 0', fill: 'none', teeth: '' }
+    };
+    const look = mood === 'reflechit' ? 3 : 1;
+    const p = poses[mood] || poses.content;
+    const m = mouths[mood] || mouths.content;
+    const labels = { content: 'Memo, la mascotte échiquier, sourit', reflechit: 'Memo, la mascotte échiquier, réfléchit', bravo: 'Memo, la mascotte échiquier, est ravie', oups: 'Memo, la mascotte échiquier, est embêtée' };
+    return {
+      size, frame, frameShade, limb: '#3B2A20',
+      armL: p.armL, armR: p.armR, handL: p.handL, handR: p.handR,
+      brows: brows[mood] || brows.content,
+      eyesOpen: mood !== 'bravo', eyesHappy: mood === 'bravo',
+      pupilL: 46 + look, pupilR: 74 + look, pupilY: mood === 'reflechit' ? 41 : 45,
+      shineL: 47.5 + look, shineR: 75.5 + look, shineY: mood === 'reflechit' ? 39.5 : 43.5,
+      mouth: m.mouth, mouthFill: m.fill, teeth: !!m.teeth, teethPath: m.teeth || 'M0 0',
+      sweat: mood === 'oups', sparkle: mood === 'bravo',
+      label: labels[mood] || labels.content,
+      wrapStyle: 'width: ' + size + 'px; height: ' + size + 'px; flex: none' +
+        (this.props.badge ? '; border-radius: 50%; background: radial-gradient(circle at 50% 40%, #FFF6DD 0, #FFE3A3 100%)' : '')
+    };
+  }
+}
+</script>
+</body>
+</html>

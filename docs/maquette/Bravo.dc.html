@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Fin de séance</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F0D16}
+a{color:#7EE2A2}a:hover{color:#B5F2C9}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.icf{fill:currentColor;stroke:none}
+@keyframes fall{0%{transform:translateY(-40px) rotate(0);opacity:1}100%{transform:translateY(860px) rotate(540deg);opacity:.9}}
+@keyframes bounce{0%{transform:scale(.3)}60%{transform:scale(1.12)}80%{transform:scale(.95)}100%{transform:scale(1)}}
+@keyframes rise{0%{transform:translateY(18px);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes flicker{0%,100%{transform:scale(1) rotate(-3deg)}50%{transform:scale(1.14) rotate(4deg)}}
+.conf{position:absolute;top:0;width:9px;height:14px;border-radius:2px;animation:fall 3.2s linear infinite}
+.bounce{animation:bounce .7s ease-out both}
+.rise1{animation:rise .4s .3s ease-out both}
+.rise2{animation:rise .4s .45s ease-out both}
+.rise3{animation:rise .4s .6s ease-out both}
+.flicker{animation:flicker .9s ease-in-out infinite;transform-origin:50% 90%}
+@media (prefers-reduced-motion:reduce){.conf,.bounce,.rise1,.rise2,.rise3,.flicker{animation:none}.conf{display:none}}
+.btn{background-image:linear-gradient(180deg,rgba(255,255,255,.24) 0,rgba(255,255,255,.07) 48%,rgba(0,0,0,0) 52%,rgba(0,0,0,.1) 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 10px 18px -6px rgba(0,0,0,.6);transition:transform .08s ease,filter .15s;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(3px)}
+.btn-cta{position:relative;overflow:hidden;text-transform:uppercase;letter-spacing:.8px;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.btn-cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(255,255,255,0));animation:shine 3.4s ease-in-out infinite}
+@keyframes shine{0%,62%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){.btn-cta::after{animation:none;display:none}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; background: #14121C; color: #FFFFFF; font-family: Fredoka, Nunito, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden; padding: 40px 20px 26px; gap: 18px">
+  <div aria-hidden="true" style="position: absolute; inset: 0; pointer-events: none">
+    <span class="conf" style="left: 30px; background: #FFC94A; animation-delay: 0s"></span>
+    <span class="conf" style="left: 80px; background: #3DDC84; animation-delay: .8s"></span>
+    <span class="conf" style="left: 130px; background: #6FB2EE; animation-delay: 1.6s"></span>
+    <span class="conf" style="left: 185px; background: #FF9B3D; animation-delay: .4s"></span>
+    <span class="conf" style="left: 240px; background: #FFC94A; animation-delay: 2.2s"></span>
+    <span class="conf" style="left: 290px; background: #E8664F; animation-delay: 1.2s"></span>
+    <span class="conf" style="left: 340px; background: #3DDC84; animation-delay: 2.6s"></span>
+    <span class="conf" style="left: 360px; background: #6FB2EE; animation-delay: .2s"></span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 10px">
+    <div style="position: relative; width: 150px; height: 150px; display: flex; align-items: center; justify-content: center">
+      <span style="position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, rgba(247,201,72,.35) 0, rgba(247,201,72,0) 70%)"></span>
+      <span class="bounce" style="position: relative; width: 112px; height: 112px; border-radius: 50%; border: 5px solid #FFC94A; box-sizing: border-box; overflow: hidden; box-shadow: 0 6px 0 #B88A1A">
+        <dc-import name="Mascotte" size="102" mood="bravo" badge="{{ true }}" hint-size="102px,102px"></dc-import>
+      </span>
+      <span class="bounce" style="position: absolute; right: 8px; bottom: 14px; width: 44px; height: 44px; border-radius: 50%; background: #FFC94A; border: 3px solid #14121C; display: flex; align-items: center; justify-content: center; color: #4A3608">
+        <svg width="24" height="24" viewBox="0 0 24 24" class="icf" aria-hidden="true"><path d="M8 3h8v6a4 4 0 0 1-8 0zM5 4h3v2.5A2.5 2.5 0 0 1 5.5 9 2.5 2.5 0 0 1 3 6.5V4zm14 0h2v2.5A2.5 2.5 0 0 1 18.5 9 2.5 2.5 0 0 1 16 6.5V4zM11 13h2v4h3v3H8v-3h3z"/></svg>
+      </span>
+    </div>
+    <h1 style="margin: 0; font-size: 30px; font-weight: 900; color: #FFC94A">Séance terminée !</h1>
+    <p style="margin: 0; font-size: 16px; font-weight: 700; color: #B8B4C8">Votre Italienne progresse.</p>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+    <div class="rise1" style="border: 2px solid #FFC94A; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; align-items: center">
+      <span style="align-self: stretch; text-align: center; background: #FFC94A; color: #3A2A05; font-size: 12px; font-weight: 900; text-transform: uppercase; padding: 4px">XP</span>
+      <span style="font-size: 24px; font-weight: 900; padding: 10px 0; color: #FFC94A">+120</span>
+    </div>
+    <div class="rise2" style="border: 2px solid #3DDC84; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; align-items: center">
+      <span style="align-self: stretch; text-align: center; background: #3DDC84; color: #08331A; font-size: 12px; font-weight: 900; text-transform: uppercase; padding: 4px">Précision</span>
+      <span style="font-size: 24px; font-weight: 900; padding: 10px 0; color: #8EF0B4">92 %</span>
+    </div>
+    <div class="rise3" style="border: 2px solid #6FB2EE; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; align-items: center">
+      <span style="align-self: stretch; text-align: center; background: #6FB2EE; color: #0B2740; font-size: 12px; font-weight: 900; text-transform: uppercase; padding: 4px">Combo</span>
+      <span style="font-size: 24px; font-weight: 900; padding: 10px 0; color: #9CC8F0">x7</span>
+    </div>
+  </div>
+
+  <div style="background: #221F2E; border-radius: 18px; padding: 14px 16px; display: flex; align-items: center; gap: 14px">
+    <svg width="44" height="44" viewBox="0 0 24 24" class="icf flicker" style="color: #FF9B3D" aria-hidden="true"><path d="M12.5 2c.6 3.6 5.5 5.6 5.5 11a6 6 0 0 1-12 0c0-2.6 1.3-4.4 2.6-5.4.1 2 1.1 3.3 2.4 3.6-.6-3.3.1-6.6 1.5-9.2z"/></svg>
+    <div style="display: flex; flex-direction: column">
+      <span style="font-size: 22px; font-weight: 900; color: #FFB054">13 jours de suite</span>
+      <span style="font-size: 14px; font-weight: 700; color: #B8B4C8">Revenez demain pour garder votre série.</span>
+    </div>
+  </div>
+
+  <div style="background: #221F2E; border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 800">
+      <span>Positions maîtrisées</span><span style="color: #7EE2A2">+4</span>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 800">
+      <span>À revoir demain</span><span style="color: #FFB4A5">2</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 6px; padding-top: 4px">
+      <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 800; color: #B8B4C8">
+        <span>Ligue Argent · 4e</span><span>Top 10 = promotion</span>
+      </div>
+      <div style="height: 12px; border-radius: 999px; background: #2E2A3D; overflow: hidden">
+        <div style="width: 72%; height: 100%; border-radius: 999px; background: #C9D1D9"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="flex: 1"></div>
+  <a class="btn btn-cta" href="Main.dc.html" style="display: block; text-align: center; text-decoration: none; background-color: {{accent}}; border-bottom: 5px solid #11703A; border-radius: 14px; padding: 14px; color: #FFFFFF; font-size: 20px; font-weight: 900">Continuer</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1A9E4B","options":["#1A9E4B","#7C4DFF","#FF7A1A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { accent: this.props.accent ?? '#1A9E4B' };
+  }
+}
+</script>
+</body>
+</html>

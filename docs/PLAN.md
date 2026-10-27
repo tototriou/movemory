@@ -54,10 +54,19 @@ puis **Solution** (flèche du bon coup). Un mauvais coup est annulé avec animat
 Streak quotidien, XP, ligues hebdomadaires (classement entre amis, sans jeu entre eux), badges
 (« Italienne maîtrisée »), notifications de rappel, objectif quotidien réglable.
 
-## 5. Modèle économique (à discuter)
+## 5. Modèle économique : freemium (après le MVP)
 
-Freemium : 1 ouverture par couleur + révision quotidienne gratuites ; abonnement pour répertoire illimité,
-import de parties, analyse par moteur, statistiques.
+Le code est open source (GPL-3) ; on vend le **service**, pas le code : comptes et synchro, contenu pédagogique, confort.
+
+| Gratuit | Premium (abonnement) |
+|---|---|
+| Révision du jour | Répertoire illimité |
+| 1 ouverture par couleur | Toutes les ouvertures et leurs explications |
+| Profondeur jusqu'à 5 coups | Profondeur 7-10+ coups |
+| Import des 10 dernières parties Chess.com | Import et analyse illimités |
+| — | Statistiques détaillées, synchro multi-appareils, tenues/accessoires pour Memo |
+
+Le contenu pédagogique (explications des coups) peut avoir sa propre licence, distincte de celle du code.
 
 ## 6. Feuille de route
 
@@ -67,12 +76,11 @@ import de parties, analyse par moteur, statistiques.
 | 1. MVP jouable | Maquette validée, échiquier tactile (drag & drop), révision du jour, choix des ouvertures, sauvegarde locale | à faire |
 | 2. Comptes | Supabase (auth, synchro des révisions), streak, XP | à faire |
 | 3. Import de parties | Chess.com, écarts au répertoire | à faire |
-| 4. Moteur | Erreurs d'ouverture via Stockfish, problèmes tactiques par ouverture | à faire |
+| 4. Moteur | Stockfish sur l'appareil (WASM web + natif mobile), erreurs d'ouverture des parties importées | à faire |
 | 5. Lancement | Notifications, onboarding, stores (EAS), abonnement | à faire |
 
 ## 7. Questions ouvertes
 
 - Nom définitif de l'app (« Gambit » est un nom de code).
-- Code source ouvert ou fermé ? (impact sur les bibliothèques GPL, voir MOTEURS.md)
 - Mode hors-ligne complet dès le MVP ?
 - Contenu pédagogique (explications des coups) : écrit à la main, généré, ou les deux ?

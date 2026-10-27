@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Bon coup</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&amp;family=Nunito:wght@600;700;800;900&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F0D16}
+a{color:#7EE2A2}a:hover{color:#B5F2C9}
+.ic{fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.icf{fill:currentColor;stroke:none}
+@keyframes up{0%{transform:translateY(100%)}100%{transform:translateY(0)}}
+@keyframes floatxp{0%{transform:translateY(10px);opacity:0}20%{opacity:1}100%{transform:translateY(-46px);opacity:0}}
+@keyframes combo{0%{transform:scale(1)}40%{transform:scale(1.5)}100%{transform:scale(1)}}
+@keyframes spark{0%{transform:scale(0);opacity:1}100%{transform:scale(1.6);opacity:0}}
+.up{animation:up .4s cubic-bezier(.2,.9,.3,1.2) both}
+.floatxp{animation:floatxp 1.8s ease-out infinite}
+.combo{animation:combo .6s ease-out .3s both}
+.spark{animation:spark 1.4s ease-out infinite}
+@media (prefers-reduced-motion:reduce){.up,.floatxp,.combo,.spark{animation:none}}
+.btn{background-image:linear-gradient(180deg,rgba(255,255,255,.24) 0,rgba(255,255,255,.07) 48%,rgba(0,0,0,0) 52%,rgba(0,0,0,.1) 100%);box-shadow:inset 0 2px 0 rgba(255,255,255,.3),0 10px 18px -6px rgba(0,0,0,.6);transition:transform .08s ease,filter .15s;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.btn:active{transform:translateY(3px)}
+.btn-cta{position:relative;overflow:hidden;text-transform:uppercase;letter-spacing:.8px;text-shadow:0 2px 0 rgba(0,0,0,.3)}
+.btn-cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(100deg,rgba(255,255,255,0),rgba(255,255,255,.35),rgba(255,255,255,0));animation:shine 3.4s ease-in-out infinite}
+@keyframes shine{0%,62%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){.btn-cta::after{animation:none;display:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; background: #14121C; color: #FFFFFF; font-family: Fredoka, Nunito, system-ui, sans-serif; display: flex; flex-direction: column; overflow: hidden">
+
+  <header style="display: flex; align-items: center; gap: 12px; padding: 18px 16px 8px">
+    <a href="Main.dc.html" aria-label="Quitter la séance" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #B8B4C8">
+      <svg width="26" height="26" viewBox="0 0 24 24" class="ic" style="stroke-width: 2.8" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </a>
+    <div role="progressbar" aria-label="Progression de la séance" aria-valuenow="7" aria-valuemin="0" aria-valuemax="12" style="flex: 1; height: 16px; border-radius: 999px; background: #2E2A3D; overflow: hidden">
+      <div style="width: 58%; height: 100%; border-radius: 999px; background: {{accent}}; box-shadow: inset 0 -5px 0 rgba(0,0,0,.18), inset 0 4px 0 rgba(255,255,255,.22)"></div>
+    </div>
+    <span class="combo" style="display: flex; align-items: center; gap: 3px; font-weight: 900; font-size: 16px; color: #FFC94A">
+      <svg width="20" height="20" viewBox="0 0 24 24" class="icf" aria-hidden="true"><path d="M13.5 2 4 14h7l-1.5 8L19 10h-7z"/></svg>x4
+    </span>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 6px 16px 0">
+    <div style="display: flex; flex-direction: column">
+      <span style="font-size: 13px; font-weight: 800; color: #B8B4C8; text-transform: uppercase; letter-spacing: 1px">Révision · Blancs</span>
+      <span style="font-size: 19px; font-weight: 900">Partie italienne – Giuoco Piano</span>
+    </div>
+    <div style="position: relative; display: flex; justify-content: center; border-radius: 8px; box-shadow: 0 6px 0 #0A0910">
+      <dc-import name="Board" fen="r1bqk1nr/pppp1ppp/2n5/2b1p3/2B1P3/2P2N2/PP1P1PPP/RNBQK2R b KQkq - 0 4" size="{{boardSize}}" marks="{{marks}}" arrow="{{arrow}}" label="Vous avez joué 4.c3 ; la flèche bleue montre l'idée suivante, d4" hint-size="358px,358px"></dc-import>
+      <span class="spark" aria-hidden="true" style="position: absolute; left: 90px; top: 224px; width: 44px; height: 44px; border-radius: 50%; border: 4px solid #FFC94A; box-sizing: border-box; pointer-events: none"></span>
+      <span class="floatxp" aria-hidden="true" style="position: absolute; left: 84px; top: 196px; font-size: 22px; font-weight: 900; color: #FFC94A; text-shadow: 0 2px 0 #6B4E0A">+10 XP</span>
+    </div>
+  </main>
+
+  <section class="up" aria-live="polite" style="position: relative; background: #221F2E; border-top: 3px solid #3DDC84; border-radius: 22px 22px 0 0; padding: 18px 18px 26px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <span style="width: 36px; height: 36px; border-radius: 50%; background: #3DDC84; display: flex; align-items: center; justify-content: center; color: #08331A">
+        <svg width="20" height="20" viewBox="0 0 24 24" class="ic" style="stroke-width: 3.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+      </span>
+      <span style="font-size: 21px; font-weight: 900; color: #FFFFFF">Excellent ! 4.c3</span>
+    </div>
+    <span class="pop" style="position: absolute; right: 14px; top: -74px">
+      <dc-import name="Mascotte" size="88" mood="bravo" hint-size="88px,88px"></dc-import>
+    </span>
+
+    <p style="margin: 0; font-size: 16px; font-weight: 700; line-height: 1.4; color: #FFFFFF"><b>Memo :</b> le pion c3 prépare <b>d4</b> : les Blancs vont bâtir un grand centre et chasser le fou c5.</p>
+    <p style="margin: 0; font-size: 14px; font-weight: 700; line-height: 1.4; color: #B8B4C8">À retenir : dans la Giuoco Piano, c3 puis d4 est le plan principal.</p>
+    <a class="btn btn-cta" href="Erreur.dc.html" style="display: block; text-align: center; text-decoration: none; background-color: {{accent}}; border-bottom: 5px solid #11703A; border-radius: 14px; padding: 13px; color: #FFFFFF; font-size: 18px; font-weight: 900; margin-top: 4px">Continuer</a>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#1A9E4B","options":["#1A9E4B","#7C4DFF","#FF7A1A"]},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      accent: this.props.accent ?? '#1A9E4B',
+      boardSize: 358,
+      marks: [{ sq: 'c2', type: 'good' }, { sq: 'c3', type: 'good' }],
+      arrow: { from: 'd2', to: 'd4', color: '#3E86C8' }
+    };
+  }
+}
+</script>
+</body>
+</html>
