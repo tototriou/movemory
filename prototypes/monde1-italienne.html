@@ -1,0 +1,613 @@
+<title>Movemory Monde 1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap">
+<style>
+/* Écran de jeu mobile d'abord : une colonne de 480px max, carte du monde puis séance plein écran. Thème sombre assumé. */
+:root {
+  --bg: #14121C; --bg-2: #0F0D16; --surface: #221F2E; --surface-2: #2E2A3D; --line: #3E3952;
+  --fg: #FFFFFF; --muted: #B8B4C8;
+  --accent: #1A9E4B; --accent-edge: #11703A; --gold: #FFC94A; --gold-edge: #B88A1A;
+  --good: #3DDC84; --bad: #F0605D; --hint: #8FD3FF;
+  --sq-light: #F2E8D5; --sq-dark: #6D8FB3;
+  --world-a: #8A4A2A; --world-b: #7A3F22;
+  --display: "Fredoka", "Nunito", system-ui, sans-serif;
+  --body: "Nunito", system-ui, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; -webkit-tap-highlight-color: transparent; }
+button { font: inherit; color: inherit; }
+.app { max-width: 480px; margin: 0 auto; min-height: 100%; position: relative; overflow-x: clip; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+/* Boutons de jeu */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 16px; padding: 14px 18px; font-family: var(--display); font-weight: 600; font-size: 18px; cursor: pointer; background-color: var(--surface-2); border-bottom: 5px solid #0A0910; background-image: linear-gradient(180deg, rgba(255,255,255,.22), rgba(255,255,255,.05) 50%, rgba(0,0,0,0) 52%, rgba(0,0,0,.08)); box-shadow: inset 0 2px 0 rgba(255,255,255,.25), 0 10px 18px -8px rgba(0,0,0,.6); transition: transform .08s, filter .15s; }
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(3px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-cta { background-color: var(--accent); border-bottom-color: var(--accent-edge); text-transform: uppercase; letter-spacing: .8px; text-shadow: 0 2px 0 rgba(0,0,0,.3); }
+.btn-gold { background-color: var(--gold); border-bottom-color: var(--gold-edge); color: #3A2A05; }
+.btn-ghost { background: transparent; border: 2px solid var(--line); border-bottom-width: 5px; box-shadow: none; }
+
+/* ---------- Carte du monde ---------- */
+.map { position: relative; height: 100vh; height: 100dvh; min-height: 620px; display: flex; flex-direction: column; overflow: hidden; }
+.map-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.map-bg::before { content: ""; position: absolute; left: -60%; top: -40%; width: 220%; height: 180%; background: conic-gradient(var(--world-a) 25%, var(--world-b) 0 50%, var(--world-a) 0 75%, var(--world-b) 0); background-size: 112px 112px; transform: scaleY(.58) rotate(45deg); }
+.map-bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(90% 60% at 50% 50%, rgba(0,0,0,0) 40%, rgba(20,8,4,.6) 100%); }
+.hud { position: relative; z-index: 2; margin: 0 10px; padding: 12px 12px 10px; padding-left: max(12px, env(safe-area-inset-left, 0px)); padding-right: max(12px, env(safe-area-inset-right, 0px)); background: rgba(15,13,22,.9); border-radius: 0 0 22px 22px; display: grid; gap: 10px; }
+.hud-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.brand { font-family: var(--display); font-weight: 700; font-size: 20px; }
+.chip { display: inline-flex; align-items: center; gap: 4px; font-family: var(--display); font-weight: 600; font-size: 16px; }
+.world-title { font-family: var(--display); font-weight: 600; font-size: 15px; color: var(--muted); }
+.bar { height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.bar > span { display: block; height: 100%; border-radius: 999px; background: var(--gold); transition: width .5s; }
+.bar-row { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; color: var(--muted); }
+.bar-row .bar { flex: 1; }
+.path { position: relative; z-index: 1; flex: 1; min-height: 0; }
+.tile { position: absolute; width: 110px; height: 90px; border: 0; padding: 0; background: none; cursor: pointer; }
+.tile svg { position: absolute; inset: 0; }
+.tile:disabled { cursor: default; }
+.tile .num { position: absolute; left: 0; right: 0; top: 18px; text-align: center; font-family: var(--display); font-weight: 700; font-size: 24px; text-shadow: 0 3px 0 rgba(0,0,0,.35); }
+.tile-label { position: absolute; z-index: 3; transform: translateX(-50%); white-space: nowrap; font-size: 12px; font-weight: 800; background: rgba(15,13,22,.85); border-radius: 8px; padding: 2px 8px; pointer-events: none; }
+.tile-label.punish { color: #FFB4A5; }
+.tile.current .ring { position: absolute; left: 50%; top: 36px; width: 104px; height: 60px; margin: -30px 0 0 -52px; border-radius: 50%; border: 4px solid var(--gold); animation: ring 1.6s ease-out infinite; }
+@keyframes ring { from { transform: scale(.9); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
+.memo-token { position: absolute; z-index: 4; width: 84px; height: 84px; pointer-events: none; animation: bob 1.5s ease-in-out infinite; }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.map-foot { position: relative; z-index: 5; display: grid; gap: 10px; justify-items: center; padding: 16px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)); background: linear-gradient(rgba(20,18,28,0), rgba(20,18,28,.92) 35%, var(--bg) 70%); }
+.play { width: 92px; height: 92px; border-radius: 50%; padding: 0; font-size: 0; }
+.play-wrap { position: relative; display: grid; place-items: center; width: 108px; height: 108px; border-radius: 50%; }
+.play-label { font-family: var(--display); font-weight: 600; font-size: 15px; background: #fff; color: #14121C; border-radius: 999px; padding: 5px 14px; box-shadow: 0 4px 0 #C9C3B8; }
+.test-row { display: flex; align-items: center; gap: 12px; font-size: 13px; color: var(--muted); font-weight: 700; flex-wrap: wrap; justify-content: center; }
+.test-row label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.link-btn { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font-weight: 700; font-size: 13px; padding: 6px; }
+
+/* ---------- Séance ---------- */
+.session { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 20px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.s-top { display: flex; align-items: center; gap: 12px; }
+.icon-btn { width: 44px; height: 44px; border-radius: 12px; border: 0; background: transparent; color: var(--muted); display: grid; place-items: center; cursor: pointer; }
+.s-top .bar { flex: 1; height: 16px; }
+.s-top .bar > span { background: var(--accent); box-shadow: inset 0 -5px 0 rgba(0,0,0,.18), inset 0 4px 0 rgba(255,255,255,.22); }
+.combo { font-family: var(--display); font-weight: 700; color: var(--gold); min-width: 40px; text-align: right; }
+.combo.bump { animation: bump .5s; }
+@keyframes bump { 40% { transform: scale(1.5); } }
+.s-title { display: flex; justify-content: space-between; align-items: flex-end; gap: 8px; }
+.eyebrow { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+.s-name { font-family: var(--display); font-weight: 600; font-size: 20px; }
+.pill { background: var(--surface-2); border-radius: 10px; padding: 5px 10px; font-size: 13px; font-weight: 800; white-space: nowrap; }
+.pill.punish { background: #4A2430; color: #FFB4A5; }
+.coach { display: flex; gap: 8px; align-items: flex-start; min-height: 86px; }
+.coach .memo { flex: none; width: 70px; height: 70px; margin-top: -4px; }
+.bubble { flex: 1; min-width: 0; background: var(--surface); border-radius: 4px 16px 16px 16px; padding: 10px 14px; animation: pop .35s ease-out both; }
+.bubble b.who { display: block; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: #7EE2A2; }
+.bubble p { margin: 2px 0 0; line-height: 1.4; font-weight: 700; }
+@keyframes pop { from { transform: scale(.92); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.board-wrap { position: relative; width: 100%; max-width: 420px; aspect-ratio: 1; margin: 0 auto; border-radius: 8px; overflow: hidden; box-shadow: 0 6px 0 #0A0910; touch-action: none; user-select: none; -webkit-user-select: none; }
+.board-wrap.shake { animation: shake .4s; }
+@keyframes shake { 20% { transform: translateX(-8px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(3px); } }
+.squares { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(8, 1fr); grid-template-rows: repeat(8, 1fr); }
+.sq { position: relative; }
+.sq.l { background: var(--sq-light); } .sq.d { background: var(--sq-dark); }
+.sq.last.l { background: #F3E08A; } .sq.last.d { background: #C7A94A; }
+.sq.sel.l, .sq.sel.d { background: #F6D365; }
+.sq.hint::after { content: ""; position: absolute; inset: 6%; border-radius: 50%; border: 4px solid var(--hint); animation: pulse 1.2s ease-in-out infinite; }
+@keyframes pulse { 50% { transform: scale(.85); opacity: .6; } }
+.sq.dot::before { content: ""; position: absolute; left: 50%; top: 50%; width: 28%; height: 28%; margin: -14% 0 0 -14%; border-radius: 50%; background: rgba(20,18,28,.28); }
+.sq.cap::before { content: ""; position: absolute; inset: 4%; border-radius: 50%; border: 5px solid rgba(20,18,28,.28); }
+.coord { position: absolute; font-size: 10px; font-weight: 800; font-family: var(--display); }
+.coord.r { left: 3px; top: 1px; } .coord.f { right: 3px; bottom: 0; }
+.sq.l .coord { color: #56769A; } .sq.d .coord { color: var(--sq-light); }
+.pieces { position: absolute; inset: 0; pointer-events: none; }
+.pc { position: absolute; width: 12.5%; height: 12.5%; display: grid; place-items: center; font-family: "DejaVu Sans", "Segoe UI Symbol", "Noto Sans Symbols 2", sans-serif; line-height: 1; transition: transform .22s ease; will-change: transform; }
+.pc.w { color: #fff; text-shadow: 0 0 1.5px #1A1A1A, 0 0 1.5px #1A1A1A, 0 2px 1px rgba(0,0,0,.35); }
+.pc.b { color: #2A2725; text-shadow: 0 0 1px rgba(255,255,255,.3), 0 2px 1px rgba(0,0,0,.3); }
+.pc.drag { transition: none; z-index: 5; }
+.arrows { position: absolute; inset: 0; pointer-events: none; }
+.moves { display: flex; flex-wrap: wrap; gap: 4px 8px; font-weight: 800; font-size: 14px; color: var(--muted); min-height: 20px; }
+.moves .cur { color: var(--fg); background: var(--surface-2); border-radius: 6px; padding: 0 6px; }
+.s-actions { display: flex; gap: 10px; margin-top: auto; }
+.s-actions .btn { flex: 1; }
+
+.sheet { position: fixed; left: 50%; bottom: 0; z-index: 20; width: 100%; max-width: 480px; transform: translateX(-50%); background: var(--surface); border-top: 4px solid var(--good); border-radius: 22px 22px 0 0; padding: 18px 18px 22px; padding-left: max(18px, env(safe-area-inset-left, 0px)); padding-right: max(18px, env(safe-area-inset-right, 0px)); padding-bottom: max(22px, env(safe-area-inset-bottom, 0px)); display: grid; gap: 10px; box-shadow: 0 -12px 30px rgba(0,0,0,.45); animation: up .35s cubic-bezier(.2,.9,.3,1.15) both; }
+.sheet.bad { border-top-color: var(--bad); }
+@keyframes up { from { transform: translate(-50%, 100%); } to { transform: translate(-50%, 0); } }
+.sheet-head { display: flex; align-items: center; gap: 10px; }
+.badge { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none; background: var(--good); color: #08331A; }
+.sheet.bad .badge { background: var(--bad); color: #fff; }
+.sheet h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 21px; }
+.sheet p { margin: 0; line-height: 1.45; font-weight: 700; }
+.sheet .note { color: var(--muted); font-size: 14px; }
+.sheet .memo { position: absolute; right: 12px; top: -78px; width: 90px; height: 90px; }
+.sheet .row { display: flex; gap: 10px; }
+.sheet .row .btn { flex: 1; }
+.xp-float { position: absolute; z-index: 6; font-family: var(--display); font-weight: 700; font-size: 22px; color: var(--gold); text-shadow: 0 2px 0 #6B4E0A; pointer-events: none; animation: xp 1.4s ease-out forwards; }
+@keyframes xp { from { transform: translateY(8px); opacity: 0; } 20% { opacity: 1; } to { transform: translateY(-50px); opacity: 0; } }
+
+/* ---------- Fin ---------- */
+.end { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; gap: 18px; padding: 40px 20px 24px; padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); text-align: center; }
+.end .memo { width: 140px; height: 140px; animation: pop .6s both; }
+.end h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: 30px; color: var(--gold); text-wrap: balance; }
+.end p { margin: 0; color: var(--muted); font-weight: 700; max-width: 34ch; line-height: 1.45; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; }
+.stat { border: 2px solid var(--line); border-radius: 16px; overflow: hidden; }
+.stat span { display: block; padding: 4px; font-size: 12px; font-weight: 800; text-transform: uppercase; background: var(--surface-2); color: var(--muted); }
+.stat b { display: block; padding: 10px 0; font-family: var(--display); font-size: 24px; }
+.mastery { width: 100%; background: var(--surface); border-radius: 18px; padding: 14px; display: grid; gap: 8px; text-align: left; }
+.m-row { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 14px; }
+.m-row .name { flex: 1; min-width: 0; }
+.pips { display: flex; gap: 4px; }
+.pips i { width: 14px; height: 14px; border-radius: 4px; background: var(--surface-2); }
+.pips i.on { background: var(--gold); }
+.end .btn { width: 100%; margin-top: auto; }
+.conf { position: absolute; top: -20px; width: 9px; height: 14px; border-radius: 2px; animation: fall 3s linear infinite; pointer-events: none; }
+@keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+
+<div class="app" id="app">
+  <section class="map" id="screen-map" aria-label="Carte du monde 1">
+    <div class="map-bg"></div>
+    <header class="hud">
+      <div class="hud-top">
+        <span class="brand">Movemory</span>
+        <span class="chip" style="color:#FFB054" title="Série de jours">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.5 2c.6 3.6 5.5 5.6 5.5 11a6 6 0 0 1-12 0c0-2.6 1.3-4.4 2.6-5.4.1 2 1.1 3.3 2.4 3.6-.6-3.3.1-6.6 1.5-9.2z"/></svg><span id="streak">1</span>
+        </span>
+        <span class="chip" style="color:var(--gold)" title="Points d'expérience">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 2 4 14h7l-1.5 8L19 10h-7z"/></svg><span id="xp">0</span> XP
+        </span>
+        <span class="chip" style="color:#8FD3FF" title="Gemmes">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 3h12l4 6-10 12L2 9z"/></svg><span id="gems">0</span>
+        </span>
+      </div>
+      <div class="world-title">Monde 1 · Partie italienne · 3 coups contre 6 lignes</div>
+      <div class="bar-row"><div class="bar"><span id="world-bar" style="width:0%"></span></div><span id="world-count">0/7</span></div>
+    </header>
+    <div class="path" id="path"></div>
+    <footer class="map-foot">
+      <span class="play-label" id="play-label">Commencer</span>
+      <div class="play-wrap" id="play-ring">
+        <button class="btn btn-cta play" id="play" aria-label="Jouer la prochaine étape">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+        </button>
+      </div>
+      <div class="test-row">
+        <label><input type="checkbox" id="unlock"> Mode test : tout débloquer</label>
+        <button class="link-btn" id="reset">Remettre à zéro</button>
+      </div>
+    </footer>
+  </section>
+
+  <section class="session" id="screen-session" hidden aria-label="Séance">
+    <div class="s-top">
+      <button class="icon-btn" id="quit" aria-label="Quitter la séance"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <div class="bar" role="progressbar" aria-label="Progression de la séance"><span id="s-bar" style="width:0%"></span></div>
+      <span class="combo" id="combo" aria-label="Combo">x0</span>
+    </div>
+    <div class="s-title">
+      <div><div class="eyebrow" id="s-eyebrow">Monde 1 · Blancs</div><div class="s-name" id="s-name">Partie italienne</div></div>
+      <span class="pill" id="s-pill">Coup 1</span>
+    </div>
+    <div class="coach">
+      <div class="memo" id="coach-memo"></div>
+      <div class="bubble" id="bubble"><b class="who">Memo</b><p id="bubble-text"></p></div>
+    </div>
+    <div class="board-wrap" id="board">
+      <div class="squares" id="squares"></div>
+      <svg class="arrows" id="arrows" viewBox="0 0 800 800" aria-hidden="true"></svg>
+      <div class="pieces" id="pieces"></div>
+    </div>
+    <div class="moves" id="moves" aria-label="Coups joués"></div>
+    <div class="s-actions">
+      <button class="btn" id="btn-hint"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg>Indice</button>
+      <button class="btn" id="btn-solution"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--hint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Solution</button>
+    </div>
+  </section>
+
+  <section class="end" id="screen-end" hidden aria-label="Fin de séance"></section>
+</div>
+<div id="sheet-host"></div>
+
+<script type="module">
+import { Chess } from 'https://cdn.jsdelivr.net/npm/chess.js@1.4.0/+esm';
+
+const CONTENT = {"id": "italienne", "nom": "Partie italienne", "eco": "C50", "camp": "w", "licence": "CC BY-SA 4.0 — lignes et idées adaptées de Wikibooks, Chess Opening Theory (https://en.wikibooks.org/wiki/Chess_Opening_Theory/1._e4/1...e5/2._Nf3/2...Nc6/3._Bc4), textes réécrits pour Movemory.", "tronc": [{"san": "e4", "pourquoi": "On prend le centre avec un pion et on ouvre la route au fou f1 et à la dame.", "principes": ["centre", "developpement"]}, {"san": "e5", "pourquoi": "Les Noirs répondent pareil : ils prennent leur part du centre."}, {"san": "Nf3", "pourquoi": "On sort un cavalier vers le centre, et il attaque déjà le pion e5.", "principes": ["developpement"]}, {"san": "Nc6", "pourquoi": "Les Noirs défendent e5 en sortant leur cavalier."}, {"san": "Bc4", "pourquoi": "Le fou vise f7, le point faible des Noirs : seul le roi le protège. C'est ça, la Partie italienne !", "principes": ["developpement", "case-faible"]}], "lignes": [{"id": "giuoco-piano", "nom": "Giuoco Piano", "rang": 1, "coups": [{"san": "Bc5", "pourquoi": "La réponse la plus jouée : le fou noir vise à son tour f2, notre point faible."}, {"san": "c3", "pourquoi": "On prépare d4 pour bâtir un grand centre. Le fou c4 garde aussi une case de repli en b3.", "principes": ["centre"]}, {"san": "Nf6", "pourquoi": "Les Noirs développent leur cavalier et attaquent notre pion e4."}, {"san": "d3", "pourquoi": "On protège e4 tranquillement : c'est la Giuoco Pianissimo, solide et pleine de plans.", "principes": ["centre"]}, {"san": "d6", "pourquoi": "Les Noirs renforcent e5 et ouvrent la diagonale de leur fou c8."}, {"san": "O-O", "pourquoi": "On met le roi à l'abri et la tour se rapproche du centre : un réflexe à avoir dans toutes les ouvertures.", "principes": ["roi"]}]}, {"id": "deux-cavaliers", "nom": "Défense des deux cavaliers", "rang": 2, "coups": [{"san": "Nf6", "pourquoi": "Plus actif : les Noirs attaquent tout de suite notre pion e4."}, {"san": "d3", "pourquoi": "On défend e4 calmement. 4.Cg5 existe mais mène à des complications : on garde un jeu solide.", "principes": ["centre"]}, {"san": "Be7", "pourquoi": "Développement prudent : les Noirs préparent leur roque."}, {"san": "O-O", "pourquoi": "Roi à l'abri d'abord, on agira au centre ensuite.", "principes": ["roi"]}, {"san": "O-O", "pourquoi": "Les Noirs roquent aussi."}, {"san": "Re1", "pourquoi": "La tour vient soutenir e4 et prépare la poussée d4 au bon moment.", "principes": ["centre", "developpement"]}]}, {"id": "hongroise", "nom": "Défense hongroise", "rang": 3, "coups": [{"san": "Be7", "pourquoi": "Passif : le fou se contente de protéger le roi, il ne vise rien."}, {"san": "d4", "pourquoi": "Contre un coup passif, on ouvre le centre tout de suite pour profiter de notre avance de développement.", "principes": ["centre"]}, {"san": "exd4", "pourquoi": "Les Noirs échangent au centre."}, {"san": "Nxd4", "pourquoi": "On reprend avec le cavalier, qui se retrouve parfaitement centralisé.", "principes": ["centre", "developpement"]}, {"san": "Nf6", "pourquoi": "Les Noirs attaquent notre pion e4."}, {"san": "Nc3", "pourquoi": "On défend e4 en sortant une nouvelle pièce : deux principes en un seul coup.", "principes": ["developpement"]}]}, {"id": "paris", "nom": "Défense de Paris", "rang": 4, "coups": [{"san": "d6", "pourquoi": "Les Noirs soutiennent e5, mais enferment leur fou f8 : c'est passif."}, {"san": "d4", "pourquoi": "Même recette contre la passivité : on frappe au centre.", "principes": ["centre"]}, {"san": "exd4", "pourquoi": "Les Noirs lâchent le centre."}, {"san": "Nxd4", "pourquoi": "Le cavalier reprend et s'installe au centre.", "principes": ["centre", "developpement"]}, {"san": "Nf6", "pourquoi": "Les Noirs attaquent e4."}, {"san": "Nc3", "pourquoi": "On protège e4 en développant : nos pièces sortent plus vite que celles des Noirs.", "principes": ["developpement"]}]}, {"id": "anti-fried-liver", "nom": "Variante 3…h6", "rang": 5, "coups": [{"san": "h6", "pourquoi": "Les Noirs empêchent Cg5, mais perdent un temps sans développer de pièce."}, {"san": "d4", "pourquoi": "Un temps perdu par l'adversaire ? On en profite pour ouvrir le centre.", "principes": ["centre"]}, {"san": "exd4", "pourquoi": "Les Noirs échangent."}, {"san": "Nxd4", "pourquoi": "Le cavalier reprend au centre.", "principes": ["centre"]}, {"san": "Nf6", "pourquoi": "Les Noirs attaquent e4."}, {"san": "Nc3", "pourquoi": "On défend e4 en sortant une pièce : notre développement est déjà bien en avance.", "principes": ["developpement"]}]}, {"id": "blackburne-shilling", "nom": "Piège Blackburne-Shilling", "rang": 6, "aPunir": true, "coups": [{"san": "Nd4", "pourquoi": "Imprécision ! Le cavalier joue une deuxième fois et abandonne e5. C'est un piège : à vous de punir… sans tomber dedans."}, {"san": "Nxd4", "pourquoi": "On échange ce cavalier trop aventureux. Surtout pas 4.Cxe5 ?? : après 4…Dg5 les Noirs attaquent g2 et f7 en même temps !", "principes": ["piege"]}, {"san": "exd4", "pourquoi": "Les Noirs reprennent : leur pion d4 est avancé, mais loin de ses pièces."}, {"san": "O-O", "pourquoi": "On met le roi à l'abri et on prépare Te1 : nos pièces sortent pendant que les Noirs ont joué deux fois le même cavalier.", "principes": ["roi", "developpement"]}, {"san": "Nf6", "pourquoi": "Les Noirs sortent enfin une pièce et attaquent e4."}, {"san": "Re1", "pourquoi": "La tour défend e4 et prépare e5 pour chasser le cavalier f6. Grosse avance de développement : imprécision punie !", "principes": ["developpement", "centre"]}]}]};
+
+/* ---------- Mascotte Memo (échiquier à lunettes) ---------- */
+function memoSvg(mood = 'content') {
+  const poses = {
+    content: ['M21 58 Q10 64 9 76', [9, 78], 'M99 52 Q110 46 110 32', [110, 29]],
+    reflechit: ['M21 60 Q10 72 22 80 L34 76', [36, 75], 'M99 58 Q110 64 111 76', [111, 78]],
+    bravo: ['M21 50 Q8 40 10 24', [10, 21], 'M99 50 Q112 40 110 24', [110, 21]],
+    oups: ['M21 52 Q8 36 20 14 L28 10', [30, 9], 'M99 58 Q110 64 111 76', [111, 78]],
+  };
+  const brows = { content: 'M37 29 q9 -5 18 0 M65 29 q9 -5 18 0', reflechit: 'M37 27 q9 -6 18 -1 M65 31 q9 -1 18 0', bravo: 'M37 26 q9 -7 18 0 M65 26 q9 -7 18 0', oups: 'M37 27 q9 3 18 6 M65 33 q9 -3 18 -6' };
+  const mouths = {
+    content: ['M47 64 Q60 76 73 64 Z', '#7A2E3E', 'M49 65 Q60 69 71 65 L70 67.5 Q60 71 50 67.5 Z'],
+    reflechit: ['M52 68 Q58 66 68 69', 'none', ''],
+    bravo: ['M44 62 Q60 82 76 62 Z', '#7A2E3E', 'M46 63 Q60 68 74 63 L73 66.5 Q60 71 47 66.5 Z'],
+    oups: ['M48 70 q4 -4 8 0 q4 4 8 0 q4 -4 8 0', 'none', ''],
+  };
+  const [aL, hL, aR, hR] = poses[mood];
+  const [mp, mf, teeth] = mouths[mood];
+  const look = mood === 'reflechit' ? 3 : 1, py = mood === 'reflechit' ? 41 : 45;
+  const checks = [[43,16],[77,16],[26,33],[60,33],[43,50],[77,50],[26,67],[60,67]].map(([x, y]) => `<rect x="${x}" y="${y}" width="17" height="17" fill="#6D8FB3"/>`).join('');
+  const eyes = mood === 'bravo'
+    ? '<path d="M40 46 q6 -7 12 0 M68 46 q6 -7 12 0" fill="none" stroke="#1E1B2E" stroke-width="3" stroke-linecap="round"/>'
+    : `<circle cx="${46 + look}" cy="${py}" r="4.6" fill="#1E1B2E"/><circle cx="${74 + look}" cy="${py}" r="4.6" fill="#1E1B2E"/><circle cx="${47.5 + look}" cy="${py - 1.5}" r="1.5" fill="#fff"/><circle cx="${75.5 + look}" cy="${py - 1.5}" r="1.5" fill="#fff"/>`;
+  const extra = mood === 'oups' ? '<path d="M100 22 q5 8 0 11 q-5 -3 0 -11 z" fill="#8FD3FF"/>'
+    : mood === 'bravo' ? '<path d="M106 8 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2 z M12 6 l1.5 4 l4 1.5 l-4 1.5 l-1.5 4 l-1.5 -4 l-4 -1.5 l4 -1.5 z" fill="#FFC94A"/>' : '';
+  return `<svg viewBox="0 0 120 120" width="100%" height="100%" role="img" aria-label="Memo, la mascotte">
+    <ellipse cx="60" cy="116" rx="30" ry="4" fill="rgba(0,0,0,.25)"/>
+    <path d="M50 92 L48 108 M70 92 L72 108" fill="none" stroke="#3B2A20" stroke-width="5" stroke-linecap="round"/>
+    <path d="M40 106 q-1 -5 7 -5 q6 0 7 6 z M66 107 q1 -6 7 -6 q8 0 7 5 z" fill="#1A9E4B"/>
+    <path d="M40 106 h14 M66 107 h14" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="${aL}" fill="none" stroke="#3B2A20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${aR}" fill="none" stroke="#3B2A20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="20" y="12" width="80" height="82" rx="9" fill="#6C4524"/><rect x="20" y="10" width="80" height="80" rx="9" fill="#9A6233"/>
+    <rect x="26" y="16" width="68" height="68" rx="3" fill="#F2E8D5"/>${checks}
+    <circle cx="${hL[0]}" cy="${hL[1]}" r="6" fill="#fff" stroke="#C9C3D6" stroke-width="1.5"/><circle cx="${hR[0]}" cy="${hR[1]}" r="6" fill="#fff" stroke="#C9C3D6" stroke-width="1.5"/>
+    <path d="${brows[mood]}" fill="none" stroke="#3B2A20" stroke-width="4.5" stroke-linecap="round"/>
+    <circle cx="46" cy="44" r="11.5" fill="rgba(255,255,255,.9)"/><circle cx="74" cy="44" r="11.5" fill="rgba(255,255,255,.9)"/>${eyes}
+    <circle cx="46" cy="44" r="11.5" fill="none" stroke="#1E1B2E" stroke-width="3.4"/><circle cx="74" cy="44" r="11.5" fill="none" stroke="#1E1B2E" stroke-width="3.4"/>
+    <path d="M57.5 43 q2.5 -3 5 0 M34.5 42 L27 39 M85.5 42 L93 39" fill="none" stroke="#1E1B2E" stroke-width="3" stroke-linecap="round"/>
+    <ellipse cx="35" cy="62" rx="5" ry="3.2" fill="#FF8FB1" opacity=".6"/><ellipse cx="85" cy="62" rx="5" ry="3.2" fill="#FF8FB1" opacity=".6"/>
+    <path d="${mp}" fill="${mf}" stroke="#5A1E2A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>${teeth ? `<path d="${teeth}" fill="#fff"/>` : ''}
+    <path d="M52 92 l8 4 l8 -4 l0 8 l-8 -4 l-8 4 z" fill="#FFC94A" stroke="#C9951E" stroke-width="1.2" stroke-linejoin="round"/>${extra}
+  </svg>`;
+}
+
+/* ---------- Notation française ---------- */
+const FR = { K: 'R', Q: 'D', R: 'T', B: 'F', N: 'C' };
+const fr = (san) => san.replace(/^[KQRBN]/, (p) => FR[p]).replace(/=([QRBN])/, (_, p) => '=' + FR[p]);
+const label = (ply, san) => `${Math.floor(ply / 2) + 1}${ply % 2 === 0 ? '.' : '…'}${fr(san)}`;
+const fenKey = (fen) => fen.split(' ').slice(0, 4).join(' ');
+
+/* ---------- Données du monde ---------- */
+const TRONC = CONTENT.tronc;
+const LINES = CONTENT.lignes;
+const DEPTH = 3; // coups de l'utilisateur après le tronc
+
+// Toutes les positions où l'utilisateur joue, avec les coups acceptés (toutes lignes confondues).
+const CARDS = new Map();
+function cardsOf(moves, from, to) {
+  const c = new Chess(); const out = [];
+  moves.forEach((m, i) => {
+    if (c.turn() === 'w' && i >= from && i < to) {
+      const k = fenKey(c.fen());
+      if (!CARDS.has(k)) CARDS.set(k, { key: k, expected: new Map() });
+      CARDS.get(k).expected.set(m.san, m);
+      out.push(k);
+    }
+    c.move(m.san);
+  });
+  return out;
+}
+const TILES = [];
+TILES.push({ id: 'tronc', name: 'Le tronc commun', moves: TRONC, from: 0, to: TRONC.length, cards: cardsOf(TRONC, 0, TRONC.length) });
+for (const l of LINES) {
+  const moves = [...TRONC, ...l.coups];
+  TILES.push({ id: l.id, name: l.nom, punish: !!l.aPunir, moves, from: TRONC.length, to: TRONC.length + DEPTH * 2, cards: cardsOf(moves, TRONC.length, TRONC.length + DEPTH * 2) });
+}
+// Ordre sur la carte : tronc, 3 lignes, coffre, 3 lignes (dont le coup à punir), défi final
+const MAP_ORDER = ['tronc', LINES[0].id, LINES[1].id, LINES[2].id, 'coffre', LINES[3].id, LINES[4].id, LINES[5].id, 'defi'];
+const tileById = (id) => TILES.find((t) => t.id === id);
+
+/* ---------- Progression (localStorage, avec repli en mémoire) ---------- */
+const SAVE_KEY = 'movemory-monde1-v1';
+let P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: false };
+try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); if (s) P = { ...P, ...s }; } catch {}
+const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(P)); } catch {} };
+const card = (k) => (P.cards[k] ||= { seen: false, ok: 0 });
+const tileMastered = (t) => t.cards.every((k) => card(k).ok >= 2);
+function stepDone(id) {
+  if (id === 'coffre') return P.chest;
+  if (id === 'defi') return P.boss;
+  return tileMastered(tileById(id));
+}
+const currentIndex = () => { const i = MAP_ORDER.findIndex((id) => !stepDone(id)); return i === -1 ? MAP_ORDER.length - 1 : i; };
+const unlocked = (i) => P.unlock || i <= currentIndex();
+
+/* ---------- Carte ---------- */
+const $ = (id) => document.getElementById(id);
+const COORDS = [[0.30, 0.93], [0.46, 0.83], [0.62, 0.73], [0.46, 0.63], [0.30, 0.53], [0.46, 0.43], [0.62, 0.33], [0.46, 0.23], [0.50, 0.11]];
+function tileSvg(kind) {
+  const c = { done: ['#FFC94A', '#FFD976', '#C9951E', '#A87B12'], todo: ['#8B5CF6', '#A78BFA', '#6D28D9', '#5B21B6'], locked: ['#5A5470', '#6B6585', '#3E3952', '#332E47'], punish: ['#E2574C', '#F07A6F', '#A8382F', '#8E2C24'], chest: ['#A86E35', '#BE8448', '#7A4E22', '#5F3C1A'], boss: ['#3A2420', '#4A302A', '#24140F', '#1A0E0A'] }[kind];
+  return `<svg viewBox="0 0 110 90" aria-hidden="true"><polygon points="9,36 55,66 55,82 9,52" fill="${c[2]}"/><polygon points="55,66 101,36 101,52 55,82" fill="${c[3]}"/><polygon points="55,6 101,36 55,66 9,36" fill="${c[0]}"/><polygon points="55,14 89,36 55,58 21,36" fill="${c[1]}"/></svg>`;
+}
+function renderMap() {
+  const path = $('path'); const W = path.clientWidth || 380, H = path.clientHeight || 640;
+  const cur = currentIndex();
+  let html = '';
+  const order = MAP_ORDER.map((id, i) => ({ id, i })).sort((a, b) => COORDS[a.i][1] - COORDS[b.i][1]);
+  for (const { id, i } of order) {
+    const [fx, fy] = COORDS[i]; const x = fx * W - 55, y = fy * H - 46;
+    const done = stepDone(id), open = unlocked(i);
+    const t = tileById(id);
+    let kind = done ? 'done' : !open ? 'locked' : id === 'coffre' ? 'chest' : id === 'defi' ? 'boss' : t?.punish ? 'punish' : 'todo';
+    if (!done && id === 'coffre' && open) kind = 'chest';
+    let inner = '';
+    if (done) inner = '<svg style="position:absolute;left:38px;top:20px" width="34" height="26" viewBox="0 0 24 18" aria-hidden="true"><path d="M3 9l6 6L21 3" fill="none" stroke="#6B4405" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    else if (id === 'coffre') inner = '<svg style="position:absolute;left:35px;top:8px" width="40" height="36" viewBox="0 0 24 22" aria-hidden="true"><rect x="2" y="8" width="20" height="12" rx="2" fill="#8B5A2B"/><path d="M2 10V7a4 4 0 0 1 4-4h12a4 4 0 0 1 4 4v3z" fill="#A86E35"/><rect x="2" y="10" width="20" height="2.5" fill="#FFC94A"/><rect x="10" y="9" width="4" height="6" rx="1" fill="#FFC94A"/></svg>';
+    else if (id === 'defi') inner = '<svg style="position:absolute;left:35px;top:10px" width="40" height="34" viewBox="0 0 24 20" aria-hidden="true"><path d="M2 6l5 4 5-8 5 8 5-4-2 12H4z" fill="#FFC94A" stroke="#8A5E0A" stroke-width="1.2" stroke-linejoin="round"/></svg>';
+    else if (i !== cur) inner = `<span class="num">${i + 1}</span>`;
+    const name = id === 'coffre' ? 'Coffre' : id === 'defi' ? 'Défi final' : t.name;
+    html += `<button class="tile ${i === cur ? 'current' : ''}" data-step="${id}" style="left:${x}px;top:${y}px" ${open ? '' : 'disabled'} aria-label="${name}${done ? ', maîtrisé' : open ? '' : ', verrouillé'}">${i === cur ? '<span class="ring"></span>' : ''}${tileSvg(kind)}${inner}</button>`;
+  }
+  const [cx, cy] = COORDS[cur];
+  html += `<div class="memo-token" style="left:${cx * W - 42}px;top:${cy * H - 92}px">${memoSvg(stepDone(MAP_ORDER[cur]) ? 'bravo' : 'content')}</div>`;
+  path.innerHTML = html;
+  const doneCount = MAP_ORDER.filter(stepDone).length;
+  $('world-bar').style.width = `${(doneCount / MAP_ORDER.length) * 100}%`;
+  $('world-count').textContent = `${doneCount}/${MAP_ORDER.length}`;
+  $('xp').textContent = P.xp; $('gems').textContent = P.gems;
+  const curId = MAP_ORDER[cur];
+  $('play-label').textContent = P.boss ? 'Monde 1 terminé !' : curId === 'coffre' ? 'Ouvrir le coffre' : curId === 'defi' ? 'Défi final' : (tileById(curId).cards.some((k) => card(k).seen) ? 'Réviser : ' : 'Découvrir : ') + tileById(curId).name;
+  const ring = Math.round(MAP_ORDER.filter(stepDone).length / MAP_ORDER.length * 100);
+  $('play-ring').style.background = `conic-gradient(var(--gold) 0 ${ring}%, var(--surface-2) ${ring}% 100%)`;
+  $('unlock').checked = P.unlock;
+}
+$('path').addEventListener('click', (e) => { const b = e.target.closest('.tile'); if (b && !b.disabled) openStep(b.dataset.step); });
+$('play').addEventListener('click', () => openStep(MAP_ORDER[currentIndex()]));
+$('unlock').addEventListener('change', (e) => { P.unlock = e.target.checked; save(); renderMap(); });
+$('reset').addEventListener('click', () => { P = { cards: {}, xp: 0, gems: 0, chest: false, boss: false, unlock: P.unlock }; save(); renderMap(); });
+window.addEventListener('resize', () => { if (!$('screen-map').hidden) renderMap(); });
+
+function show(screen) { for (const s of ['map', 'session', 'end']) $('screen-' + s).hidden = s !== screen; closeSheet(); window.scrollTo(0, 0); if (screen === 'map') renderMap(); }
+
+function openStep(id) {
+  if (id === 'coffre') return openChest();
+  if (id === 'defi') return startSession({ boss: true });
+  startSession({ tile: tileById(id) });
+}
+
+/* ---------- Échiquier ---------- */
+const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
+const FILES = 'abcdefgh';
+let game = new Chess(); let pieceEls = new Map(); let inputEnabled = false; let onUserMove = null; let selected = null;
+const sqXY = (sq) => [FILES.indexOf(sq[0]), 8 - Number(sq[1])];
+function buildSquares() {
+  let h = '';
+  for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) {
+    const sq = FILES[f] + (8 - r);
+    h += `<div class="sq ${(r + f) % 2 ? 'd' : 'l'}" data-sq="${sq}">${f === 0 ? `<span class="coord r">${8 - r}</span>` : ''}${r === 7 ? `<span class="coord f">${FILES[f]}</span>` : ''}</div>`;
+  }
+  $('squares').innerHTML = h;
+}
+function placePiece(el, sq) { const [x, y] = sqXY(sq); el.style.transform = `translate(${x * 100}%, ${y * 100}%)`; el.dataset.sq = sq; }
+function renderPieces() {
+  const host = $('pieces'); host.innerHTML = ''; pieceEls = new Map();
+  const size = $('board').clientWidth / 8;
+  for (const row of game.board()) for (const p of row) if (p) {
+    const el = document.createElement('div'); el.className = `pc ${p.color}`; el.textContent = GLYPH[p.type] + '︎'; el.style.fontSize = `${size * 0.82}px`;
+    el.style.transition = 'none'; placePiece(el, p.square); host.appendChild(el); pieceEls.set(p.square, el);
+    requestAnimationFrame(() => (el.style.transition = ''));
+  }
+}
+function sqClass(cls, squares) { document.querySelectorAll('.sq.' + cls).forEach((s) => s.classList.remove(cls)); for (const sq of squares) document.querySelector(`.sq[data-sq="${sq}"]`)?.classList.add(cls); }
+function animate(move) {
+  const el = pieceEls.get(move.from);
+  const cap = pieceEls.get(move.flags.includes('e') ? move.to[0] + move.from[1] : move.to);
+  if (cap && cap !== el) { cap.remove(); }
+  pieceEls.delete(move.from); if (el) { placePiece(el, move.to); pieceEls.set(move.to, el); }
+  if (move.flags.includes('k') || move.flags.includes('q')) {
+    const rk = move.flags.includes('k') ? ['h', 'f'] : ['a', 'd']; const rank = move.from[1];
+    const rel = pieceEls.get(rk[0] + rank); pieceEls.delete(rk[0] + rank); if (rel) { placePiece(rel, rk[1] + rank); pieceEls.set(rk[1] + rank, rel); }
+  }
+  sqClass('last', [move.from, move.to]);
+}
+function arrow(from, to, color) {
+  if (!from) { $('arrows').innerHTML = ''; return; }
+  const c = (sq) => { const [x, y] = sqXY(sq); return [x * 100 + 50, y * 100 + 50]; };
+  const [x1, y1] = c(from), [x2, y2] = c(to); const len = Math.hypot(x2 - x1, y2 - y1), ux = (x2 - x1) / len, uy = (y2 - y1) / len;
+  const bx = x2 - ux * 42, by = y2 - uy * 42;
+  $('arrows').innerHTML = `<line x1="${x1}" y1="${y1}" x2="${bx}" y2="${by}" stroke="${color}" stroke-width="20" stroke-linecap="round" opacity=".85"/><polygon points="${x2},${y2} ${bx - uy * 30},${by + ux * 30} ${bx + uy * 30},${by - ux * 30}" fill="${color}" opacity=".85"/>`;
+}
+function squareAt(clientX, clientY) {
+  const r = $('board').getBoundingClientRect(); const f = Math.floor((clientX - r.left) / r.width * 8), rr = Math.floor((clientY - r.top) / r.height * 8);
+  if (f < 0 || f > 7 || rr < 0 || rr > 7) return null; return FILES[f] + (8 - rr);
+}
+function select(sq) {
+  selected = sq; sqClass('sel', sq ? [sq] : []);
+  const moves = sq ? game.moves({ square: sq, verbose: true }) : [];
+  sqClass('dot', moves.filter((m) => !m.captured).map((m) => m.to)); sqClass('cap', moves.filter((m) => m.captured).map((m) => m.to));
+}
+let drag = null;
+$('board').addEventListener('pointerdown', (e) => {
+  if (!inputEnabled) return;
+  const sq = squareAt(e.clientX, e.clientY); if (!sq) return;
+  const p = game.get(sq);
+  if (selected && selected !== sq && !(p && p.color === game.turn())) { tryMove(selected, sq); return; }
+  if (p && p.color === game.turn()) {
+    select(sq); const el = pieceEls.get(sq); const r = $('board').getBoundingClientRect();
+    drag = { sq, el, r, moved: false }; el.classList.add('drag'); $('board').setPointerCapture(e.pointerId);
+  } else select(null);
+});
+$('board').addEventListener('pointermove', (e) => {
+  if (!drag) return; drag.moved = true;
+  const { r, el } = drag; const s = r.width / 8;
+  el.style.transform = `translate(${e.clientX - r.left - s / 2}px, ${e.clientY - r.top - s / 2}px)`;
+});
+$('board').addEventListener('pointerup', (e) => {
+  if (!drag) return; const { sq, el, moved } = drag; drag = null; el.classList.remove('drag');
+  const to = squareAt(e.clientX, e.clientY);
+  if (moved && to && to !== sq) { placePiece(el, sq); tryMove(sq, to); } else placePiece(el, sq);
+});
+function tryMove(from, to) {
+  select(null);
+  let m; try { m = new Chess(game.fen()).move({ from, to, promotion: 'q' }); } catch { return; }
+  if (onUserMove) onUserMove(m);
+}
+
+/* ---------- Séance ---------- */
+let S = null;
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+function say(text, mood = 'content') { $('coach-memo').innerHTML = memoSvg(mood); const b = $('bubble'); b.style.animation = 'none'; void b.offsetWidth; b.style.animation = ''; $('bubble-text').innerHTML = text; }
+function renderMoves(highlightLast = false) {
+  const h = game.history();
+  $('moves').innerHTML = h.map((san, i) => `<span class="${highlightLast && i === h.length - 1 ? 'cur' : ''}">${label(i, san)}</span>`).join('') + (game.turn() === 'w' && inputEnabled ? `<span style="color:var(--gold)">${Math.floor(h.length / 2) + 1}. ?</span>` : '');
+}
+function setCombo(n) { S.combo = n; const c = $('combo'); c.textContent = 'x' + n; c.classList.remove('bump'); void c.offsetWidth; if (n > 1) c.classList.add('bump'); }
+
+function buildRuns(opts) {
+  if (opts.boss) return TILES.filter((t) => t.id !== 'tronc').map((t, i) => ({ tile: t, from: i === 0 ? 0 : t.from, to: t.to, mode: 'boss' }));
+  const t = opts.tile; const isNew = t.cards.some((k) => !card(k).seen);
+  // Nouvelle ligne : 1er passage guidé, puis de mémoire. Sinon : de mémoire.
+  return isNew ? [{ tile: t, from: t.from, to: t.to, mode: 'learn' }, { tile: t, from: t.from, to: t.to, mode: 'recall' }] : [{ tile: t, from: t.from, to: t.to, mode: 'recall' }];
+}
+function startSession(opts) {
+  S = { opts, runs: buildRuns(opts), runIndex: 0, combo: 0, correct: 0, total: 0, errors: 0, xp: 0, failedThisRun: false };
+  S.totalAsks = S.runs.reduce((n, r) => { let k = 0; for (let ply = r.from; ply < r.to; ply++) if (ply % 2 === 0) k++; return n + k; }, 0);
+  show('session'); buildSquares(); setCombo(0);
+  $('s-eyebrow').textContent = opts.boss ? 'Défi final · sans indice' : 'Monde 1 · Blancs';
+  const pill = $('s-pill'); pill.classList.toggle('punish', !!opts.tile?.punish);
+  $('btn-hint').disabled = $('btn-solution').disabled = !!opts.boss;
+  nextRun();
+}
+async function nextRun() {
+  if (S.runIndex >= S.runs.length) return endSession();
+  const run = S.runs[S.runIndex]; S.run = run; S.failedThisRun = false;
+  game = new Chess(); S.lastOpp = ''; renderPieces(); sqClass('last', []); arrow(null); renderMoves();
+  $('s-name').textContent = run.mode === 'boss' ? `Défi : ${run.tile.name}` : run.tile.name;
+  $('s-pill').textContent = run.tile.punish ? '⚔ Coup à punir' : run.mode === 'learn' ? 'Découverte' : run.mode === 'boss' ? `Ligne ${S.runIndex + 1}/${S.runs.length}` : 'De mémoire';
+  if (run.mode === 'learn') say(run.tile.id === 'tronc' ? 'Bienvenue ! On commence par les 3 coups qui définissent la Partie italienne. Je vous montre, vous jouez.' : `Nouvelle ligne : <b>${run.tile.name}</b>. Je vous guide une première fois, puis vous la rejouerez de mémoire.`, 'content');
+  else if (run.mode === 'recall') say(S.runIndex > 0 ? 'Et maintenant, <b>de mémoire</b> !' : `On révise <b>${run.tile.name}</b>, de mémoire.`, 'reflechit');
+  else say(`Défi final : <b>${run.tile.name}</b>. Pas d'indice, pas d'erreur !`, 'reflechit');
+  await wait(700);
+  step();
+}
+async function step() {
+  const run = S.run; const ply = game.history().length;
+  if (ply >= run.to) { S.runIndex++; return nextRun(); }
+  const move = run.tile.moves[ply];
+  const asked = game.turn() === 'w' && ply >= run.from;
+  if (!asked) {
+    const prev = run.from > 0 && ply < run.from;
+    await wait(prev ? 260 : 650);
+    animate(game.move(move.san)); renderMoves(true);
+    if (game.turn() === 'w' && game.history().length >= run.from && ply + 1 < run.to) {
+      S.lastOpp = `Les Noirs jouent <b>${label(ply, move.san)}</b>. ${move.pourquoi}`;
+      say(S.lastOpp + ' À vous !', 'reflechit');
+    }
+    return step();
+  }
+  // C'est à l'utilisateur
+  const k = fenKey(game.fen()); const c = CARDS.get(k); const cs = card(k);
+  S.hintUsed = false; S.errorHere = false; const opp = ply > 0 && ply === game.history().length && S.lastOpp ? S.lastOpp + '<br>' : '';
+  $('s-pill').textContent = run.tile.punish && ply === run.from ? '⚔ Punissez l’erreur' : `Coup ${Math.floor(ply / 2) + 1}`;
+  sqClass('hint', []); arrow(null);
+  if (run.mode === 'learn' && !cs.seen) {
+    const mv = new Chess(game.fen()).move(move.san);
+    arrow(mv.from, mv.to, '#3E86C8');
+    say(`${opp}Nouveau coup : jouez <b>${label(ply, move.san)}</b> (flèche bleue).`, 'content');
+  } else if (ply === 0) say('À vous : quel est le premier coup ?', 'reflechit');
+  inputEnabled = true; renderMoves(true);
+  onUserMove = (m) => handleAnswer(m, move, c, cs, ply);
+}
+function handleAnswer(m, move, c, cs, ply) {
+  const run = S.run;
+  const accepted = m.san === move.san;
+  inputEnabled = false; onUserMove = null; arrow(null); sqClass('hint', []);
+  if (!accepted) {
+    S.errors++; S.failedThisRun = true; S.errorHere = true; setCombo(0); cs.ok = 0; save();
+    $('board').classList.remove('shake'); void $('board').offsetWidth; $('board').classList.add('shake');
+    const temp = new Chess(game.fen()); const mv = temp.move(m.san); const el = pieceEls.get(mv.from);
+    if (el) { placePiece(el, mv.to); setTimeout(() => placePiece(el, mv.from), 380); }
+    const good = new Chess(game.fen()).move(move.san);
+    setTimeout(() => arrow(good.from, good.to, '#3DDC84'), 400);
+    if (run.mode === 'boss') {
+      return sheet({ bad: true, title: 'Défi raté', text: `<b>Memo :</b> ici, c'était <b>${label(ply, move.san)}</b>. ${move.pourquoi}`, note: 'Révisez encore un peu, puis retentez le défi.', mood: 'oups', buttons: [['Retour à la carte', 'btn-cta', () => show('map')]] });
+    }
+    return sheet({ bad: true, title: 'Pas votre ligne !', text: `<b>Memo :</b> ${fr(m.san)} n'est pas le coup prévu. Ici on joue <b>${label(ply, move.san)}</b> : ${lower(move.pourquoi)}`, note: 'Cette position reviendra plus souvent.', mood: 'oups', buttons: [['Rejouer le bon coup', 'btn-cta', () => { closeSheet(); retry(move, c, cs, ply); }]] });
+  }
+  // Bon coup
+  const played = game.move(m.san); animate(played); renderMoves(true);
+  S.correct++; setCombo(S.combo + 1);
+  const learning = run.mode === 'learn' && !cs.seen;
+  if (!learning && !S.hintUsed && !S.errorHere) cs.ok = Math.min(2, cs.ok + 1);
+  cs.seen = true; save();
+  const gain = learning ? 5 : 10 + Math.min(S.combo, 5); S.xp += gain; floatXp(gain, played.to);
+  const expl = move;
+  sheet({ bad: false, title: learning ? 'C’est noté !' : pick(['Excellent !', 'Bien joué !', 'Parfait !']) + ' ' + label(ply, m.san), text: `<b>Memo :</b> ${expl.pourquoi}`, note: learning ? '' : cs.ok >= 2 ? 'Position maîtrisée ✓' : `Maîtrise : ${cs.ok}/2`, mood: 'bravo', buttons: [['Continuer', 'btn-cta', () => { closeSheet(); step(); }]] });
+}
+function retry(move, c, cs, ply) {
+  const good = new Chess(game.fen()).move(move.san); arrow(good.from, good.to, '#3DDC84');
+  say(`Jouez <b>${label(ply, move.san)}</b> pour continuer.`, 'content');
+  inputEnabled = true;
+  onUserMove = (m) => {
+    if (m.san !== move.san) { $('board').classList.remove('shake'); void $('board').offsetWidth; $('board').classList.add('shake'); return; }
+    inputEnabled = false; onUserMove = null; arrow(null); animate(game.move(m.san)); renderMoves(true); cs.seen = true; save(); step();
+  };
+}
+$('btn-hint').addEventListener('click', () => {
+  if (!inputEnabled || !S) return; S.hintUsed = true; const move = S.run.tile.moves[game.history().length];
+  const mv = new Chess(game.fen()).move(move.san); sqClass('hint', [mv.from]);
+  say('Indice : cette pièce-là. Où doit-elle aller ?', 'content');
+});
+$('btn-solution').addEventListener('click', () => {
+  if (!inputEnabled || !S) return; S.hintUsed = true; const ply = game.history().length; const move = S.run.tile.moves[ply];
+  const mv = new Chess(game.fen()).move(move.san); arrow(mv.from, mv.to, '#3E86C8');
+  say(`La solution : <b>${label(ply, move.san)}</b>. ${move.pourquoi}`, 'content');
+});
+$('quit').addEventListener('click', () => { inputEnabled = false; show('map'); });
+
+function floatXp(n, sq) {
+  const [x, y] = sqXY(sq); const el = document.createElement('div'); el.className = 'xp-float'; el.textContent = `+${n} XP`;
+  el.style.left = `${x * 12.5}%`; el.style.top = `${y * 12.5}%`; $('board').appendChild(el); setTimeout(() => el.remove(), 1500);
+}
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+
+function sheet({ bad, title, text, note, mood, buttons }) {
+  const host = $('sheet-host');
+  host.innerHTML = `<div class="sheet ${bad ? 'bad' : ''}" role="status" aria-live="polite">
+    <div class="memo">${memoSvg(mood)}</div>
+    <div class="sheet-head"><span class="badge">${bad ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>' : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'}</span><h2>${title}</h2></div>
+    <p>${text}</p>${note ? `<p class="note">${note}</p>` : ''}
+    <div class="row">${buttons.map(([t, cls], i) => `<button class="btn ${cls}" data-i="${i}">${t}</button>`).join('')}</div></div>`;
+  host.querySelectorAll('button').forEach((b) => b.addEventListener('click', buttons[b.dataset.i][2]));
+  host.querySelector('button')?.focus();
+  const total = S.totalAsks || 1; $('s-bar').style.width = `${Math.min(100, (S.correct / total) * 100)}%`;
+}
+function closeSheet() { $('sheet-host').innerHTML = ''; }
+
+function endSession() {
+  inputEnabled = false;
+  const boss = S.opts.boss;
+  if (boss && S.errors === 0) { P.boss = true; S.xp += 100; P.gems += 50; }
+  P.xp += S.xp; save();
+  const t = S.opts.tile; const acc = S.correct + S.errors ? Math.round((S.correct / (S.correct + S.errors)) * 100) : 100;
+  const rows = boss ? '' : t.cards.map((k) => { const c = CARDS.get(k); const ok = card(k).ok; const anyMove = [...c.expected.keys()][0]; const ply = (() => { const g = new Chess(); for (const m of t.moves) { if (fenKey(g.fen()) === k) return g.history().length; g.move(m.san); } return 0; })(); return `<div class="m-row"><span class="name">${label(ply, anyMove)}</span><span class="pips"><i class="${ok >= 1 ? 'on' : ''}"></i><i class="${ok >= 2 ? 'on' : ''}"></i></span></div>`; }).join('');
+  const mastered = !boss && tileMastered(t);
+  const conf = (boss && P.boss) || mastered ? Array.from({ length: 10 }, (_, i) => `<span class="conf" style="left:${8 + i * 9}%;background:${['#FFC94A', '#3DDC84', '#8FD3FF', '#F0605D', '#A78BFA'][i % 5]};animation-delay:${(i * 0.37) % 2.4}s"></span>`).join('') : '';
+  $('screen-end').innerHTML = `${conf}
+    <div class="memo">${memoSvg('bravo')}</div>
+    <h1>${boss ? (P.boss ? 'Monde 1 terminé !' : 'Défi terminé') : mastered ? 'Étape maîtrisée !' : 'Séance terminée !'}</h1>
+    <p>${boss ? (P.boss ? 'Vous connaissez les 3 premiers coups contre les 6 lignes majeures. Le Monde 2 ajoutera 4 lignes de plus.' : '') : mastered ? 'Memo avance d’une case sur la carte.' : 'Chaque position doit être réussie 2 fois sans indice pour être maîtrisée. Dans l’app, la 2e fois sera le lendemain ; ici, relancez simplement l’étape.'}</p>
+    <div class="stats">
+      <div class="stat"><span>XP</span><b style="color:var(--gold)">+${S.xp}</b></div>
+      <div class="stat"><span>Précision</span><b style="color:var(--good)">${acc} %</b></div>
+      <div class="stat"><span>Erreurs</span><b style="color:${S.errors ? 'var(--bad)' : 'var(--fg)'}">${S.errors}</b></div>
+    </div>
+    ${rows ? `<div class="mastery"><b>Maîtrise de l’étape</b>${rows}</div>` : ''}
+    <button class="btn btn-cta" id="end-continue">Continuer</button>`;
+  show('end');
+  $('end-continue').addEventListener('click', () => show('map'));
+}
+
+function openChest() {
+  if (!P.chest) { P.chest = true; P.gems += 20; save(); }
+  $('screen-end').innerHTML = `<div class="memo">${memoSvg('bravo')}</div><h1>Coffre ouvert !</h1><p>+20 gemmes. Plus tard, elles serviront à habiller Memo (chapeaux, lunettes, écharpes…).</p><div class="stats"><div class="stat"><span>Gemmes</span><b style="color:#8FD3FF">+20</b></div><div class="stat"><span>Total</span><b>${P.gems}</b></div><div class="stat"><span>Étape</span><b>5/9</b></div></div><button class="btn btn-cta" id="end-continue">Continuer</button>`;
+  show('end'); $('end-continue').addEventListener('click', () => show('map'));
+}
+
+renderMap();
+requestAnimationFrame(renderMap);
+</script>

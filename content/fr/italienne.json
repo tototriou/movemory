@@ -1,0 +1,288 @@
+{
+  "id": "italienne",
+  "nom": "Partie italienne",
+  "eco": "C50",
+  "camp": "w",
+  "licence": "CC BY-SA 4.0 — lignes et idées adaptées de Wikibooks, Chess Opening Theory (https://en.wikibooks.org/wiki/Chess_Opening_Theory/1._e4/1...e5/2._Nf3/2...Nc6/3._Bc4), textes réécrits pour Movemory.",
+  "tronc": [
+    {
+      "san": "e4",
+      "pourquoi": "On prend le centre avec un pion et on ouvre la route au fou f1 et à la dame.",
+      "principes": [
+        "centre",
+        "developpement"
+      ]
+    },
+    {
+      "san": "e5",
+      "pourquoi": "Les Noirs répondent pareil : ils prennent leur part du centre."
+    },
+    {
+      "san": "Nf3",
+      "pourquoi": "On sort un cavalier vers le centre, et il attaque déjà le pion e5.",
+      "principes": [
+        "developpement"
+      ]
+    },
+    {
+      "san": "Nc6",
+      "pourquoi": "Les Noirs défendent e5 en sortant leur cavalier."
+    },
+    {
+      "san": "Bc4",
+      "pourquoi": "Le fou vise f7, le point faible des Noirs : seul le roi le protège. C'est ça, la Partie italienne !",
+      "principes": [
+        "developpement",
+        "case-faible"
+      ]
+    }
+  ],
+  "lignes": [
+    {
+      "id": "giuoco-piano",
+      "nom": "Giuoco Piano",
+      "rang": 1,
+      "coups": [
+        {
+          "san": "Bc5",
+          "pourquoi": "La réponse la plus jouée : le fou noir vise à son tour f2, notre point faible."
+        },
+        {
+          "san": "c3",
+          "pourquoi": "On prépare d4 pour bâtir un grand centre. Le fou c4 garde aussi une case de repli en b3.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "Nf6",
+          "pourquoi": "Les Noirs développent leur cavalier et attaquent notre pion e4."
+        },
+        {
+          "san": "d3",
+          "pourquoi": "On protège e4 tranquillement : c'est la Giuoco Pianissimo, solide et pleine de plans.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "d6",
+          "pourquoi": "Les Noirs renforcent e5 et ouvrent la diagonale de leur fou c8."
+        },
+        {
+          "san": "O-O",
+          "pourquoi": "On met le roi à l'abri et la tour se rapproche du centre : un réflexe à avoir dans toutes les ouvertures.",
+          "principes": [
+            "roi"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "deux-cavaliers",
+      "nom": "Défense des deux cavaliers",
+      "rang": 2,
+      "coups": [
+        {
+          "san": "Nf6",
+          "pourquoi": "Plus actif : les Noirs attaquent tout de suite notre pion e4."
+        },
+        {
+          "san": "d3",
+          "pourquoi": "On défend e4 calmement. 4.Cg5 existe mais mène à des complications : on garde un jeu solide.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "Be7",
+          "pourquoi": "Développement prudent : les Noirs préparent leur roque."
+        },
+        {
+          "san": "O-O",
+          "pourquoi": "Roi à l'abri d'abord, on agira au centre ensuite.",
+          "principes": [
+            "roi"
+          ]
+        },
+        {
+          "san": "O-O",
+          "pourquoi": "Les Noirs roquent aussi."
+        },
+        {
+          "san": "Re1",
+          "pourquoi": "La tour vient soutenir e4 et prépare la poussée d4 au bon moment.",
+          "principes": [
+            "centre",
+            "developpement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hongroise",
+      "nom": "Défense hongroise",
+      "rang": 3,
+      "coups": [
+        {
+          "san": "Be7",
+          "pourquoi": "Passif : le fou se contente de protéger le roi, il ne vise rien."
+        },
+        {
+          "san": "d4",
+          "pourquoi": "Contre un coup passif, on ouvre le centre tout de suite pour profiter de notre avance de développement.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "exd4",
+          "pourquoi": "Les Noirs échangent au centre."
+        },
+        {
+          "san": "Nxd4",
+          "pourquoi": "On reprend avec le cavalier, qui se retrouve parfaitement centralisé.",
+          "principes": [
+            "centre",
+            "developpement"
+          ]
+        },
+        {
+          "san": "Nf6",
+          "pourquoi": "Les Noirs attaquent notre pion e4."
+        },
+        {
+          "san": "Nc3",
+          "pourquoi": "On défend e4 en sortant une nouvelle pièce : deux principes en un seul coup.",
+          "principes": [
+            "developpement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "paris",
+      "nom": "Défense de Paris",
+      "rang": 4,
+      "coups": [
+        {
+          "san": "d6",
+          "pourquoi": "Les Noirs soutiennent e5, mais enferment leur fou f8 : c'est passif."
+        },
+        {
+          "san": "d4",
+          "pourquoi": "Même recette contre la passivité : on frappe au centre.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "exd4",
+          "pourquoi": "Les Noirs lâchent le centre."
+        },
+        {
+          "san": "Nxd4",
+          "pourquoi": "Le cavalier reprend et s'installe au centre.",
+          "principes": [
+            "centre",
+            "developpement"
+          ]
+        },
+        {
+          "san": "Nf6",
+          "pourquoi": "Les Noirs attaquent e4."
+        },
+        {
+          "san": "Nc3",
+          "pourquoi": "On protège e4 en développant : nos pièces sortent plus vite que celles des Noirs.",
+          "principes": [
+            "developpement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "anti-fried-liver",
+      "nom": "Variante 3…h6",
+      "rang": 5,
+      "coups": [
+        {
+          "san": "h6",
+          "pourquoi": "Les Noirs empêchent Cg5, mais perdent un temps sans développer de pièce."
+        },
+        {
+          "san": "d4",
+          "pourquoi": "Un temps perdu par l'adversaire ? On en profite pour ouvrir le centre.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "exd4",
+          "pourquoi": "Les Noirs échangent."
+        },
+        {
+          "san": "Nxd4",
+          "pourquoi": "Le cavalier reprend au centre.",
+          "principes": [
+            "centre"
+          ]
+        },
+        {
+          "san": "Nf6",
+          "pourquoi": "Les Noirs attaquent e4."
+        },
+        {
+          "san": "Nc3",
+          "pourquoi": "On défend e4 en sortant une pièce : notre développement est déjà bien en avance.",
+          "principes": [
+            "developpement"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blackburne-shilling",
+      "nom": "Piège Blackburne-Shilling",
+      "rang": 6,
+      "aPunir": true,
+      "coups": [
+        {
+          "san": "Nd4",
+          "pourquoi": "Imprécision ! Le cavalier joue une deuxième fois et abandonne e5. C'est un piège : à vous de punir… sans tomber dedans."
+        },
+        {
+          "san": "Nxd4",
+          "pourquoi": "On échange ce cavalier trop aventureux. Surtout pas 4.Cxe5 ?? : après 4…Dg5 les Noirs attaquent g2 et f7 en même temps !",
+          "principes": [
+            "piege"
+          ]
+        },
+        {
+          "san": "exd4",
+          "pourquoi": "Les Noirs reprennent : leur pion d4 est avancé, mais loin de ses pièces."
+        },
+        {
+          "san": "O-O",
+          "pourquoi": "On met le roi à l'abri et on prépare Te1 : nos pièces sortent pendant que les Noirs ont joué deux fois le même cavalier.",
+          "principes": [
+            "roi",
+            "developpement"
+          ]
+        },
+        {
+          "san": "Nf6",
+          "pourquoi": "Les Noirs sortent enfin une pièce et attaquent e4."
+        },
+        {
+          "san": "Re1",
+          "pourquoi": "La tour défend e4 et prépare e5 pour chasser le cavalier f6. Grosse avance de développement : imprécision punie !",
+          "principes": [
+            "developpement",
+            "centre"
+          ]
+        }
+      ]
+    }
+  ]
+}

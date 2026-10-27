@@ -1,45 +1,84 @@
-# Movemory ♟️
+<p align="center">
+  <img src="docs/assets/memo-content.svg" width="160" alt="Memo, la mascotte de Movemory : un petit échiquier à lunettes">
+</p>
 
-**Le Duolingo des ouvertures d'échecs.** Chaque jour, une courte séance sur l'échiquier : on joue le bon coup de *ses* ouvertures,
-avec de la répétition espacée : une position ratée revient plus souvent jusqu'à être maîtrisée.
+<h1 align="center">Movemory</h1>
 
-On ne joue pas contre d'autres joueurs : on **révise**, de façon passive et régulière (5 minutes par jour).
+<p align="center">
+  <b>Apprenez vos ouvertures d'échecs comme une langue : 5 minutes par jour, sur l'échiquier, avec Memo.</b><br>
+  <sub>iOS · Android · Web — open source (GPL-3.0) — en construction 🚧</sub>
+</p>
 
-## Ce qui nous différencie de chess.com
+---
 
-| | chess.com | Gambit |
-|---|---|---|
-| Cœur de l'app | Jouer des parties | Réviser son répertoire |
-| Ouvertures | Cours / explorateur | Séance quotidienne sur l'échiquier + répétition espacée (FSRS) |
-| Profondeur | Fixe | 3 → 10 coups selon le niveau |
-| Ses propres parties | Analyse ponctuelle | Les écarts au répertoire deviennent des exercices |
+## Le principe
 
-## Structure
+Vous connaissez ce moment : votre adversaire joue un coup que vous avez *forcément* déjà vu… et votre préparation
+s'est envolée. **Movemory** règle ça avec ce qui marche pour les langues : la **répétition espacée**.
 
-```
-apps/mobile       App Expo (iOS, Android et web avec une seule base de code)
-packages/core     Moteur de révision : répertoire → cartes, répétition espacée, import de parties (testé)
-supabase/         Schéma de base de données (Postgres)
-data/             Données de développement (base d'ouvertures publique, temporaire)
-docs/             Plan produit, choix techniques, maquette
-```
+- ♟️ **Vous choisissez vos ouvertures** (ex. la Partie italienne avec les Blancs, la Caro-Kann avec les Noirs).
+- 🎯 **Chaque jour, une courte séance** : une position s'affiche, **vous jouez le coup** sur l'échiquier. Pas de QCM.
+- 🧠 **Une erreur ? La position revient plus souvent**, jusqu'à ce qu'elle soit acquise. Ce que vous maîtrisez revient de plus en plus rarement, juste assez pour ne pas l'oublier.
+- 💬 **Memo explique chaque coup** : pas seulement *quoi* jouer, mais *pourquoi* (le centre, le développement, la case faible f7…).
+- ⚔️ **Des coups à punir** : l'adversaire commet une imprécision, à vous de trouver comment en profiter. On réfléchit, on ne récite pas.
 
-## Démarrer
+## Des mondes, comme dans un jeu
+
+Chaque ouverture est une suite de mondes. On élargit d'abord, puis on approfondit :
+
+| Monde | Vous apprenez… | …contre |
+|:-:|---|---|
+| 1 | vos 3 premiers coups | les 5-6 réponses majeures |
+| 2 | vos 3 premiers coups | les 10 réponses majeures |
+| 3 | vos 5 premiers coups | les 5-6 réponses majeures |
+| 4 | vos 5 premiers coups | les 10 réponses majeures |
+| … | +2 coups à chaque fois | … |
+
+Memo avance sur la carte à chaque groupe de coups maîtrisé : coffres, défi final, série de jours, XP.
+
+## Et vos vraies parties ?
+
+Connectez votre pseudo **Chess.com** : Movemory récupère vos parties, repère l'endroit où vous avez quitté votre
+répertoire, et le transforme en exercice. L'analyse se fait **sur votre téléphone** avec Stockfish, même hors-ligne.
+
+## Où en est le projet
+
+| | |
+|---|---|
+| ✅ | Plan produit, choix techniques, maquette des écrans |
+| ✅ | Moteur de révision (découpage en positions, répétition espacée FSRS, détection des écarts dans une partie) |
+| ✅ | Contenu du Monde 1 de la Partie italienne, vérifié par Stockfish |
+| 🧪 | Prototype jouable du Monde 1 : [`prototypes/monde1-italienne.html`](prototypes/monde1-italienne.html) |
+| ⏳ | App mobile et web (Expo) : échiquier, carte des mondes, séances, Memo |
+| ⏳ | Import Chess.com et analyse Stockfish sur l'appareil |
+| ⏳ | Catalogue d'ouvertures, traductions, comptes et synchro |
+
+## Pour les développeurs
 
 ```bash
 pnpm install
-pnpm test          # tests du moteur
-pnpm web           # app dans le navigateur
-pnpm dev           # app mobile (Expo Go / émulateur)
+pnpm test     # tests du moteur de révision
+pnpm web      # l'app dans le navigateur
+pnpm dev      # l'app mobile (Expo Go / émulateur)
 ```
 
-## Documentation
+```
+apps/mobile       App Expo (iOS, Android, Web)
+packages/core     Moteur de révision : positions, répétition espacée, analyse des parties
+content/          Lignes d'ouvertures et explications de Memo (CC BY-SA 4.0)
+prototypes/       Prototypes HTML autonomes
+docs/             Plan, système de mondes, choix techniques, maquette
+```
 
-- [docs/PLAN.md](docs/PLAN.md) — vision, fonctionnalités, feuille de route
-- [docs/MOTEURS.md](docs/MOTEURS.md) — moteurs et bibliothèques : options et recommandations
-- [docs/DECISIONS.md](docs/DECISIONS.md) — décisions prises (licence, hors-ligne, traduction…)
-- [docs/MONDES.md](docs/MONDES.md) — catalogues, mondes et parcours de Memo
+À lire : [le plan](docs/PLAN.md) · [les mondes](docs/MONDES.md) · [les décisions](docs/DECISIONS.md) · [les moteurs](docs/MOTEURS.md)
 
-## Licence
+## Licences et crédits
 
-[GPL-3.0](LICENSE). Le moteur d'analyse [Stockfish](https://stockfishchess.org) est également sous GPL-3.0.
+- **Code** : [GPL-3.0](LICENSE).
+- **Analyse** : [Stockfish](https://stockfishchess.org) (GPL-3.0).
+- **Contenu** (`content/`) : [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/), adapté de
+  [Wikibooks — Chess Opening Theory](https://en.wikibooks.org/wiki/Chess_Opening_Theory) ; noms d'ouvertures issus de
+  [lichess-org/chess-openings](https://github.com/lichess-org/chess-openings) (CC0).
+- **Movemory** et **Memo** sont les noms et la mascotte du projet ; merci de ne pas les réutiliser pour une autre app.
+
+<p align="center"><img src="docs/assets/memo-bravo.svg" width="90" alt=""></p>
